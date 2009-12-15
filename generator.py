@@ -671,6 +671,9 @@ functions_list_exception_test = {
 functions_list_default_test = "%s is None"
 
 def is_list_type (name):
+    whitelist = [ "virDomainBlockStats",
+                  "virDomainInterfaceStats" ]
+
     return name[-1:] == "*"
 
 def nameFixup(name, classe, type, file):
@@ -688,6 +691,21 @@ def nameFixup(name, classe, type, file):
         func = name[3:]
         func = string.lower(func[0:1]) + func[1:]
     elif name[0:16] == "virNetworkLookup":
+        func = name[3:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:18] == "virInterfaceDefine":
+        func = name[3:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:21] == "virInterfaceCreateXML":
+        func = name[3:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:18] == "virInterfaceLookup":
+        func = name[3:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:15] == "virSecretDefine":
+        func = name[3:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:15] == "virSecretLookup":
         func = name[3:]
         func = string.lower(func[0:1]) + func[1:]
     elif name[0:20] == "virStoragePoolDefine":
@@ -717,6 +735,23 @@ def nameFixup(name, classe, type, file):
     elif name[0:10] == "virNetwork":
         func = name[10:]
         func = string.lower(func[0:1]) + func[1:]
+    elif name[0:15] == "virInterfaceGet":
+        func = name[15:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:12] == "virInterface":
+        func = name[12:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:12] == 'virSecretGet':
+        func = name[12:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:9] == 'virSecret':
+        func = name[9:]
+        func = string.lower(func[0:1]) + func[1:]
+    elif name[0:12] == 'virStreamNew':
+        func = "newStream"
+    elif name[0:9] == 'virStream':
+        func = name[9:]
+        func = string.lower(func[0:1]) + func[1:]
     elif name[0:17] == "virStoragePoolGet":
         func = name[17:]
         func = string.lower(func[0:1]) + func[1:]
@@ -732,7 +767,7 @@ def nameFixup(name, classe, type, file):
     elif name[0:13] == "virNodeDevice":
         if name[13:16] == "Get":
             func = string.lower(name[16]) + name[17:]
-        elif name[13:19] == "Lookup" or name[13:] == "Create":
+        elif name[13:19] == "Lookup" or name[13:19] == "Create":
             func = string.lower(name[3]) + name[4:]
         else:
             func = string.lower(name[13]) + name[14:]
@@ -757,6 +792,9 @@ def nameFixup(name, classe, type, file):
         func = "OSType"
     if func == "xMLDesc":
         func = "XMLDesc"
+    if func == "mACString":
+        func = "MACString"
+
     return func
 
 

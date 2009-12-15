@@ -976,14 +976,6 @@ class virConnect:
         return __tmp
 
     def createXML(self, xmlDesc, flags):
-        """Create a new device on the VM host machine, for example,
-           virtual HBAs created using vport_create. """
-        ret = libvirtmod.virNodeDeviceCreateXML(self._o, xmlDesc, flags)
-        if ret is None:raise libvirtError('virNodeDeviceCreateXML() failed', conn=self)
-        __tmp = virNodeDevice(self, _obj=ret)
-        return __tmp
-
-    def createXML(self, xmlDesc, flags):
         """Launch a new guest domain, based on an XML description
           similar to the one returned by virDomainGetXMLDesc() This
           function may requires privileged access to the hypervisor.
@@ -1161,6 +1153,14 @@ class virConnect:
         ret = libvirtmod.virNetworkLookupByUUIDString(self._o, uuidstr)
         if ret is None:raise libvirtError('virNetworkLookupByUUIDString() failed', conn=self)
         __tmp = virNetwork(self, _obj=ret)
+        return __tmp
+
+    def nodeDeviceCreateXML(self, xmlDesc, flags):
+        """Create a new device on the VM host machine, for example,
+           virtual HBAs created using vport_create. """
+        ret = libvirtmod.virNodeDeviceCreateXML(self._o, xmlDesc, flags)
+        if ret is None:raise libvirtError('virNodeDeviceCreateXML() failed', conn=self)
+        __tmp = virNodeDevice(self, _obj=ret)
         return __tmp
 
     def nodeDeviceLookupByName(self, name):
