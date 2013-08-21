@@ -925,11 +925,9 @@ functions_list_exception_test = {
 }
 functions_list_default_test = "%s is None"
 
-def is_list_type (name):
-    whitelist = [ "virDomainBlockStats",
-                  "virDomainInterfaceStats" ]
+def is_python_noninteger_type (name):
 
-    return name[-1:] == "*" or name in whitelist
+    return name[-1:] == "*"
 
 def nameFixup(name, classe, type, file):
     # avoid a desastrous clash
@@ -1304,7 +1302,7 @@ def buildWrappers(module):
                                        ("ret", name))
                     classes.write("    return ret\n")
 
-                elif is_list_type (ret[0]):
+                elif is_python_noninteger_type (ret[0]):
                     if not functions_noexcept.has_key (name):
                         if functions_list_exception_test.has_key (name):
                             test = functions_list_exception_test[name]
@@ -1574,7 +1572,7 @@ def buildWrappers(module):
 
                         classes.write ("        return ret\n")
 
-                    elif is_list_type (ret[0]):
+                    elif is_python_noninteger_type (ret[0]):
                         if not functions_noexcept.has_key (name):
                             if functions_list_exception_test.has_key (name):
                                 test = functions_list_exception_test[name]
