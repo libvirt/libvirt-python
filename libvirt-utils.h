@@ -24,4 +24,8 @@
 
 # define STREQ(a,b) (strcmp(a,b) == 0)
 
+# ifndef MIN
+#  define MIN(a,b) (((a) < (b)) ? (a) : (b))
+# endif
+
 #endif /* __LIBVIRT_UTILS_H__ */
