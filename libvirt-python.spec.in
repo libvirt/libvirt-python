@@ -1,0 +1,34 @@
+
+Summary: The libvirt virtualization API
+Name: libvirt-python
+Version: @PY_VERSION@
+Release: 1%{?dist}%{?extra_release}
+Source0: http://libvirt.org/sources/python/%{name}-%{version}.tar.gz
+License: LGPLv2+
+Group: Development/Libraries
+BuildRequires: libvirt-devel >= @C_VERSION@
+BuildRequires: python-devel
+
+%description
+The libvirt-python package contains a module that permits applications
+written in the Python programming language to use the interface
+supplied by the libvirt library to use the virtualization capabilities
+of recent versions of Linux (and other OSes).
+
+%prep
+%setup
+
+%build
+CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
+
+%install
+%{__python} setup.py install --skip-build --root=%{buildroot}
+rm -f %{buildroot}%{_libdir}/python*/site-packages/*egg-info
+
+%files
+%defattr(-,root,root)
+%doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER
+%{_libdir}/python*/site-packages/libvirt.py*
+%{_libdir}/python*/site-packages/libvirt_qemu.py*
+%{_libdir}/python*/site-packages/libvirt_lxc.py*
+%{_libdir}/python*/site-packages/libvirtmod*
