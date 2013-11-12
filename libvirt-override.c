@@ -20,6 +20,7 @@
 #include <Python.h>
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
+#include <stddef.h>
 #include "typewrappers.h"
 #include "build/libvirt.h"
 #include "libvirt-utils.h"
