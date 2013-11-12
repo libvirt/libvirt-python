@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "libvirt-utils.h"
 
 /**
@@ -117,4 +118,23 @@ void virFree(void *ptrptr)
     free(*(void**)ptrptr);
     *(void**)ptrptr = NULL;
     errno = save_errno;
+}
+
+
+int virFileClose(int *fdptr)
+{
+    int saved_errno = 0;
+    int rc = 0;
+
+    saved_errno = errno;
+
+    if (*fdptr < 0)
+        return 0;
+
+    rc = close(*fdptr);
+    *fdptr = -1;
+
+    errno = saved_errno;
+
+    return rc;
 }

@@ -183,4 +183,11 @@ void virFree(void *ptrptr) ATTRIBUTE_NONNULL(1);
 #  define VIR_FREE(ptr) virFree((void *) &(ptr))
 # endif
 
+/* Don't call this directly - use the macro below */
+int virFileClose(int *fdptr)
+        ATTRIBUTE_RETURN_CHECK;
+
+# define VIR_FORCE_CLOSE(FD) \
+    ignore_value(virFileClose(&(FD)))
+
 #endif /* __LIBVIRT_UTILS_H__ */
