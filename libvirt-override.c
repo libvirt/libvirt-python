@@ -22,6 +22,7 @@
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
 #include "build/libvirt.h"
+#include "libvirt-utils.h"
 
 #ifndef __CYGWIN__
 extern void initlibvirtmod(void);
