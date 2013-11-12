@@ -43,4 +43,15 @@
 # define xalloc_oversized(n, s) \
     ((size_t) (sizeof (ptrdiff_t) <= sizeof (size_t) ? -1 : -2) / (s) < (n))
 
+
+/* The __attribute__((__warn_unused_result__)) feature
+   is available in gcc versions 3.4 and newer,
+   while the typeof feature has been available since 2.7 at least.  */
+# if 3 < __GNUC__ + (4 <= __GNUC_MINOR__)
+#  define ignore_value(x) \
+    (__extension__ ({ __typeof__ (x) __x = (x); (void) __x; }))
+# else
+#  define ignore_value(x) ((void) (x))
+# endif
+
 #endif /* __LIBVIRT_UTILS_H__ */
