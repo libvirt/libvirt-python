@@ -189,7 +189,8 @@ setPyVirTypedParameter(PyObject *info,
             goto cleanup;
         }
 
-        ignore_value(virStrcpyStatic(temp->field, keystr));
+        strncpy(temp->field, keystr, sizeof(*temp->field) - 1);
+        temp->field[sizeof(*temp->field) - 1] = '\0';
         temp->type = params[i].type;
 
         switch (params[i].type) {
