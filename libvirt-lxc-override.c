@@ -9,8 +9,6 @@
  * Daniel Veillard <veillard@redhat.com>
  */
 
-#include <config.h>
-
 /* Horrible kludge to work around even more horrible name-space pollution
    via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
    which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
@@ -20,9 +18,7 @@
 #include <libvirt/libvirt-lxc.h>
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
-#include "libvirt-lxc.h"
-#include "viralloc.h"
-#include "virfile.h"
+#include "build/libvirt-lxc.h"
 
 #ifndef __CYGWIN__
 extern void initlibvirtmod_lxc(void);
@@ -108,7 +104,7 @@ error:
  *									*
  ************************************************************************/
 static PyMethodDef libvirtLxcMethods[] = {
-#include "libvirt-lxc-export.c"
+#include "build/libvirt-lxc-export.c"
     {(char *) "virDomainLxcOpenNamespace", libvirt_lxc_virDomainLxcOpenNamespace, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
 };

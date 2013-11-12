@@ -9,8 +9,6 @@
  * Daniel Veillard <veillard@redhat.com>
  */
 
-#include <config.h>
-
 /* Horrible kludge to work around even more horrible name-space pollution
    via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
    which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
@@ -20,8 +18,7 @@
 #include <libvirt/libvirt-qemu.h>
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
-#include "libvirt-qemu.h"
-#include "viralloc.h"
+#include "build/libvirt-qemu.h"
 
 #ifndef __CYGWIN__
 extern void initlibvirtmod_qemu(void);
@@ -119,7 +116,7 @@ libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject
  *									*
  ************************************************************************/
 static PyMethodDef libvirtQemuMethods[] = {
-#include "libvirt-qemu-export.c"
+#include "build/libvirt-qemu-export.c"
     {(char *) "virDomainQemuMonitorCommand", libvirt_qemu_virDomainQemuMonitorCommand, METH_VARARGS, NULL},
     {(char *) "virDomainQemuAgentCommand", libvirt_qemu_virDomainQemuAgentCommand, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}

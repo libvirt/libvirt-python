@@ -9,8 +9,6 @@
  * Daniel Veillard <veillard@redhat.com>
  */
 
-#include <config.h>
-
 /* Horrible kludge to work around even more horrible name-space pollution
    via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
    which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
@@ -23,12 +21,7 @@
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
-#include "libvirt.h"
-#include "viralloc.h"
-#include "virtypedparam.h"
-#include "ignore-value.h"
-#include "virutil.h"
-#include "virstring.h"
+#include "build/libvirt.h"
 
 #ifndef __CYGWIN__
 extern void initlibvirtmod(void);
@@ -7225,7 +7218,7 @@ cleanup:
  *									*
  ************************************************************************/
 static PyMethodDef libvirtMethods[] = {
-#include "libvirt-export.c"
+#include "build/libvirt-export.c"
     {(char *) "virGetVersion", libvirt_virGetVersion, METH_VARARGS, NULL},
     {(char *) "virConnectGetVersion", libvirt_virConnectGetVersion, METH_VARARGS, NULL},
     {(char *) "virConnectGetCPUModelNames", libvirt_virConnectGetCPUModelNames, METH_VARARGS, NULL},

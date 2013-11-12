@@ -7,16 +7,12 @@
  * Daniel Veillard <veillard@redhat.com>
  */
 
-#include <config.h>
-
 /* Horrible kludge to work around even more horrible name-space pollution
  *    via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
  *       which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
 #undef HAVE_PTHREAD_H
 
 #include "typewrappers.h"
-
-#include "viralloc.h"
 
 #ifndef Py_CAPSULE_H
 typedef void(*PyCapsule_Destructor)(void *, void *);
