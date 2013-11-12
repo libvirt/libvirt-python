@@ -106,4 +106,81 @@
 # endif                         /* __GNUC__ */
 
 
+/* Don't call these directly - use the macros below */
+int virAlloc(void *ptrptr, size_t size)
+    ATTRIBUTE_RETURN_CHECK ATTRIBUTE_NONNULL(1);
+int virAllocN(void *ptrptr, size_t size, size_t count)
+    ATTRIBUTE_RETURN_CHECK ATTRIBUTE_NONNULL(1);
+int virReallocN(void *ptrptr, size_t size, size_t count)
+    ATTRIBUTE_RETURN_CHECK ATTRIBUTE_NONNULL(1);
+void virFree(void *ptrptr) ATTRIBUTE_NONNULL(1);
+
+/**
+ * VIR_ALLOC:
+ * @ptr: pointer to hold address of allocated memory
+ *
+ * Allocate sizeof(*ptr) bytes of memory and store
+ * the address of allocated memory in 'ptr'. Fill the
+ * newly allocated memory with zeros.
+ *
+ * This macro is safe to use on arguments with side effects.
+ *
+ * Returns -1 on failure (with OOM error reported), 0 on success
+ */
+# define VIR_ALLOC(ptr) virAlloc(&(ptr), sizeof(*(ptr)))
+
+/**
+ * VIR_ALLOC_N:
+ * @ptr: pointer to hold address of allocated memory
+ * @count: number of elements to allocate
+ *
+ * Allocate an array of 'count' elements, each sizeof(*ptr)
+ * bytes long and store the address of allocated memory in
+ * 'ptr'. Fill the newly allocated memory with zeros.
+ *
+ * This macro is safe to use on arguments with side effects.
+ *
+ * Returns -1 on failure (with OOM error reported), 0 on success
+ */
+# define VIR_ALLOC_N(ptr, count) virAllocN(&(ptr), sizeof(*(ptr)), (count))
+
+/**
+ * VIR_REALLOC_N:
+ * @ptr: pointer to hold address of allocated memory
+ * @count: number of elements to allocate
+ *
+ * Re-allocate an array of 'count' elements, each sizeof(*ptr)
+ * bytes long and store the address of allocated memory in
+ * 'ptr'. If 'ptr' grew, the added memory is uninitialized.
+ *
+ * This macro is safe to use on arguments with side effects.
+ *
+ * Returns -1 on failure (with OOM error reported), 0 on success
+ */
+# define VIR_REALLOC_N(ptr, count) virReallocN(&(ptr), sizeof(*(ptr)), (count))
+
+/**
+ * VIR_FREE:
+ * @ptr: pointer holding address to be freed
+ *
+ * Free the memory stored in 'ptr' and update to point
+ * to NULL.
+ *
+ * This macro is safe to use on arguments with side effects.
+ */
+# if !STATIC_ANALYSIS
+/* The ternary ensures that ptr is a pointer and not an integer type,
+ * while evaluating ptr only once.  This gives us extra compiler
+ * safety when compiling under gcc.  For now, we intentionally cast
+ * away const, since a number of callers safely pass const char *.
+ */
+#  define VIR_FREE(ptr) virFree((void *) (1 ? (const void *) &(ptr) : (ptr)))
+# else
+/* The Coverity static analyzer considers the else path of the "?:" and
+ * flags the VIR_FREE() of the address of the address of memory as a
+ * RESOURCE_LEAK resulting in numerous false positives (eg, VIR_FREE(&ptr))
+ */
+#  define VIR_FREE(ptr) virFree((void *) &(ptr))
+# endif
+
 #endif /* __LIBVIRT_UTILS_H__ */

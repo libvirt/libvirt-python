@@ -18,6 +18,7 @@
 #include <libvirt/libvirt-lxc.h>
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
+#include "libvirt-utils.h"
 #include "build/libvirt-lxc.h"
 
 #ifndef __CYGWIN__

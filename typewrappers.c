@@ -13,6 +13,7 @@
 #undef HAVE_PTHREAD_H
 
 #include "typewrappers.h"
+#include "libvirt-utils.h"
 
 #ifndef Py_CAPSULE_H
 typedef void(*PyCapsule_Destructor)(void *, void *);

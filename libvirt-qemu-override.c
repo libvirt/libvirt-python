@@ -18,6 +18,7 @@
 #include <libvirt/libvirt-qemu.h>
 #include <libvirt/virterror.h>
 #include "typewrappers.h"
+#include "libvirt-utils.h"
 #include "build/libvirt-qemu.h"
 
 #ifndef __CYGWIN__
