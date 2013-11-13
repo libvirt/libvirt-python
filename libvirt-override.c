@@ -419,12 +419,14 @@ cleanup:
  */
 static int
 getPyNodeCPUCount(virConnectPtr conn) {
-    int i_retval;
+    int i_retval = -1;
     virNodeInfo nodeinfo;
 
+#if LIBVIR_CHECK_VERSION(1, 0, 0)
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virNodeGetCPUMap(conn, NULL, NULL, 0);
     LIBVIRT_END_ALLOW_THREADS;
+#endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
 
     if (i_retval < 0) {
         /* fallback: use nodeinfo */
@@ -7088,6 +7090,7 @@ cleanup:
 }
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
+#if LIBVIR_CHECK_VERSION(1, 0, 0)
 static PyObject *
 libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
                          PyObject *args)
@@ -7156,6 +7159,7 @@ error:
     ret = NULL;
     goto cleanup;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
 
 
 static PyObject *
@@ -7400,7 +7404,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virNodeGetMemoryParameters", libvirt_virNodeGetMemoryParameters, METH_VARARGS, NULL},
     {(char *) "virNodeSetMemoryParameters", libvirt_virNodeSetMemoryParameters, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
+#if LIBVIR_CHECK_VERSION(1, 0, 0)
     {(char *) "virNodeGetCPUMap", libvirt_virNodeGetCPUMap, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
     {(char *) "virDomainCreateXMLWithFiles", libvirt_virDomainCreateXMLWithFiles, METH_VARARGS, NULL},
     {(char *) "virDomainCreateWithFiles", libvirt_virDomainCreateWithFiles, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
