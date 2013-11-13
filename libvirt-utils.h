@@ -28,6 +28,16 @@
 #  define MIN(a,b) (((a) < (b)) ? (a) : (b))
 # endif
 
+/**
+ * libvirt.h provides this as of version 1.1.5, but we want to be able
+ * to support older versions of libvirt so copy and paste the macro from
+ * libvirt.h
+ */
+# ifndef LIBVIR_CHECK_VERSION
+#  define LIBVIR_CHECK_VERSION(major, minor, micro) \
+    ((major) * 1000000 + (minor) * 1000 + (micro) <= LIBVIR_VERSION_NUMBER)
+# endif
+
 /* Return 1 if an array of N objects, each of size S, cannot exist due
    to size arithmetic overflow.  S must be positive and N must be
    nonnegative.  This is a macro, not a function, so that it
