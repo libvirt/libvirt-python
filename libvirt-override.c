@@ -254,7 +254,9 @@ cleanup:
     return NULL;
 }
 
-
+/* While these appeared in libvirt in 1.0.2, we only
+ * need them in the python from 1.1.0 onwards */
+#if LIBVIR_CHECK_VERSION(1, 1, 0)
 typedef struct {
     const char *name;
     int type;
@@ -406,6 +408,7 @@ cleanup:
     virTypedParamsFree(params, n);
     return ret;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 0) */
 
 
 /*
