@@ -7,6 +7,7 @@ from distutils.command.sdist import sdist
 from distutils.dir_util import remove_tree
 from distutils.util import get_platform
 from distutils.spawn import spawn
+from distutils.errors import DistutilsExecError
 import distutils
 
 import sys
@@ -17,6 +18,7 @@ import re
 import time
 
 MIN_LIBVIRT = "0.10.2"
+MIN_LIBVIRT_LXC = "1.0.2"
 
 # Hack to stop 'pip install' failing with error
 # about missing 'build' dir.
@@ -32,6 +34,14 @@ spawn([pkgcfg,
        "--print-errors",
        "--atleast-version=%s" % MIN_LIBVIRT,
        "libvirt"])
+
+have_libvirt_lxc=True
+try:
+    spawn([pkgcfg,
+           "--atleast-version=%s" % MIN_LIBVIRT_LXC,
+         "libvirt"])
+except DistutilsExecError,e:
+    have_libvirt_lxc=False
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
@@ -79,17 +89,18 @@ if ldflags != "":
 c_modules.append(moduleqemu)
 py_modules.append("libvirt_qemu")
 
-modulelxc = Extension('libvirtmod_lxc',
-                      sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
-                      libraries = [ "virt-lxc" ],
-                      include_dirs = [ "." ])
-if cflags != "":
-    modulelxc.extra_compile_args.append(cflags)
-if ldflags != "":
-    modulelxc.extra_link_args.append(ldflags)
+if have_libvirt_lxc:
+    modulelxc = Extension('libvirtmod_lxc',
+                          sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
+                          libraries = [ "virt-lxc" ],
+                          include_dirs = [ "." ])
+    if cflags != "":
+        modulelxc.extra_compile_args.append(cflags)
+    if ldflags != "":
+        modulelxc.extra_link_args.append(ldflags)
 
-c_modules.append(modulelxc)
-py_modules.append("libvirt_lxc")
+    c_modules.append(modulelxc)
+    py_modules.append("libvirt_lxc")
 
 
 class my_build(build):
@@ -114,7 +125,8 @@ class my_build(build):
 
         self.spawn(["python", "generator.py", "libvirt", apis[0]])
         self.spawn(["python", "generator.py", "libvirt-qemu", apis[1]])
-        self.spawn(["python", "generator.py", "libvirt-lxc", apis[2]])
+        if have_libvirt_lxc:
+            self.spawn(["python", "generator.py", "libvirt-lxc", apis[2]])
 
         build.run(self)
 
