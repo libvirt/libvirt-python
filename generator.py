@@ -17,11 +17,6 @@ import re
 
 quiet=True
 
-coreapifile = sys.argv[1]
-lxcapifile = sys.argv[2]
-qemuapifile = sys.argv[3]
-
-
 #######################################################################
 #
 #  That part if purely the API acquisition phase from the
@@ -1945,13 +1940,18 @@ def lxcBuildWrappers(module):
 quiet = 0
 if not os.path.exists("build"):
     os.mkdir("build")
-if buildStubs("libvirt", coreapifile) < 0:
+
+if buildStubs(sys.argv[1], sys.argv[2]) < 0:
     sys.exit(1)
-if buildStubs("libvirt-lxc", lxcapifile) < 0:
+
+if sys.argv[1] == "libvirt":
+    buildWrappers(sys.argv[1])
+elif sys.argv[1] == "libvirt-lxc":
+    lxcBuildWrappers(sys.argv[1])
+elif sys.argv[1] == "libvirt-qemu":
+    qemuBuildWrappers(sys.argv[1])
+else:
+    print "ERROR: unknown module %s" % sys.argv[1]
     sys.exit(1)
-if buildStubs("libvirt-qemu", qemuapifile) < 0:
-    sys.exit(1)
-buildWrappers("libvirt")
-lxcBuildWrappers("libvirt-lxc")
-qemuBuildWrappers("libvirt-qemu")
+
 sys.exit(0)
