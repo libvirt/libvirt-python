@@ -52,6 +52,9 @@ def get_pkgconfig_data(args, mod, required=True):
 ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
 cflags = get_pkgconfig_data(["--cflags"], "libvirt", False)
 
+c_modules = []
+py_modules = []
+
 module = Extension('libvirtmod',
                    sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
                    libraries = [ "virt" ],
@@ -61,6 +64,8 @@ if cflags != "":
 if ldflags != "":
     module.extra_link_args.append(ldflags)
 
+c_modules.append(module)
+py_modules.append("libvirt")
 
 moduleqemu = Extension('libvirtmod_qemu',
                        sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
@@ -71,6 +76,9 @@ if cflags != "":
 if ldflags != "":
     moduleqemu.extra_link_args.append(ldflags)
 
+c_modules.append(moduleqemu)
+py_modules.append("libvirt_qemu")
+
 modulelxc = Extension('libvirtmod_lxc',
                       sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
                       libraries = [ "virt-lxc" ],
@@ -79,6 +87,10 @@ if cflags != "":
     modulelxc.extra_compile_args.append(cflags)
 if ldflags != "":
     modulelxc.extra_link_args.append(ldflags)
+
+c_modules.append(modulelxc)
+py_modules.append("libvirt_lxc")
+
 
 class my_build(build):
 
@@ -258,8 +270,8 @@ setup(name = 'libvirt-python',
       maintainer = 'Libvirt Maintainers',
       maintainer_email = 'libvir-list@redhat.com',
       description = 'The libvirt virtualization API',
-      ext_modules = [module, modulelxc, moduleqemu],
-      py_modules = ["libvirt", "libvirt_qemu", "libvirt_lxc"],
+      ext_modules = c_modules,
+      py_modules = py_modules,
       package_dir = {
           '': 'build'
       },
