@@ -200,4 +200,10 @@ int virFileClose(int *fdptr)
 # define VIR_FORCE_CLOSE(FD) \
     ignore_value(virFileClose(&(FD)))
 
+# if ! LIBVIR_CHECK_VERSION(1, 0, 2)
+void virTypedParamsClear(virTypedParameterPtr params, int nparams);
+
+void virTypedParamsFree(virTypedParameterPtr params, int nparams);
+# endif /* ! LIBVIR_CHECK_VERSION(1, 0, 2) */
+
 #endif /* __LIBVIRT_UTILS_H__ */

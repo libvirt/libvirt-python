@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <libvirt/libvirt.h>
 #include "libvirt-utils.h"
 
 /**
@@ -138,3 +139,48 @@ int virFileClose(int *fdptr)
 
     return rc;
 }
+
+#if ! LIBVIR_CHECK_VERSION(1, 0, 2)
+/**
+ * virTypedParamsClear:
+ * @params: the array of the typed parameters
+ * @nparams: number of parameters in the @params array
+ *
+ * Frees all memory used by string parameters. The memory occupied by @params
+ * is not free; use virTypedParamsFree if you want it to be freed too.
+ *
+ * Returns nothing.
+ */
+void
+virTypedParamsClear(virTypedParameterPtr params,
+                    int nparams)
+{
+    size_t i;
+
+    if (!params)
+        return;
+
+    for (i = 0; i < nparams; i++) {
+        if (params[i].type == VIR_TYPED_PARAM_STRING)
+            VIR_FREE(params[i].value.s);
+    }
+}
+
+/**
+ * virTypedParamsFree:
+ * @params: the array of the typed parameters
+ * @nparams: number of parameters in the @params array
+ *
+ * Frees all memory used by string parameters and the memory occuiped by
+ * @params.
+ *
+ * Returns nothing.
+ */
+void
+virTypedParamsFree(virTypedParameterPtr params,
+                   int nparams)
+{
+    virTypedParamsClear(params, nparams);
+    VIR_FREE(params);
+}
+#endif /* ! LIBVIR_CHECK_VERSION(1, 0, 2) */
