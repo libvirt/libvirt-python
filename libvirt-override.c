@@ -7171,6 +7171,7 @@ error:
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
 
 
+#if LIBVIR_CHECK_VERSION(1, 1, 1)
 static PyObject *
 libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyObject *py_retval = NULL;
@@ -7260,6 +7261,7 @@ cleanup:
     VIR_FREE(files);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
 
 
 /************************************************************************
@@ -7422,8 +7424,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 0, 0)
     {(char *) "virNodeGetCPUMap", libvirt_virNodeGetCPUMap, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
+#if LIBVIR_CHECK_VERSION(1, 1, 1)
     {(char *) "virDomainCreateXMLWithFiles", libvirt_virDomainCreateXMLWithFiles, METH_VARARGS, NULL},
     {(char *) "virDomainCreateWithFiles", libvirt_virDomainCreateWithFiles, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
     {NULL, NULL, 0, NULL}
 };
 
