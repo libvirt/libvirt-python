@@ -4555,6 +4555,7 @@ libvirt_virDomainGetJobInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(1, 0, 3)
 static PyObject *
 libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 {
@@ -4595,6 +4596,7 @@ cleanup:
     else
         return VIR_PY_NONE;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
 
 static PyObject *
 libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
@@ -7379,7 +7381,9 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virConnectBaselineCPU", libvirt_virConnectBaselineCPU, METH_VARARGS, NULL},
     {(char *) "virDomainGetJobInfo", libvirt_virDomainGetJobInfo, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(1, 0, 3)
     {(char *) "virDomainGetJobStats", libvirt_virDomainGetJobStats, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
     {(char *) "virDomainSnapshotListNames", libvirt_virDomainSnapshotListNames, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 9, 13)
     {(char *) "virDomainListAllSnapshots", libvirt_virDomainListAllSnapshots, METH_VARARGS, NULL},
