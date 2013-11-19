@@ -3024,6 +3024,7 @@ libvirt_virConnectListDefinedNetworks(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllNetworks(PyObject *self ATTRIBUTE_UNUSED,
                                   PyObject *args)
@@ -3070,6 +3071,7 @@ cleanup:
     VIR_FREE(nets);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 
 static PyObject *
@@ -3465,6 +3467,7 @@ libvirt_virConnectListDefinedStoragePools(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllStoragePools(PyObject *self ATTRIBUTE_UNUSED,
                                       PyObject *args)
@@ -3511,6 +3514,7 @@ cleanup:
     VIR_FREE(pools);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 static PyObject *
 libvirt_virStoragePoolListVolumes(PyObject *self ATTRIBUTE_UNUSED,
@@ -3819,6 +3823,7 @@ libvirt_virNodeListDevices(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllNodeDevices(PyObject *self ATTRIBUTE_UNUSED,
                                      PyObject *args)
@@ -3865,6 +3870,7 @@ cleanup:
     VIR_FREE(devices);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 static PyObject *
 libvirt_virNodeDeviceListCaps(PyObject *self ATTRIBUTE_UNUSED,
@@ -4030,6 +4036,7 @@ libvirt_virConnectListSecrets(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllSecrets(PyObject *self ATTRIBUTE_UNUSED,
                                  PyObject *args)
@@ -4076,6 +4083,7 @@ cleanup:
     VIR_FREE(secrets);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 static PyObject *
 libvirt_virSecretGetValue(PyObject *self ATTRIBUTE_UNUSED,
@@ -4250,6 +4258,7 @@ libvirt_virConnectListNWFilters(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllNWFilters(PyObject *self ATTRIBUTE_UNUSED,
                                    PyObject *args)
@@ -4296,6 +4305,7 @@ cleanup:
     VIR_FREE(filters);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 static PyObject *
 libvirt_virConnectListInterfaces(PyObject *self ATTRIBUTE_UNUSED,
@@ -4406,6 +4416,7 @@ libvirt_virConnectListDefinedInterfaces(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
 static PyObject *
 libvirt_virConnectListAllInterfaces(PyObject *self ATTRIBUTE_UNUSED,
                                     PyObject *args)
@@ -4452,6 +4463,7 @@ cleanup:
     VIR_FREE(ifaces);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
 static PyObject *
 libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
@@ -7272,7 +7284,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virConnGetLastError", libvirt_virConnGetLastError, METH_VARARGS, NULL},
     {(char *) "virConnectListNetworks", libvirt_virConnectListNetworks, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedNetworks", libvirt_virConnectListDefinedNetworks, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllNetworks", libvirt_virConnectListAllNetworks, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virNetworkGetUUID", libvirt_virNetworkGetUUID, METH_VARARGS, NULL},
     {(char *) "virNetworkGetUUIDString", libvirt_virNetworkGetUUIDString, METH_VARARGS, NULL},
     {(char *) "virNetworkLookupByUUID", libvirt_virNetworkLookupByUUID, METH_VARARGS, NULL},
@@ -7307,7 +7321,9 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedStoragePools", libvirt_virConnectListDefinedStoragePools, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllStoragePools", libvirt_virConnectListAllStoragePools, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virStoragePoolGetAutostart", libvirt_virStoragePoolGetAutostart, METH_VARARGS, NULL},
     {(char *) "virStoragePoolListVolumes", libvirt_virStoragePoolListVolumes, METH_VARARGS, NULL},
     {(char *) "virStoragePoolListAllVolumes", libvirt_virStoragePoolListAllVolumes, METH_VARARGS, NULL},
@@ -7322,23 +7338,31 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virEventInvokeHandleCallback", libvirt_virEventInvokeHandleCallback, METH_VARARGS, NULL},
     {(char *) "virEventInvokeTimeoutCallback", libvirt_virEventInvokeTimeoutCallback, METH_VARARGS, NULL},
     {(char *) "virNodeListDevices", libvirt_virNodeListDevices, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllNodeDevices", libvirt_virConnectListAllNodeDevices, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virNodeDeviceListCaps", libvirt_virNodeDeviceListCaps, METH_VARARGS, NULL},
     {(char *) "virSecretGetUUID", libvirt_virSecretGetUUID, METH_VARARGS, NULL},
     {(char *) "virSecretGetUUIDString", libvirt_virSecretGetUUIDString, METH_VARARGS, NULL},
     {(char *) "virSecretLookupByUUID", libvirt_virSecretLookupByUUID, METH_VARARGS, NULL},
     {(char *) "virConnectListSecrets", libvirt_virConnectListSecrets, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllSecrets", libvirt_virConnectListAllSecrets, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virSecretGetValue", libvirt_virSecretGetValue, METH_VARARGS, NULL},
     {(char *) "virSecretSetValue", libvirt_virSecretSetValue, METH_VARARGS, NULL},
     {(char *) "virNWFilterGetUUID", libvirt_virNWFilterGetUUID, METH_VARARGS, NULL},
     {(char *) "virNWFilterGetUUIDString", libvirt_virNWFilterGetUUIDString, METH_VARARGS, NULL},
     {(char *) "virNWFilterLookupByUUID", libvirt_virNWFilterLookupByUUID, METH_VARARGS, NULL},
     {(char *) "virConnectListNWFilters", libvirt_virConnectListNWFilters, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllNWFilters", libvirt_virConnectListAllNWFilters, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virConnectListInterfaces", libvirt_virConnectListInterfaces, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedInterfaces", libvirt_virConnectListDefinedInterfaces, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllInterfaces", libvirt_virConnectListAllInterfaces, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virConnectBaselineCPU", libvirt_virConnectBaselineCPU, METH_VARARGS, NULL},
     {(char *) "virDomainGetJobInfo", libvirt_virDomainGetJobInfo, METH_VARARGS, NULL},
     {(char *) "virDomainGetJobStats", libvirt_virDomainGetJobStats, METH_VARARGS, NULL},
