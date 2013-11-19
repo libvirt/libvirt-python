@@ -1824,6 +1824,7 @@ cleanup:
 }
 
 
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
 static PyObject *
 libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
                              PyObject *args)
@@ -1938,6 +1939,7 @@ libvirt_virDomainGetEmulatorPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(cpumap);
     return pycpumap;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 
 
 /************************************************************************
@@ -7299,8 +7301,10 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainPinVcpu", libvirt_virDomainPinVcpu, METH_VARARGS, NULL},
     {(char *) "virDomainPinVcpuFlags", libvirt_virDomainPinVcpuFlags, METH_VARARGS, NULL},
     {(char *) "virDomainGetVcpuPinInfo", libvirt_virDomainGetVcpuPinInfo, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
     {(char *) "virDomainGetEmulatorPinInfo", libvirt_virDomainGetEmulatorPinInfo, METH_VARARGS, NULL},
     {(char *) "virDomainPinEmulator", libvirt_virDomainPinEmulator, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedStoragePools", libvirt_virConnectListDefinedStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListAllStoragePools", libvirt_virConnectListAllStoragePools, METH_VARARGS, NULL},
