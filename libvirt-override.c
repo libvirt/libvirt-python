@@ -2394,6 +2394,7 @@ libvirt_virConnectListDomainsID(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 9, 13)
 static PyObject *
 libvirt_virConnectListAllDomains(PyObject *self ATTRIBUTE_UNUSED,
                                  PyObject *args)
@@ -2440,6 +2441,7 @@ cleanup:
     VIR_FREE(doms);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 9, 13) */
 
 static PyObject *
 libvirt_virConnectListDefinedDomains(PyObject *self ATTRIBUTE_UNUSED,
@@ -7231,7 +7233,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virConnectOpenAuth", libvirt_virConnectOpenAuth, METH_VARARGS, NULL},
     {(char *) "virConnectListDomainsID", libvirt_virConnectListDomainsID, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedDomains", libvirt_virConnectListDefinedDomains, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 9, 13)
     {(char *) "virConnectListAllDomains", libvirt_virConnectListAllDomains, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 9, 13) */
     {(char *) "virConnectDomainEventRegister", libvirt_virConnectDomainEventRegister, METH_VARARGS, NULL},
     {(char *) "virConnectDomainEventDeregister", libvirt_virConnectDomainEventDeregister, METH_VARARGS, NULL},
     {(char *) "virConnectDomainEventRegisterAny", libvirt_virConnectDomainEventRegisterAny, METH_VARARGS, NULL},
