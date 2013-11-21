@@ -17,7 +17,7 @@ import os.path
 import re
 import time
 
-MIN_LIBVIRT = "0.10.2"
+MIN_LIBVIRT = "0.9.11"
 MIN_LIBVIRT_LXC = "1.0.2"
 
 # Hack to stop 'pip install' failing with error
