@@ -6307,6 +6307,7 @@ libvirt_virConnectDomainEventPMSuspendDiskCallback(virConnectPtr conn ATTRIBUTE_
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
 
+#if LIBVIR_CHECK_VERSION(1, 1, 1)
 static int
 libvirt_virConnectDomainEventDeviceRemovedCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                    virDomainPtr dom,
@@ -6351,6 +6352,7 @@ libvirt_virConnectDomainEventDeviceRemovedCallback(virConnectPtr conn ATTRIBUTE_
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
 
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject * self,
@@ -6431,10 +6433,11 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject * self,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventPMSuspendDiskCallback);
         break;
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
+#if LIBVIR_CHECK_VERSION(1, 1, 1)
     case VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventDeviceRemovedCallback);
         break;
-
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
