@@ -6185,6 +6185,8 @@ libvirt_virConnectDomainEventPMSuspendCallback(virConnectPtr conn ATTRIBUTE_UNUS
     return ret;
 }
 
+
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
 static int
 libvirt_virConnectDomainEventBalloonChangeCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                    virDomainPtr dom,
@@ -6231,6 +6233,7 @@ libvirt_virConnectDomainEventBalloonChangeCallback(virConnectPtr conn ATTRIBUTE_
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 
 static int
 libvirt_virConnectDomainEventPMSuspendDiskCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
@@ -6393,9 +6396,11 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject * self,
     case VIR_DOMAIN_EVENT_ID_PMSUSPEND:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventPMSuspendCallback);
         break;
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
     case VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventBalloonChangeCallback);
         break;
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
     case VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventPMSuspendDiskCallback);
         break;
