@@ -2279,6 +2279,7 @@ libvirt_virConnectGetVersion(PyObject *self ATTRIBUTE_UNUSED,
     return PyInt_FromLong(hvVersion);
 }
 
+#if LIBVIR_CHECK_VERSION(1, 1, 3)
 static PyObject *
 libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
                                    PyObject *args)
@@ -2330,6 +2331,7 @@ error:
     rv = VIR_PY_INT_FAIL;
     goto done;
 }
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 3) */
 
 static PyObject *
 libvirt_virConnectGetLibVersion(PyObject *self ATTRIBUTE_UNUSED,
@@ -7276,7 +7278,9 @@ static PyMethodDef libvirtMethods[] = {
 #include "build/libvirt-export.c"
     {(char *) "virGetVersion", libvirt_virGetVersion, METH_VARARGS, NULL},
     {(char *) "virConnectGetVersion", libvirt_virConnectGetVersion, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(1, 1, 3)
     {(char *) "virConnectGetCPUModelNames", libvirt_virConnectGetCPUModelNames, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 1, 3) */
     {(char *) "virConnectGetLibVersion", libvirt_virConnectGetLibVersion, METH_VARARGS, NULL},
     {(char *) "virConnectOpenAuth", libvirt_virConnectOpenAuth, METH_VARARGS, NULL},
     {(char *) "virConnectListDomainsID", libvirt_virConnectListDomainsID, METH_VARARGS, NULL},
