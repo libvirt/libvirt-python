@@ -27,6 +27,7 @@ import os
 import xml.sax
 
 debug = 0
+onlyOverrides = False
 
 def getparser():
     # Attach parser to an unmarshalling object. return both objects.
@@ -183,12 +184,18 @@ class docParser(xml.sax.handler.ContentHandler):
 
 
 def function(name, desc, ret, args, file, module, cond):
+    if onlyOverrides and name not in functions:
+        return
     functions[name] = (desc, ret, args, file, module, cond)
 
 def qemu_function(name, desc, ret, args, file, module, cond):
+    if onlyOverrides and name not in qemu_functions:
+        return
     qemu_functions[name] = (desc, ret, args, file, module, cond)
 
 def lxc_function(name, desc, ret, args, file, module, cond):
+    if onlyOverrides and name not in lxc_functions:
+        return
     lxc_functions[name] = (desc, ret, args, file, module, cond)
 
 def enum(type, name, value):
@@ -213,16 +220,22 @@ def enum(type, name, value):
     elif value == 'VIR_DOMAIN_AFFECT_CONFIG':
         value = 2
     if name[-5:] != '_LAST':
+        if onlyOverrides and name not in enums[type]:
+            return
         enums[type][name] = value
 
 def lxc_enum(type, name, value):
     if not lxc_enums.has_key(type):
         lxc_enums[type] = {}
+    if onlyOverrides and name not in lxc_enums[type]:
+        return
     lxc_enums[type][name] = value
 
 def qemu_enum(type, name, value):
     if not qemu_enums.has_key(type):
         qemu_enums[type] = {}
+    if onlyOverrides and name not in qemu_enums[type]:
+        return
     qemu_enums[type][name] = value
 
 
@@ -791,6 +804,7 @@ def buildStubs(module, api_xml):
         f = open(api_xml)
         data = f.read()
         f.close()
+        onlyOverrides = False
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
@@ -809,6 +823,7 @@ def buildStubs(module, api_xml):
         f = open(override_api_xml)
         data = f.read()
         f.close()
+        onlyOverrides = True
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
