@@ -82,6 +82,7 @@ libvirt_qemu_virDomainQemuMonitorCommand(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
 static PyObject *
 libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 {
@@ -111,6 +112,8 @@ libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject
     VIR_FREE(result);
     return py_retval;
 }
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -119,7 +122,9 @@ libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject
 static PyMethodDef libvirtQemuMethods[] = {
 #include "build/libvirt-qemu-export.c"
     {(char *) "virDomainQemuMonitorCommand", libvirt_qemu_virDomainQemuMonitorCommand, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
     {(char *) "virDomainQemuAgentCommand", libvirt_qemu_virDomainQemuAgentCommand, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
     {NULL, NULL, 0, NULL}
 };
 
