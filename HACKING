@@ -1,0 +1,36 @@
+    libvirt Python Bindings Hacking
+    ===============================
+
+Most of the libvirt python binding code is automatically generated
+using the script  generator.py, and the API description that the
+libvirt library installs the location shown by pkg-config, with
+this command:
+
+  $ pkg-config --variable libvirt_api libvirt
+  /usr/share/libvirt/api/libvirt-api.xml
+
+Some of the API descriptions in the primary XML files are not directly
+usable by the code generator. Thus there are overrides in
+
+ - libvirt-override-api.xml
+ - libvirt-qemu-override-api.xml
+ - libvirt-lxc-override-api.xml
+
+For stuff which the generator can't cope with at all there are some
+hand written source files
+
+ - libvirt-override.c - low level binding to libvirt.so
+ - libvirt-qemu-override.c - low level binding to libvirt-qemu.so
+ - libvirt-lxc-override.c - low level binding to libvirt-lxc.so
+
+ - libvirt-override.py - high level overrides in the global namespace
+ - libvirt-override-virConnect.py - high level overrides in
+   the virConnect class
+ - libvirt-override-virDomain.py - high level overrides in
+   the virDomain class
+ - libvirt-override-virDomainSnapshot.py - high level overrides in
+   the virDomainSnapshot class
+ - libvirt-override-virStoragePool.py - high level overrides in
+   the virStoragePool class
+ - libvirt-override-virStream.py - high level overrides in
+   the virStream class
