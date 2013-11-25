@@ -29,7 +29,7 @@
 # endif
 
 /**
- * libvirt.h provides this as of version 1.1.5, but we want to be able
+ * libvirt.h provides this as of version 1.2.0, but we want to be able
  * to support older versions of libvirt so copy and paste the macro from
  * libvirt.h
  */
