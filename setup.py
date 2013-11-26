@@ -59,6 +59,20 @@ def get_pkgconfig_data(args, mod, required=True):
 
     return line
 
+def get_api_xml_files():
+    """Check with pkg-config that libvirt is present and extract
+    the API XML file paths we need from it"""
+
+    libvirt_api = get_pkgconfig_data(["--variable", "libvirt_api"], "libvirt")
+
+    offset = libvirt_api.index("-api.xml")
+    libvirt_qemu_api = libvirt_api[0:offset] + "-qemu-api.xml"
+
+    offset = libvirt_api.index("-api.xml")
+    libvirt_lxc_api = libvirt_api[0:offset] + "-lxc-api.xml"
+
+    return (libvirt_api, libvirt_qemu_api, libvirt_lxc_api)
+
 ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
 cflags = get_pkgconfig_data(["--cflags"], "libvirt", False)
 
@@ -105,23 +119,8 @@ if have_libvirt_lxc:
 
 class my_build(build):
 
-    def get_api_xml_files(self):
-        """Check with pkg-config that libvirt is present and extract
-        the API XML file paths we need from it"""
-
-        libvirt_api = get_pkgconfig_data(["--variable", "libvirt_api"], "libvirt")
-
-        offset = libvirt_api.index("-api.xml")
-        libvirt_qemu_api = libvirt_api[0:offset] + "-qemu-api.xml"
-
-        offset = libvirt_api.index("-api.xml")
-        libvirt_lxc_api = libvirt_api[0:offset] + "-lxc-api.xml"
-
-        return (libvirt_api, libvirt_qemu_api, libvirt_lxc_api)
-
-
     def run(self):
-        apis = self.get_api_xml_files()
+        apis = get_api_xml_files()
 
         self.spawn(["python", "generator.py", "libvirt", apis[0]])
         self.spawn(["python", "generator.py", "libvirt-qemu", apis[1]])
@@ -266,7 +265,9 @@ class my_test(Command):
         Run test suite
         """
 
-        self.spawn(["python", "sanitytest.py", self.build_platlib])
+        apis = get_api_xml_files()
+
+        self.spawn(["python", "sanitytest.py", self.build_platlib, apis[0]])
 
 
 class my_clean(clean):

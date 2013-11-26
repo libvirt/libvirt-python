@@ -1,40 +1,282 @@
 #!/usr/bin/python
 
 import sys
+import lxml
+import lxml.etree
+import string
 
+# Munge import path to insert build location for libvirt mod
 sys.path.insert(0, sys.argv[1])
-
 import libvirt
 
-globals = dir(libvirt)
+# Path to the libvirt API XML file
+xml = sys.argv[2]
 
-# Sanity test that the generator hasn't gone wrong
+f = open(xml, "r")
+tree = lxml.etree.parse(f)
 
-# Look for core classes
-for clsname in ["virConnect",
-                "virDomain",
-                "virDomainSnapshot",
-                "virInterface",
-                "virNWFilter",
-                "virNodeDevice",
-                "virNetwork",
-                "virSecret",
-                "virStoragePool",
-                "virStorageVol",
-                "virStream",
-                ]:
-    assert(clsname in globals)
-    assert(object in getattr(libvirt, clsname).__bases__)
+verbose = False
 
-# Constants
-assert("VIR_CONNECT_RO" in globals)
+wantenums = []
+wantfunctions = []
 
-# Error related bits
-assert("libvirtError" in globals)
-assert("VIR_ERR_AUTH_FAILED" in globals)
-assert("virGetLastError" in globals)
+# Phase 1: Identify all functions and enums in public API
+set = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
+for n in set:
+    wantfunctions.append(n)
 
-# Some misc methods
-assert("virInitialize" in globals)
-assert("virEventAddHandle" in globals)
-assert("virEventRegisterDefaultImpl" in globals)
+set = tree.xpath('/api/files/file/exports[@type="enum"]/@symbol')
+for n in set:
+    wantenums.append(n)
+
+
+# Phase 2: Identify all classes and methods in the 'libvirt' python module
+gotenums = []
+gottypes = []
+gotfunctions = { "libvirt": [] }
+
+for name in dir(libvirt):
+    if name[0] == '_':
+        continue
+    thing = getattr(libvirt, name)
+    if type(thing) == int:
+        gotenums.append(name)
+    elif type(thing) == type:
+        gottypes.append(name)
+        gotfunctions[name] = []
+    elif callable(thing):
+        gotfunctions["libvirt"].append(name)
+    else:
+       pass
+
+for klassname in gottypes:
+    klassobj = getattr(libvirt, klassname)
+    for name in dir(klassobj):
+        if name[0] == '_':
+            continue
+        thing = getattr(klassobj, name)
+        if callable(thing):
+            gotfunctions[klassname].append(name)
+        else:
+            pass
+
+
+# Phase 3: First cut at mapping of C APIs to python classes + methods
+basicklassmap = {}
+
+for cname in wantfunctions:
+    name = cname
+    # Some virConnect APIs have stupid names
+    if name[0:7] == "virNode" and name[0:13] != "virNodeDevice":
+        name = "virConnect" + name[7:]
+    if name[0:7] == "virConn" and name[0:10] != "virConnect":
+        name = "virConnect" + name[7:]
+
+    # The typed param APIs are only for internal use
+    if name[0:14] == "virTypedParams":
+        continue
+
+    # These aren't functions, they're callback signatures
+    if name in ["virConnectAuthCallbackPtr", "virConnectCloseFunc",
+                "virStreamSinkFunc", "virStreamSourceFunc", "virStreamEventCallback",
+                "virEventHandleCallback", "virEventTimeoutCallback", "virFreeCallback"]:
+        continue
+    if name[0:21] == "virConnectDomainEvent" and name[-8:] == "Callback":
+        continue
+
+
+    # virEvent APIs go into main 'libvirt' namespace not any class
+    if name[0:8] == "virEvent":
+        if name[-4:] == "Func":
+            continue
+        basicklassmap[name] = ["libvirt", name, cname]
+    else:
+        found = False
+        # To start with map APIs to classes based on the
+        # naming prefix. Mistakes will be fixed in next
+        # loop
+        for klassname in gottypes:
+            klen = len(klassname)
+            if name[0:klen] == klassname:
+                found = True
+                if name not in basicklassmap:
+                    basicklassmap[name] = [klassname, name[klen:], cname]
+                elif len(basicklassmap[name]) < klassname:
+                    basicklassmap[name] = [klassname, name[klen:], cname]
+
+        # Anything which can't map to a class goes into the
+        # global namespaces
+        if not found:
+            basicklassmap[name] = ["libvirt", name[3:], cname]
+
+
+# Phase 4: Deal with oh so many special cases in C -> python mapping
+finalklassmap = {}
+
+for name in sorted(basicklassmap):
+    klass = basicklassmap[name][0]
+    func = basicklassmap[name][1]
+    cname = basicklassmap[name][2]
+
+    # The object lifecycle APIs are irrelevant since they're
+    # used inside the object constructors/destructors.
+    if func in ["Ref", "Free", "New", "GetConnect", "GetDomain"]:
+        if klass == "virStream" and func == "New":
+            klass = "virConnect"
+            func = "NewStream"
+        else:
+            continue
+
+
+    # All the error handling methods need special handling
+    if klass == "libvirt":
+        if func in ["CopyLastError", "DefaultErrorFunc",
+                    "ErrorFunc", "FreeError",
+                    "SaveLastError", "ResetError"]:
+            continue
+        elif func in ["GetLastError", "GetLastErrorMessage", "ResetLastError", "Initialize"]:
+            func = "vir" + func
+        elif func == "SetErrorFunc":
+            func = "RegisterErrorHandler"
+    elif klass == "virConnect":
+        if func in ["CopyLastError", "SetErrorFunc"]:
+            continue
+        elif func in ["GetLastError", "ResetLastError"]:
+            func = "virConn" + func
+
+    # Remove 'Get' prefix from most APIs, except those in virConnect
+    # and virDomainSnapshot namespaces which stupidly used a different
+    # convention which we now can't fix without breaking API
+    if func[0:3] == "Get" and klass not in ["virConnect", "virDomainSnapshot", "libvirt"]:
+        if func not in ["GetCPUStats"]:
+            func = func[3:]
+
+    # The object creation and lookup APIs all have to get re-mapped
+    # into the parent class
+    if func in ["CreateXML", "CreateLinux", "CreateXMLWithFiles",
+                "DefineXML", "CreateXMLFrom", "LookupByUUID",
+                "LookupByUUIDString", "LookupByVolume" "LookupByName",
+                "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
+                "LookupByMACString", "LookupByUsage", "LookupByVolume",
+                "LookupSCSIHostByWWN", "Restore", "RestoreFlags",
+                "SaveImageDefineXML", "SaveImageGetXMLDesc"]:
+        if klass != "virDomain":
+            func = klass[3:] + func
+
+        if klass == "virDomainSnapshot":
+            klass = "virDomain"
+            func = func[6:]
+        elif klass == "virStorageVol" and func in ["StorageVolCreateXMLFrom", "StorageVolCreateXML"]:
+            klass = "virStoragePool"
+            func = func[10:]
+        elif func == "StoragePoolLookupByVolume":
+            klass = "virStorageVol"
+        elif func == "StorageVolLookupByName":
+            klass = "virStoragePool"
+        else:
+            klass = "virConnect"
+
+    # The open methods get remapped to primary namespace
+    if klass == "virConnect" and func in ["Open", "OpenAuth", "OpenReadOnly"]:
+        klass = "libvirt"
+
+    # These are inexplicably renamed in the python API
+    if func == "ListDomains":
+        func = "ListDomainsID"
+    elif func == "ListAllNodeDevices":
+        func = "ListAllDevices"
+    elif func == "ListNodeDevices":
+        func = "ListDevices"
+
+    # The virInterfaceChangeXXXX APIs go into virConnect. Stupidly
+    # they have lost their 'interface' prefix in names, but we can't
+    # fix this name
+    if func[0:6] == "Change":
+        klass = "virConnect"
+
+    # Need to special case the snapshot APIs
+    if klass == "virDomainSnapshot" and func in ["Current", "ListNames", "Num"]:
+        klass = "virDomain"
+        func = "snapshot" + func
+
+    # Names should stsart with lowercase letter...
+    func = string.lower(func[0:1]) + func[1:]
+    if func[0:8] == "nWFilter":
+        func = "nwfilter" + func[8:]
+
+    # ...except when they don't. More stupid naming
+    # decisions we can't fix
+    if func == "iD":
+        func = "ID"
+    if func == "uUID":
+        func = "UUID"
+    if func == "uUIDString":
+        func = "UUIDString"
+    if func == "oSType":
+        func = "OSType"
+    if func == "xMLDesc":
+        func = "XMLDesc"
+    if func == "mACString":
+        func = "MACString"
+
+    finalklassmap[name] = [klass, func, cname]
+
+
+# Phase 5: Validate sure that every C API is mapped to a python API
+fail = False
+usedfunctions = {}
+for name in sorted(finalklassmap):
+    klass = finalklassmap[name][0]
+    func = finalklassmap[name][1]
+
+    if func in gotfunctions[klass]:
+        usedfunctions["%s.%s" % (klass, func)] = 1
+        if verbose:
+            print "PASS %s -> %s.%s" % (name, klass, func)
+    else:
+        print "FAIL %s -> %s.%s       (C API not mapped to python)" % (name, klass, func)
+        fail = True
+
+
+# Phase 6: Validate that every python API has a corresponding C API
+for klass in gotfunctions:
+    if klass == "libvirtError":
+        continue
+    for func in sorted(gotfunctions[klass]):
+        # These are pure python methods with no C APi
+        if func in ["connect", "getConnect", "domain", "getDomain"]:
+            continue
+
+        key = "%s.%s" % (klass, func)
+        if not key in usedfunctions:
+            print "FAIL %s.%s       (Python API not mapped to C)" % (klass, func)
+            fail = True
+        else:
+            if verbose:
+                print "PASS %s.%s" % (klass, func)
+
+# Phase 7: Validate that all the low level C APIs have binding
+for name in sorted(finalklassmap):
+    cname = finalklassmap[name][2]
+
+    pyname = cname
+    if pyname == "virSetErrorFunc":
+        pyname = "virRegisterErrorHandler"
+    elif pyname == "virConnectListDomains":
+        pyname = "virConnectListDomainsID"
+
+    # These exist in C and exist in python, but we've got
+    # a pure-python impl so don't check them
+    if name in ["virStreamRecvAll", "virStreamSendAll"]:
+        continue
+
+    try:
+        thing = getattr(libvirt.libvirtmod, pyname)
+    except AttributeError:
+        print "FAIL libvirt.libvirtmod.%s      (C binding does not exist)" % pyname
+        fail = True
+
+if fail:
+    sys.exit(1)
+else:
+    sys.exit(0)
