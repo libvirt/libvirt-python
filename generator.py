@@ -1264,12 +1264,14 @@ def buildWrappers(module):
                 func = nameFixup(name, classe, type, file)
                 info = (0, func, name, ret, args, file, mod)
                 function_classes[classe].append(info)
+                break
             elif name[0:3] == "vir" and len(args) >= 2 and args[1][1] == type \
                 and file != "python_accessor" and not name in function_skip_index_one:
                 found = 1
                 func = nameFixup(name, classe, type, file)
                 info = (1, func, name, ret, args, file, mod)
                 function_classes[classe].append(info)
+                break
         if found == 1:
             continue
         func = nameFixup(name, "None", file, file)
