@@ -20,7 +20,7 @@ class libvirtError(Exception):
 
         # Never call virConnGetLastError().
         # virGetLastError() is now thread local
-        err = virGetLastError()
+        err = libvirtmod.virGetLastError()
         if err is None:
             msg = defmsg
         else:
