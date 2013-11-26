@@ -1719,11 +1719,51 @@ def buildWrappers(module):
                 classes.write("\n")
             # Append "<classname>.py" to class def, iff it exists
             try:
+                wantfuncs = []
                 extra = open("libvirt-override-" + classname + ".py", "r")
                 classes.write ("    #\n")
                 classes.write ("    # %s methods from %s.py (hand coded)\n" % (classname,classname))
                 classes.write ("    #\n")
-                classes.writelines(extra.readlines())
+                cached = None
+
+
+                # Since we compile with older libvirt, we don't want to pull
+                # in manually written python methods which call C methods
+                # that don't exist. This code attempts to detect which
+                # methods to skip by looking at the libvirtmod.XXXX calls
+
+                def shouldSkip(lines):
+                    for line in lines:
+                        offset = line.find("libvirtmod.")
+                        if offset != -1:
+                            func = line[offset + 11:]
+                            offset = func.find("(")
+                            func = func[0:offset]
+                            if func not in functions_skipped:
+                                return True
+                    return False
+
+                for line in extra.readlines():
+                    offset = line.find(" def ")
+                    if offset != -1:
+                        name = line[offset+5:]
+                        offset = name.find("(")
+                        name = name[0:offset]
+                        if cached is not None:
+                            if not shouldSkip(cached):
+                                classes.writelines(cached)
+                        if name == "__del__":
+                            cached = None
+                            classes.write(line)
+                        else:
+                            cached = [line]
+                    else:
+                        if cached is not None:
+                            cached.append(line)
+                        else:
+                            classes.write(line)
+                if not shouldSkip(cached):
+                    classes.writelines(cached)
                 classes.write("\n")
                 extra.close()
             except:
