@@ -5998,7 +5998,7 @@ libvirt_virConnectDomainEventBlockJobCallback(virConnectPtr conn ATTRIBUTE_UNUSE
 
     /* Call the Callback Dispatcher */
     pyobj_ret = PyObject_CallMethod(pyobj_conn,
-                                    (char*)"dispatchDomainEventBlockPullCallback",
+                                    (char*)"_dispatchDomainEventBlockPullCallback",
                                     (char*)"OsiiO",
                                     pyobj_dom, path, type, status, pyobj_cbData);
 

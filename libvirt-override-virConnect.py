@@ -113,7 +113,7 @@
            authScheme, subject, opaque)
         return 0
 
-    def dispatchDomainEventBlockPullCallback(self, dom, path, type, status, cbData):
+    def _dispatchDomainEventBlockPullCallback(self, dom, path, type, status, cbData):
         """Dispatches events to python user domain blockJob event callbacks
         """
         try:
