@@ -116,6 +116,15 @@ libvirt_constcharPtrWrap(const char *str)
     return ret;
 }
 
+PyObject *
+libvirt_boolWrap(int val)
+{
+  if (val)
+      Py_RETURN_TRUE;
+  else
+      Py_RETURN_FALSE;
+}
+
 int
 libvirt_intUnwrap(PyObject *obj, int *val)
 {

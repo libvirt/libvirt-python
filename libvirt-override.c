@@ -2865,6 +2865,83 @@ libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
+libvirt_virNodeGetSecurityModel(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval;
+    int c_retval;
+    virConnectPtr conn;
+    PyObject *pyobj_conn;
+    virSecurityModel model;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityModel", &pyobj_conn))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNodeGetSecurityModel(conn, &model);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+    py_retval = PyList_New(2);
+    PyList_SetItem(py_retval, 0, libvirt_constcharPtrWrap(&model.model[0]));
+    PyList_SetItem(py_retval, 1, libvirt_constcharPtrWrap(&model.doi[0]));
+    return py_retval;
+}
+
+static PyObject *
+libvirt_virDomainGetSecurityLabel(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval;
+    int c_retval;
+    virDomainPtr dom;
+    PyObject *pyobj_dom;
+    virSecurityLabel label;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityLabel", &pyobj_dom))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainGetSecurityLabel(dom, &label);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+    py_retval = PyList_New(2);
+    PyList_SetItem(py_retval, 0, libvirt_constcharPtrWrap(&label.label[0]));
+    PyList_SetItem(py_retval, 1, libvirt_boolWrap(label.enforcing));
+    return py_retval;
+}
+
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
+static PyObject *
+libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval;
+    int c_retval;
+    virDomainPtr dom;
+    PyObject *pyobj_dom;
+    virSecurityLabel *labels;
+    size_t i;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityLabel", &pyobj_dom))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainGetSecurityLabelList(dom, &labels);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+    py_retval = PyList_New(0);
+    for (i = 0 ; i < c_retval ; i++) {
+        PyObject *entry = PyList_New(2);
+        PyList_SetItem(entry, 0, libvirt_constcharPtrWrap(&labels[i].label[0]));
+        PyList_SetItem(entry, 1, libvirt_boolWrap(labels[i].enforcing));
+	PyList_Append(py_retval, entry);
+    }
+    free(labels);
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
+
+static PyObject *
 libvirt_virDomainGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
@@ -7304,6 +7381,11 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetControlInfo", libvirt_virDomainGetControlInfo, METH_VARARGS, NULL},
     {(char *) "virDomainGetBlockInfo", libvirt_virDomainGetBlockInfo, METH_VARARGS, NULL},
     {(char *) "virNodeGetInfo", libvirt_virNodeGetInfo, METH_VARARGS, NULL},
+    {(char *) "virNodeGetSecurityModel", libvirt_virNodeGetSecurityModel, METH_VARARGS, NULL},
+    {(char *) "virDomainGetSecurityLabel", libvirt_virDomainGetSecurityLabel, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(0, 10, 0)
+    {(char *) "virDomainGetSecurityLabelList", libvirt_virDomainGetSecurityLabelList, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
     {(char *) "virNodeGetCPUStats", libvirt_virNodeGetCPUStats, METH_VARARGS, NULL},
     {(char *) "virNodeGetMemoryStats", libvirt_virNodeGetMemoryStats, METH_VARARGS, NULL},
     {(char *) "virDomainGetUUID", libvirt_virDomainGetUUID, METH_VARARGS, NULL},

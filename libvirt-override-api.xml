@@ -104,6 +104,21 @@
       <return type='char *' info='the list of information or None in case of error'/>
       <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
     </function>
+    <function name='virNodeGetSecurityModel' file='python'>
+      <info>Extract information about the host security model</info>
+      <return type='char *' info='the list of information or None in case of error'/>
+      <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
+    </function>
+    <function name='virDomainGetSecurityLabel' file='python'>
+      <info>Extract information about the domain security label. Only the first label will be returned.</info>
+      <return type='char *' info='the list of information or None in case of error'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+    </function>
+    <function name='virDomainGetSecurityLabelList' file='python'>
+      <info>Extract information about the domain security label. A list of all labels will be returned.</info>
+      <return type='char *' info='the list of information or None in case of error'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+    </function>
     <function name='virNodeGetCPUStats' file='python'>
       <info>Extract node's CPU statistics.</info>
       <return type='char *' info='dictionary mapping field names to values or None in case of error'/>

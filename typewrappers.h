@@ -164,6 +164,7 @@ PyObject * libvirt_ulonglongWrap(unsigned long long val);
 PyObject * libvirt_charPtrWrap(char *str);
 PyObject * libvirt_charPtrSizeWrap(char *str, Py_ssize_t size);
 PyObject * libvirt_constcharPtrWrap(const char *str);
+PyObject * libvirt_boolWrap(int val);
 int libvirt_intUnwrap(PyObject *obj, int *val);
 int libvirt_uintUnwrap(PyObject *obj, unsigned int *val);
 int libvirt_longUnwrap(PyObject *obj, long *val);
