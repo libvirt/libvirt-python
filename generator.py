@@ -517,7 +517,8 @@ skip_function = (
     "virNWFilterRef",
     "virStoragePoolRef",
     "virStorageVolRef",
-    'virStreamRef',
+    "virStreamRef",
+    "virDomainSnapshotRef",
 
     # This functions shouldn't be called via the bindings (and even the docs
     # contain an explicit warning to that effect). The equivalent should be
