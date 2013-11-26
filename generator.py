@@ -187,16 +187,21 @@ class docParser(xml.sax.handler.ContentHandler):
 
 
 def function(name, desc, ret, args, file, module, cond):
+    global onlyOverrides
     if onlyOverrides and name not in functions:
         return
+    if name == "virConnectListDomains":
+        name = "virConnectListDomainsID"
     functions[name] = (desc, ret, args, file, module, cond)
 
 def qemu_function(name, desc, ret, args, file, module, cond):
+    global onlyOverrides
     if onlyOverrides and name not in qemu_functions:
         return
     qemu_functions[name] = (desc, ret, args, file, module, cond)
 
 def lxc_function(name, desc, ret, args, file, module, cond):
+    global onlyOverrides
     if onlyOverrides and name not in lxc_functions:
         return
     lxc_functions[name] = (desc, ret, args, file, module, cond)
@@ -786,6 +791,7 @@ def buildStubs(module, api_xml):
     global py_types
     global py_return_types
     global unknown_types
+    global onlyOverrides
 
     if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
         print "ERROR: Unknown module type: %s" % module
