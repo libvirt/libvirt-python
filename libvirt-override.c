@@ -25,10 +25,18 @@
 #include "build/libvirt.h"
 #include "libvirt-utils.h"
 
-#ifndef __CYGWIN__
-extern void initlibvirtmod(void);
+#if PY_MAJOR_VERSION > 2
+# ifndef __CYGWIN__
+extern PyObject *PyInit_libvirtmod(void);
+# else
+extern PyObject *PyInit_cygvirtmod(void);
+# endif
 #else
+# ifndef __CYGWIN__
+extern void initlibvirtmod(void);
+# else
 extern void initcygvirtmod(void);
+# endif
 #endif
 
 #if 0
@@ -7620,30 +7628,59 @@ static PyMethodDef libvirtMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-void
-#ifndef __CYGWIN__
-initlibvirtmod
-#else
-initcygvirtmod
-#endif
+#if PY_MAJOR_VERSION > 2
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+# ifndef __CYGWIN__
+        "libvirtmod",
+# else
+        "cygvirtmod",
+# endif
+        NULL,
+        -1,
+        libvirtMethods,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+};
+
+PyObject *
+# ifndef __CYGWIN__
+PyInit_libvirtmod
+# else
+PyInit_cygvirtmod
+# endif
   (void)
 {
-    static int initialized = 0;
+    PyObject *module;
 
-    if (initialized != 0)
-        return;
+    if (virInitialize() < 0)
+        return NULL;
 
+    module = PyModule_Create(&moduledef);
+
+    return module;
+}
+#else /* ! PY_MAJOR_VERSION > 2 */
+void
+# ifndef __CYGWIN__
+initlibvirtmod
+# else
+initcygvirtmod
+# endif
+  (void)
+{
     if (virInitialize() < 0)
         return;
 
     /* initialize the python extension module */
     Py_InitModule((char *)
-#ifndef __CYGWIN__
-                  "libvirtmod"
-#else
-                  "cygvirtmod"
-#endif
-                  , libvirtMethods);
-
-    initialized = 1;
+# ifndef __CYGWIN__
+                  "libvirtmod",
+# else
+                  "cygvirtmod",
+# endif
+		  libvirtMethods);
 }
+#endif /* ! PY_MAJOR_VERSION > 2 */

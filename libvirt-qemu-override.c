@@ -21,10 +21,18 @@
 #include "libvirt-utils.h"
 #include "build/libvirt-qemu.h"
 
-#ifndef __CYGWIN__
-extern void initlibvirtmod_qemu(void);
+#if PY_MAJOR_VERSION > 2
+# ifndef __CYGWIN__
+extern PyObject *PyInit_libvirtmod_qemu(void);
+# else
+extern PyObject *PyInit_cygvirtmod_qemu(void);
+# endif
 #else
+# ifndef __CYGWIN__
+extern void initlibvirtmod_qemu(void);
+# else
 extern void initcygvirtmod_qemu(void);
+# endif
 #endif
 
 #if 0
@@ -128,30 +136,59 @@ static PyMethodDef libvirtQemuMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-void
-#ifndef __CYGWIN__
-initlibvirtmod_qemu
-#else
-initcygvirtmod_qemu
-#endif
+#if PY_MAJOR_VERSION > 2
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+# ifndef __CYGWIN__
+        "libvirtmod_qemu",
+# else
+        "cygvirtmod_qemu",
+# endif
+        NULL,
+        -1,
+        libvirtQemuMethods,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+};
+
+PyObject *
+# ifndef __CYGWIN__
+PyInit_libvirtmod_qemu
+# else
+PyInit_cygvirtmod_qemu
+# endif
   (void)
 {
-    static int initialized = 0;
+    PyObject *module;
 
-    if (initialized != 0)
-        return;
+    if (virInitialize() < 0)
+        return NULL;
 
+    module = PyModule_Create(&moduledef);
+
+    return module;
+}
+#else /* ! PY_MAJOR_VERSION > 2 */
+void
+# ifndef __CYGWIN__
+initlibvirtmod_qemu
+# else
+initcygvirtmod_qemu
+# endif
+  (void)
+{
     if (virInitialize() < 0)
         return;
 
     /* initialize the python extension module */
     Py_InitModule((char *)
-#ifndef __CYGWIN__
-                  "libvirtmod_qemu"
-#else
-                  "cygvirtmod_qemu"
-#endif
-                  , libvirtQemuMethods);
-
-    initialized = 1;
+# ifndef __CYGWIN__
+                  "libvirtmod_qemu",
+# else
+                  "cygvirtmod_qemu",
+# endif
+		  libvirtQemuMethods);
 }
+#endif /* ! PY_MAJOR_VERSION > 2 */
