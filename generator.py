@@ -867,7 +867,10 @@ def buildStubs(module, api_xml):
     wrapper.write("#include \"typewrappers.h\"\n")
     wrapper.write("#include \"build/" + module + ".h\"\n\n")
 
-    for function in list(funcs.keys()):
+    funcnames = list(funcs.keys())
+    if funcnames is not None:
+        funcnames.sort()
+    for function in funcnames:
         # Skip the functions which are not for the module
         ret = print_function_wrapper(module, function, wrapper, export, include)
         if ret < 0:
@@ -1760,7 +1763,10 @@ def buildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in list(enums.items()):
+    enumvals = list(enums.items())
+    if enumvals is not None:
+        enumvals.sort(key=lambda x: x[0])
+    for type,enum in enumvals:
         classes.write("# %s\n" % type)
         items = list(enum.items())
         items.sort(key=lambda i: int(i[1]))
