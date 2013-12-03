@@ -38,7 +38,7 @@
         """
         try:
             for cb,opaque in self.domainEventCallbacks.items():
-                cb(self,dom,event,detail,opaque)
+                cb(self, virDomain(self, _obj=dom), event, detail, opaque)
             return 0
         except AttributeError:
             pass

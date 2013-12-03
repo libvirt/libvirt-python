@@ -4923,7 +4923,6 @@ cleanup:
  *******************************************/
 static PyObject *libvirt_module    = NULL;
 static PyObject *libvirt_dict      = NULL;
-static PyObject *libvirt_dom_class = NULL;
 
 static PyObject *
 getLibvirtModuleObject(void) {
@@ -4959,23 +4958,6 @@ getLibvirtDictObject(void) {
     return libvirt_dict;
 }
 
-static PyObject *
-getLibvirtDomainClassObject(void) {
-    if (libvirt_dom_class)
-        return libvirt_dom_class;
-
-    // PyDict_GetItemString returns a borrowed reference
-    libvirt_dom_class = PyDict_GetItemString(getLibvirtDictObject(),
-                                             "virDomain");
-    if (!libvirt_dom_class) {
-        DEBUG("%s Error importing virDomain class\n", __FUNCTION__);
-        PyErr_Print();
-        return NULL;
-    }
-
-    Py_INCREF(libvirt_dom_class);
-    return libvirt_dom_class;
-}
 
 static PyObject *
 libvirt_lookupPythonFunc(const char *funcname)
@@ -5013,13 +4995,9 @@ libvirt_virConnectDomainEventCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
 {
     PyObject *pyobj_ret;
 
-    PyObject *pyobj_conn_inst = (PyObject*)opaque;
+    PyObject *pyobj_conn = (PyObject*)opaque;
     PyObject *pyobj_dom;
 
-    PyObject *pyobj_dom_args;
-    PyObject *pyobj_dom_inst;
-
-    PyObject *dom_class;
     int ret = -1;
 
     LIBVIRT_ENSURE_THREAD_STATE;
@@ -5027,45 +5005,15 @@ libvirt_virConnectDomainEventCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
     /* Create a python instance of this virDomainPtr */
     virDomainRef(dom);
     pyobj_dom = libvirt_virDomainPtrWrap(dom);
-    pyobj_dom_args = PyTuple_New(2);
-    if (PyTuple_SetItem(pyobj_dom_args, 0, pyobj_conn_inst) != 0) {
-        DEBUG("%s error creating tuple", __FUNCTION__);
-        goto cleanup;
-    }
-    if (PyTuple_SetItem(pyobj_dom_args, 1, pyobj_dom) != 0) {
-        DEBUG("%s error creating tuple", __FUNCTION__);
-        goto cleanup;
-    }
-    Py_INCREF(pyobj_conn_inst);
-
-    dom_class = getLibvirtDomainClassObject();
-    if (!PyClass_Check(dom_class)) {
-        DEBUG("%s dom_class is not a class!\n", __FUNCTION__);
-        goto cleanup;
-    }
-
-    pyobj_dom_inst = PyInstance_New(dom_class,
-                                    pyobj_dom_args,
-                                    NULL);
-
-    Py_DECREF(pyobj_dom_args);
-
-    if (!pyobj_dom_inst) {
-        DEBUG("%s Error creating a python instance of virDomain\n",
-              __FUNCTION__);
-        PyErr_Print();
-        goto cleanup;
-    }
 
     /* Call the Callback Dispatcher */
-    pyobj_ret = PyObject_CallMethod(pyobj_conn_inst,
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
                                     (char*)"_dispatchDomainEventCallbacks",
                                     (char*)"Oii",
-                                    pyobj_dom_inst,
-                                    event,
-                                    detail);
+                                    pyobj_dom,
+                                    event, detail);
 
-    Py_DECREF(pyobj_dom_inst);
+    Py_DECREF(pyobj_dom);
 
     if (!pyobj_ret) {
         DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
@@ -5075,8 +5023,6 @@ libvirt_virConnectDomainEventCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
         ret = 0;
     }
 
-
-cleanup:
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
