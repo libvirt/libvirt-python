@@ -822,7 +822,7 @@ def buildStubs(module, api_xml):
         print(file, ":", msg)
         sys.exit(1)
 
-    n = len(funcs.keys())
+    n = len(list(funcs.keys()))
     if not quiet:
         print("Found %d functions in %s" % ((n), api_xml))
 
@@ -843,7 +843,7 @@ def buildStubs(module, api_xml):
     if not quiet:
         # XXX: This is not right, same function already in @functions
         # will be overwritten.
-        print("Found %d functions in %s" % ((len(funcs.keys()) - n), override_api_xml))
+        print("Found %d functions in %s" % ((len(list(funcs.keys())) - n), override_api_xml))
     nb_wrap = 0
     failed = 0
     skipped = 0
@@ -865,7 +865,7 @@ def buildStubs(module, api_xml):
     wrapper.write("#include \"typewrappers.h\"\n")
     wrapper.write("#include \"build/" + module + ".h\"\n\n")
 
-    for function in funcs.keys():
+    for function in list(funcs.keys()):
         # Skip the functions which are not for the module
         ret = print_function_wrapper(module, function, wrapper, export, include)
         if ret < 0:
@@ -887,7 +887,7 @@ def buildStubs(module, api_xml):
 
     if unknown_types:
         print("Missing type converters: ")
-        for type in unknown_types.keys():
+        for type in list(unknown_types.keys()):
             print("%s:%d " % (type, len(unknown_types[type])))
 
     for f in funcs_failed:
@@ -1232,7 +1232,7 @@ def buildWrappers(module):
         print("ERROR: Unknown module type: %s" % module)
         return None
 
-    for type in classes_type.keys():
+    for type in list(classes_type.keys()):
         function_classes[classes_type[type][2]] = []
 
     #
@@ -1246,12 +1246,12 @@ def buildWrappers(module):
     for classe in primary_classes:
         classes_list.append(classe)
         classes_processed[classe] = ()
-        for type in classes_type.keys():
+        for type in list(classes_type.keys()):
             tinfo = classes_type[type]
             if tinfo[2] == classe:
                 ctypes.append(type)
                 ctypes_processed[type] = ()
-    for type in classes_type.keys():
+    for type in list(classes_type.keys()):
         if ctypes_processed.has_key(type):
             continue
         tinfo = classes_type[type]
@@ -1262,7 +1262,7 @@ def buildWrappers(module):
         ctypes.append(type)
         ctypes_processed[type] = ()
 
-    for name in functions.keys():
+    for name in list(functions.keys()):
         found = 0
         (desc, ret, args, file, mod, cond) = functions[name]
         for type in ctypes:
@@ -1772,10 +1772,10 @@ def buildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in enums.items():
+    for type,enum in list(enums.items()):
         classes.write("# %s\n" % type)
-        items = enum.items()
-        items.sort(lambda i1,i2: cmp(long(i1[1]),long(i2[1])))
+        items = list(enum.items())
+        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
         for name,value in items:
             classes.write("%s = %s\n" % (name,value))
         classes.write("\n")
@@ -1832,7 +1832,7 @@ def qemuBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in qemu_functions.keys():
+    for name in list(qemu_functions.keys()):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = qemu_functions[name]
         fd.write("def %s(" % func)
@@ -1882,10 +1882,10 @@ def qemuBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in qemu_enums.items():
+    for type,enum in list(qemu_enums.items()):
         fd.write("# %s\n" % type)
-        items = enum.items()
-        items.sort(lambda i1,i2: cmp(long(i1[1]),long(i2[1])))
+        items = list(enum.items())
+        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
@@ -1943,7 +1943,7 @@ def lxcBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in lxc_functions.keys():
+    for name in list(lxc_functions.keys()):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = lxc_functions[name]
         fd.write("def %s(" % func)
@@ -1993,10 +1993,10 @@ def lxcBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in lxc_enums.items():
+    for type,enum in list(lxc_enums.items()):
         fd.write("# %s\n" % type)
-        items = enum.items()
-        items.sort(lambda i1,i2: cmp(long(i1[1]),long(i2[1])))
+        items = list(enum.items())
+        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
