@@ -76,11 +76,11 @@ class docParser(xml.sax.handler.ContentHandler):
             self.function_return = None
             self.function_file = None
             self.function_module= None
-            if attrs.has_key('name'):
+            if 'name' in attrs.keys():
                 self.function = attrs['name']
-            if attrs.has_key('file'):
+            if 'file' in attrs.keys():
                 self.function_file = attrs['file']
-            if attrs.has_key('module'):
+            if 'module' in attrs.keys():
                 self.function_module= attrs['module']
         elif tag == 'cond':
             self._data = []
@@ -91,24 +91,24 @@ class docParser(xml.sax.handler.ContentHandler):
                 self.function_arg_name = None
                 self.function_arg_type = None
                 self.function_arg_info = None
-                if attrs.has_key('name'):
+                if 'name' in attrs.keys():
                     self.function_arg_name = attrs['name']
                     if self.function_arg_name == 'from':
                         self.function_arg_name = 'frm'
-                if attrs.has_key('type'):
+                if 'type' in attrs.keys():
                     self.function_arg_type = attrs['type']
-                if attrs.has_key('info'):
+                if 'info' in attrs.keys():
                     self.function_arg_info = attrs['info']
         elif tag == 'return':
             if self.in_function == 1:
                 self.function_return_type = None
                 self.function_return_info = None
                 self.function_return_field = None
-                if attrs.has_key('type'):
+                if 'type' in attrs.keys():
                     self.function_return_type = attrs['type']
-                if attrs.has_key('info'):
+                if 'info' in attrs.keys():
                     self.function_return_info = attrs['info']
-                if attrs.has_key('field'):
+                if 'field' in attrs.keys():
                     self.function_return_field = attrs['field']
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
@@ -207,7 +207,7 @@ def lxc_function(name, desc, ret, args, file, module, cond):
     lxc_functions[name] = (desc, ret, args, file, module, cond)
 
 def enum(type, name, value):
-    if not enums.has_key(type):
+    if type not in enums:
         enums[type] = {}
     if value == 'VIR_TYPED_PARAM_INT':
         value = 1
@@ -233,14 +233,14 @@ def enum(type, name, value):
         enums[type][name] = value
 
 def lxc_enum(type, name, value):
-    if not lxc_enums.has_key(type):
+    if type not in lxc_enums:
         lxc_enums[type] = {}
     if onlyOverrides and name not in lxc_enums[type]:
         return
     lxc_enums[type][name] = value
 
 def qemu_enum(type, name, value):
-    if not qemu_enums.has_key(type):
+    if type not in qemu_enums:
         qemu_enums[type] = {}
     if onlyOverrides and name not in qemu_enums[type]:
         return
@@ -603,7 +603,7 @@ def print_function_wrapper(module, name, output, export, include):
         print("failed to get function %s infos" % name)
         return
 
-    if skipped_modules.has_key(module):
+    if module in skipped_modules:
         return 0
 
     if module == "libvirt":
@@ -637,7 +637,7 @@ def print_function_wrapper(module, name, output, export, include):
         if arg[1][0:6] == "const ":
             arg[1] = arg[1][6:]
         c_args = c_args + "    %s %s;\n" % (arg[1], arg[0])
-        if py_types.has_key(arg[1]):
+        if arg[1] in py_types:
             (f, t, n, c) = py_types[arg[1]]
             if (f == 'z') and (name in foreign_encoding_args) and (num_bufs == 0):
                 f = 't#'
@@ -659,9 +659,9 @@ def print_function_wrapper(module, name, output, export, include):
                 c_call = c_call + ", "
             c_call = c_call + "%s" % (arg[0])
         else:
-            if skipped_types.has_key(arg[1]):
+            if arg[1] in skipped_types:
                 return 0
-            if unknown_types.has_key(arg[1]):
+            if arg[1] in unknown_types:
                 lst = unknown_types[arg[1]]
                 lst.append(name)
             else:
@@ -683,7 +683,7 @@ def print_function_wrapper(module, name, output, export, include):
         else:
             c_call = "\n    %s(%s);\n" % (name, c_call)
         ret_convert = "    Py_INCREF(Py_None);\n    return Py_None;\n"
-    elif py_types.has_key(ret[0]):
+    elif ret[0] in py_types:
         (f, t, n, c) = py_types[ret[0]]
         c_return = "    %s c_retval;\n" % (ret[0])
         if file == "python_accessor" and ret[2] is not None:
@@ -692,16 +692,16 @@ def print_function_wrapper(module, name, output, export, include):
             c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
         ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n,c)
         ret_convert = ret_convert + "    return py_retval;\n"
-    elif py_return_types.has_key(ret[0]):
+    elif ret[0] in py_return_types:
         (f, t, n, c) = py_return_types[ret[0]]
         c_return = "    %s c_retval;\n" % (ret[0])
         c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
         ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n,c)
         ret_convert = ret_convert + "    return py_retval;\n"
     else:
-        if skipped_types.has_key(ret[0]):
+        if ret[0] in skipped_types:
             return 0
-        if unknown_types.has_key(ret[0]):
+        if ret[0] in unknown_types:
             lst = unknown_types[ret[0]]
             lst.append(name)
         else:
@@ -1254,10 +1254,10 @@ def buildWrappers(module):
                 ctypes.append(type)
                 ctypes_processed[type] = ()
     for type in list(classes_type.keys()):
-        if ctypes_processed.has_key(type):
+        if type in ctypes_processed:
             continue
         tinfo = classes_type[type]
-        if not classes_processed.has_key(tinfo[2]):
+        if tinfo[2] not in classes_processed:
             classes_list.append(tinfo[2])
             classes_processed[tinfo[2]] = ()
 
@@ -1319,7 +1319,7 @@ def buildWrappers(module):
     if extra is not None:
         extra.close()
 
-    if function_classes.has_key("None"):
+    if "None" in function_classes:
         flist = function_classes["None"]
         flist.sort(functionCompare)
         oldfile = ""
@@ -1344,7 +1344,7 @@ def buildWrappers(module):
             writeDoc(module, name, args, '    ', classes)
 
             for arg in args:
-                if classes_type.has_key(arg[1]):
+                if arg[1] in classes_type:
                     classes.write("    if %s is None: %s__o = None\n" %
                                   (arg[0], arg[0]))
                     classes.write("    else: %s__o = %s%s\n" %
@@ -1359,17 +1359,17 @@ def buildWrappers(module):
                 if n != 0:
                     classes.write(", ")
                 classes.write("%s" % arg[0])
-                if classes_type.has_key(arg[1]):
+                if arg[1] in classes_type:
                     classes.write("__o")
                 n = n + 1
             classes.write(")\n")
 
             if ret[0] != "void":
-                if classes_type.has_key(ret[0]):
+                if ret[0] in classes_type:
                     #
                     # Raise an exception
                     #
-                    if functions_noexcept.has_key(name):
+                    if name in functions_noexcept:
                         classes.write("    if ret is None:return None\n")
                     else:
                         classes.write(
@@ -1384,8 +1384,8 @@ def buildWrappers(module):
                 # several things that we can do, depending on the
                 # contents of functions_int_*:
                 elif is_integral_type (ret[0]):
-                    if not functions_noexcept.has_key (name):
-                        if functions_int_exception_test.has_key (name):
+                    if name not in functions_noexcept:
+                        if name in functions_int_exception_test:
                             test = functions_int_exception_test[name]
                         else:
                             test = functions_int_default_test
@@ -1395,8 +1395,8 @@ def buildWrappers(module):
                     classes.write("    return ret\n")
 
                 elif is_python_noninteger_type (ret[0]):
-                    if not functions_noexcept.has_key (name):
-                        if functions_list_exception_test.has_key (name):
+                    if name not in functions_noexcept:
+                        if name in functions_list_exception_test:
                             test = functions_list_exception_test[name]
                         else:
                             test = functions_list_default_test
@@ -1414,11 +1414,11 @@ def buildWrappers(module):
         if classname == "None":
             pass
         else:
-            if classes_ancestor.has_key(classname):
+            if classname in classes_ancestor:
                 classes.write("class %s(%s):\n" % (classname,
                               classes_ancestor[classname]))
                 classes.write("    def __init__(self, _obj=None):\n")
-                if reference_keepers.has_key(classname):
+                if classname in reference_keepers:
                     rlist = reference_keepers[classname]
                     for ref in rlist:
                         classes.write("        self.%s = None\n" % ref[1])
@@ -1435,7 +1435,7 @@ def buildWrappers(module):
                     classes.write("    def __init__(self, dom, _obj=None):\n")
                 else:
                     classes.write("    def __init__(self, _obj=None):\n")
-                if reference_keepers.has_key(classname):
+                if classname in reference_keepers:
                     rlist = reference_keepers[classname]
                     for ref in rlist:
                         classes.write("        self.%s = None\n" % ref[1])
@@ -1452,7 +1452,7 @@ def buildWrappers(module):
                     classes.write("        self._conn = dom.connect()\n")
                 classes.write("        self._o = _obj\n\n")
             destruct=None
-            if classes_destructors.has_key(classname):
+            if classname in classes_destructors:
                 classes.write("    def __del__(self):\n")
                 classes.write("        if self._o is not None:\n")
                 classes.write("            libvirtmod.%s(self._o)\n" %
@@ -1460,12 +1460,12 @@ def buildWrappers(module):
                 classes.write("        self._o = None\n\n")
                 destruct=classes_destructors[classname]
 
-            if not class_skip_connect_impl.has_key(classname):
+            if classname not in class_skip_connect_impl:
                 # Build python safe 'connect' method
                 classes.write("    def connect(self):\n")
                 classes.write("        return self._conn\n\n")
 
-            if class_domain_impl.has_key(classname):
+            if classname in class_domain_impl:
                 classes.write("    def domain(self):\n")
                 classes.write("        return self._dom\n\n")
 
@@ -1504,7 +1504,7 @@ def buildWrappers(module):
                 writeDoc(module, name, args, '        ', classes)
                 n = 0
                 for arg in args:
-                    if classes_type.has_key(arg[1]):
+                    if arg[1] in classes_type:
                         if n != index:
                             classes.write("        if %s is None: %s__o = None\n" %
                                           (arg[0], arg[0]))
@@ -1522,11 +1522,11 @@ def buildWrappers(module):
                         classes.write(", ")
                     if n != index:
                         classes.write("%s" % arg[0])
-                        if classes_type.has_key(arg[1]):
+                        if arg[1] in classes_type:
                             classes.write("__o")
                     else:
                         classes.write("self")
-                        if classes_type.has_key(arg[1]):
+                        if arg[1] in classes_type:
                             classes.write(classes_type[arg[1]][0])
                     n = n + 1
                 classes.write(")\n")
@@ -1536,11 +1536,11 @@ def buildWrappers(module):
 
                 # For functions returning object types:
                 if ret[0] != "void":
-                    if classes_type.has_key(ret[0]):
+                    if ret[0] in classes_type:
                         #
                         # Raise an exception
                         #
-                        if functions_noexcept.has_key(name):
+                        if name in functions_noexcept:
                             classes.write(
                                 "        if ret is None:return None\n")
                         else:
@@ -1590,7 +1590,7 @@ def buildWrappers(module):
                         # See reference_keepers for the list
                         #
                         tclass = classes_type[ret[0]][2]
-                        if reference_keepers.has_key(tclass):
+                        if tclass in reference_keepers:
                             rlist = reference_keepers[tclass]
                             for pref in rlist:
                                 if pref[0] == classname:
@@ -1598,7 +1598,7 @@ def buildWrappers(module):
                                                   pref[1])
 
                         # Post-processing - just before we return.
-                        if function_post.has_key(name):
+                        if name in function_post:
                             classes.write("        %s\n" %
                                           (function_post[name]))
 
@@ -1606,16 +1606,16 @@ def buildWrappers(module):
                         # return the class
                         #
                         classes.write("        return __tmp\n")
-                    elif converter_type.has_key(ret[0]):
+                    elif ret[0] in converter_type:
                         #
                         # Raise an exception
                         #
-                        if functions_noexcept.has_key(name):
+                        if name in functions_noexcept:
                             classes.write(
                                 "        if ret is None:return None")
 
                         # Post-processing - just before we return.
-                        if function_post.has_key(name):
+                        if name in function_post:
                             classes.write("        %s\n" %
                                           (function_post[name]))
 
@@ -1627,8 +1627,8 @@ def buildWrappers(module):
                     # are several things that we can do, depending on
                     # the contents of functions_int_*:
                     elif is_integral_type (ret[0]):
-                        if not functions_noexcept.has_key (name):
-                            if functions_int_exception_test.has_key (name):
+                        if name not in functions_noexcept:
+                            if name in functions_int_exception_test:
                                 test = functions_int_exception_test[name]
                             else:
                                 test = functions_int_default_test
@@ -1662,15 +1662,15 @@ def buildWrappers(module):
                                                ("ret", name))
 
                         # Post-processing - just before we return.
-                        if function_post.has_key(name):
+                        if name in function_post:
                             classes.write("        %s\n" %
                                           (function_post[name]))
 
                         classes.write ("        return ret\n")
 
                     elif is_python_noninteger_type (ret[0]):
-                        if not functions_noexcept.has_key (name):
-                            if functions_list_exception_test.has_key (name):
+                        if name not in functions_noexcept:
+                            if name in functions_list_exception_test:
                                 test = functions_list_exception_test[name]
                             else:
                                 test = functions_list_default_test
@@ -1704,7 +1704,7 @@ def buildWrappers(module):
                                                ("ret", name))
 
                         # Post-processing - just before we return.
-                        if function_post.has_key(name):
+                        if name in function_post:
                             classes.write("        %s\n" %
                                           (function_post[name]))
 
@@ -1712,7 +1712,7 @@ def buildWrappers(module):
 
                     else:
                         # Post-processing - just before we return.
-                        if function_post.has_key(name):
+                        if name in function_post:
                             classes.write("        %s\n" %
                                           (function_post[name]))
 
