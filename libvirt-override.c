@@ -4921,39 +4921,26 @@ cleanup:
  * Helper functions to avoid importing modules
  * for every callback
  *******************************************/
-static PyObject *libvirt_module    = NULL;
-static PyObject *libvirt_dict      = NULL;
-
-static PyObject *
-getLibvirtModuleObject(void) {
-    if (libvirt_module)
-        return libvirt_module;
-
-    // PyImport_ImportModule returns a new reference
-    /* Bogus (char *) cast for RHEL-5 python API brokenness */
-    libvirt_module = PyImport_ImportModule((char *)"libvirt");
-    if (!libvirt_module) {
-        DEBUG("%s Error importing libvirt module\n", __FUNCTION__);
-        PyErr_Print();
-        return NULL;
-    }
-
-    return libvirt_module;
-}
 
 static PyObject *
 getLibvirtDictObject(void) {
-    if (libvirt_dict)
-        return libvirt_dict;
+    PyObject *libvirt_mod;
+    PyObject *libvirt_dict;
 
-    // PyModule_GetDict returns a borrowed reference
-    libvirt_dict = PyModule_GetDict(getLibvirtModuleObject());
-    if (!libvirt_dict) {
-        DEBUG("%s Error importing libvirt dictionary\n", __FUNCTION__);
+    libvirt_mod = PyImport_ImportModuleNoBlock("libvirt");
+    if (!libvirt_mod) {
+        DEBUG("%s Error finding libvirt in imports\n",
+	      __FUNCTION__);
         PyErr_Print();
         return NULL;
     }
-
+    libvirt_dict = PyModule_GetDict(libvirt_mod);
+    if (!libvirt_dict) {
+        DEBUG("%s Error finding libvirt dict\n",
+	      __FUNCTION__);
+        PyErr_Print();
+        return NULL;
+    }
     Py_INCREF(libvirt_dict);
     return libvirt_dict;
 }
