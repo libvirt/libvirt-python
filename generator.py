@@ -1188,15 +1188,15 @@ def writeDoc(module, name, args, indent, output):
      if funcs[name][0] is None or funcs[name][0] == "":
          return
      val = funcs[name][0]
-     val = string.replace(val, "NULL", "None")
+     val = val.replace("NULL", "None")
      output.write(indent)
      output.write('"""')
-     i = string.find(val, "\n")
+     i = val.find("\n")
      while i >= 0:
          str = val[0:i+1]
          val = val[i+1:]
          output.write(str)
-         i = string.find(val, "\n")
+         i = val.find("\n")
          output.write(indent)
      output.write(val)
      output.write(' """\n')
