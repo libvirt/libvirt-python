@@ -10,8 +10,8 @@ import getpass
 
 
 def usage():
-    print "Usage: %s HOSTNAME" % sys.argv[0]
-    print "       List active domains of HOSTNAME and print some info"
+    print("Usage: %s HOSTNAME" % sys.argv[0])
+    print("       List active domains of HOSTNAME and print some info")
 
 
 # This is the callback method passed to libvirt.openAuth() (see below).
@@ -51,12 +51,12 @@ def request_credentials(credentials, user_data):
 
 
 def print_section(title):
-    print "\n%s" % title
-    print "=" * 60
+    print("\n%s" % title)
+    print("=" * 60)
 
 
 def print_entry(key, value):
-    print "%-10s %-10s" % (key, value)
+    print("%-10s %-10s" % (key, value))
 
 
 def print_xml(key, ctx, path):
@@ -100,7 +100,7 @@ auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_NOECHOPROMPT],
 conn = libvirt.openAuth(uri, auth, 0)
 
 if conn is None:
-    print "Failed to open connection to %s" % hostname
+    print("Failed to open connection to %s" % hostname)
     sys.exit(1)
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
@@ -136,7 +136,7 @@ for id in conn.listDomainsID():
         ctx.setContextNode(d)
 
         if not first:
-            print "------------------------------------------------------------"
+            print("------------------------------------------------------------")
         else:
             first = False
 

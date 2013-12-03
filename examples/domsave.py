@@ -8,9 +8,9 @@ import libxml2
 import pdb
 
 def usage():
-   print 'Usage: %s DIR' % sys.argv[0]
-   print '       Save all currently running domU\'s into DIR'
-   print '       DIR must exist and be writable by this process'
+   print('Usage: %s DIR' % sys.argv[0])
+   print('       Save all currently running domU\'s into DIR')
+   print('       DIR must exist and be writable by this process')
 
 if len(sys.argv) != 2:
     usage()
@@ -20,7 +20,7 @@ dir = sys.argv[1]
 
 conn = libvirt.open(None)
 if conn is None:
-    print 'Failed to open connection to the hypervisor'
+    print('Failed to open connection to the hypervisor')
     sys.exit(1)
 
 doms = conn.listDomainsID()
@@ -28,13 +28,12 @@ for id in doms:
     if id == 0:
         continue
     dom = conn.lookupByID(id)
-    print "Saving %s[%d] ... " % (dom.name(), id),
-    sys.stdout.flush()
+    print("Saving %s[%d] ... " % (dom.name(), id))
     path = os.path.join(dir, dom.name())
     ret = dom.save(path)
     if ret == 0:
-        print "done"
+        print("done")
     else:
-        print "error %d" % ret
+        print("error %d" % ret)
 
 #pdb.set_trace()

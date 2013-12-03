@@ -30,7 +30,7 @@ do_debug = False
 def debug(msg):
     global do_debug
     if do_debug:
-        print msg
+        print(msg)
 
 #
 # This general purpose event loop will support waiting for file handle
@@ -456,50 +456,50 @@ def detailToString(event, detail):
     return eventStrings[event][detail]
 
 def myDomainEventCallback1 (conn, dom, event, detail, opaque):
-    print "myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
+    print("myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
                                                                  eventToString(event),
-                                                                 detailToString(event, detail))
+                                                                 detailToString(event, detail)))
 
 def myDomainEventCallback2 (conn, dom, event, detail, opaque):
-    print "myDomainEventCallback2 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
+    print("myDomainEventCallback2 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
                                                                  eventToString(event),
-                                                                 detailToString(event, detail))
+                                                                 detailToString(event, detail)))
 
 def myDomainEventRebootCallback(conn, dom, opaque):
-    print "myDomainEventRebootCallback: Domain %s(%s)" % (dom.name(), dom.ID())
+    print("myDomainEventRebootCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
 
 def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque):
-    print "myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), utcoffset)
+    print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), utcoffset))
 
 def myDomainEventWatchdogCallback(conn, dom, action, opaque):
-    print "myDomainEventWatchdogCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), action)
+    print("myDomainEventWatchdogCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), action))
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
-    print "myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action)
+    print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action))
 
 def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
-    print "myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme)
+    print("myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme))
 
 def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
-    print "myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
-            dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, reason)
+    print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
+            dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, reason))
 def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
-    print "myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
-            dom.name(), dom.ID(), devAlias, reason)
+    print("myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
+            dom.name(), dom.ID(), devAlias, reason))
 def myDomainEventPMWakeupCallback(conn, dom, reason, opaque):
-    print "myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
-            dom.name(), dom.ID())
+    print("myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
+            dom.name(), dom.ID()))
 def myDomainEventPMSuspendCallback(conn, dom, reason, opaque):
-    print "myDomainEventPMSuspendCallback: Domain %s(%s) system pmsuspend" % (
-            dom.name(), dom.ID())
+    print("myDomainEventPMSuspendCallback: Domain %s(%s) system pmsuspend" % (
+            dom.name(), dom.ID()))
 def myDomainEventBalloonChangeCallback(conn, dom, actual, opaque):
-    print "myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), actual)
+    print("myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), actual))
 def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
-    print "myDomainEventPMSuspendDiskCallback: Domain %s(%s) system pmsuspend_disk" % (
-            dom.name(), dom.ID())
+    print("myDomainEventPMSuspendDiskCallback: Domain %s(%s) system pmsuspend_disk" % (
+            dom.name(), dom.ID()))
 def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
-    print "myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
-            dom.name(), dom.ID(), dev)
+    print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
+            dom.name(), dom.ID(), dev))
 
 run = True
 
@@ -507,27 +507,27 @@ def myConnectionCloseCallback(conn, reason, opaque):
     reasonStrings = (
         "Error", "End-of-file", "Keepalive", "Client",
         )
-    print "myConnectionCloseCallback: %s: %s" % (conn.getURI(), reasonStrings[reason])
+    print("myConnectionCloseCallback: %s: %s" % (conn.getURI(), reasonStrings[reason]))
     run = False
 
-def usage(out=sys.stderr):
-    print >>out, "usage: "+os.path.basename(sys.argv[0])+" [-hdl] [uri]"
-    print >>out, "   uri will default to qemu:///system"
-    print >>out, "   --help, -h   Print this help message"
-    print >>out, "   --debug, -d  Print debug output"
-    print >>out, "   --loop, -l   Toggle event-loop-implementation"
+def usage():
+    print("usage: "+os.path.basename(sys.argv[0])+" [-hdl] [uri]")
+    print("   uri will default to qemu:///system")
+    print("   --help, -h   Print(this help message")
+    print("   --debug, -d  Print(debug output")
+    print("   --loop, -l   Toggle event-loop-implementation")
 
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hdl", ["help", "debug", "loop"])
     except getopt.GetoptError, err:
         # print help information and exit:
-        print str(err) # will print something like "option -a not recognized"
+        print(str(err)) # will print something like "option -a not recognized"
         usage()
         sys.exit(2)
     for o, a in opts:
         if o in ("-h", "--help"):
-            usage(sys.stdout)
+            usage()
             sys.exit()
         if o in ("-d", "--debug"):
             global do_debug
@@ -541,7 +541,7 @@ def main():
     else:
         uri = "qemu:///system"
 
-    print "Using uri:" + uri
+    print("Using uri:" + uri)
 
     # Run a background thread with the event loop
     if use_pure_python_event_loop:
@@ -554,7 +554,7 @@ def main():
     # Close connection on exit (to test cleanup paths)
     old_exitfunc = getattr(sys, 'exitfunc', None)
     def exit():
-        print "Closing " + str(vc)
+        print("Closing " + vc.getURI())
         vc.close()
         if (old_exitfunc): old_exitfunc()
     sys.exitfunc = exit

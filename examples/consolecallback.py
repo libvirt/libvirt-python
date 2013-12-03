@@ -62,14 +62,14 @@ def lifecycle_callback (connection, domain, event, detail, console):
 
 # main
 if len(sys.argv) != 3:
-    print "Usage:", sys.argv[0], "URI UUID"
-    print "for example:", sys.argv[0], "'qemu:///system' '32ad945f-7e78-c33a-e96d-39f25e025d81'"
+    print("Usage:", sys.argv[0], "URI UUID")
+    print("for example:", sys.argv[0], "'qemu:///system' '32ad945f-7e78-c33a-e96d-39f25e025d81'")
     sys.exit(1)
 
 uri = sys.argv[1]
 uuid = sys.argv[2]
 
-print "Escape character is ^]"
+print("Escape character is ^]")
 logging.basicConfig(filename='msg.log', level=logging.DEBUG)
 logging.info("URI: %s", uri)
 logging.info("UUID: %s", uuid)
