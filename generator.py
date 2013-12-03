@@ -1021,139 +1021,139 @@ def nameFixup(name, classe, type, file):
     l = len(classe)
     if name[0:l] == listname:
         func = name[l:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:16] == "virNetworkDefine":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:19] == "virNetworkCreateXML":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:16] == "virNetworkLookup":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:18] == "virInterfaceDefine":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:21] == "virInterfaceCreateXML":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:18] == "virInterfaceLookup":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:15] == "virSecretDefine":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:15] == "virSecretLookup":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:17] == "virNWFilterDefine":
         func = name[3:]
-        func = string.lower(func[0:3]) + func[3:]
+        func = func[0:3].lower() + func[3:]
     elif name[0:17] == "virNWFilterLookup":
         func = name[3:]
-        func = string.lower(func[0:3]) + func[3:]
+        func = func[0:3].lower() + func[3:]
     elif name[0:20] == "virStoragePoolDefine":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:23] == "virStoragePoolCreateXML":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:20] == "virStoragePoolLookup":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:19] == "virStorageVolDefine":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:19] == "virStorageVolLookup":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:20] == "virDomainGetCPUStats":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:12] == "virDomainGet":
         func = name[12:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:29] == "virDomainSnapshotLookupByName":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:26] == "virDomainSnapshotListNames":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:28] == "virDomainSnapshotNumChildren":
         func = name[17:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:20] == "virDomainSnapshotNum":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:26] == "virDomainSnapshotCreateXML":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:24] == "virDomainSnapshotCurrent":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:17] == "virDomainSnapshot":
         func = name[17:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:9] == "virDomain":
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:13] == "virNetworkGet":
         func = name[13:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:10] == "virNetwork":
         func = name[10:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:15] == "virInterfaceGet":
         func = name[15:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:12] == "virInterface":
         func = name[12:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:12] == 'virSecretGet':
         func = name[12:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:9] == 'virSecret':
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:14] == 'virNWFilterGet':
         func = name[14:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:11] == 'virNWFilter':
         func = name[11:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:12] == 'virStreamNew':
         func = "newStream"
     elif name[0:9] == 'virStream':
         func = name[9:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:17] == "virStoragePoolGet":
         func = name[17:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:14] == "virStoragePool":
         func = name[14:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:16] == "virStorageVolGet":
         func = name[16:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:13] == "virStorageVol":
         func = name[13:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:13] == "virNodeDevice":
         if name[13:16] == "Get":
-            func = string.lower(name[16]) + name[17:]
+            func = name[16].lower() + name[17:]
         elif name[13:19] == "Lookup" or name[13:19] == "Create":
-            func = string.lower(name[3]) + name[4:]
+            func = name[3].lower() + name[4:]
         else:
-            func = string.lower(name[13]) + name[14:]
+            func = name[13].lower() + name[14:]
     elif name[0:7] == "virNode":
         func = name[7:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:10] == "virConnect":
         func = name[10:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:3] == "xml":
         func = name[3:]
-        func = string.lower(func[0:1]) + func[1:]
+        func = func[0:1].lower() + func[1:]
     else:
         func = name
     if func == "iD":
