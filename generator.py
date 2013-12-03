@@ -1174,23 +1174,9 @@ def nameFixup(name, classe, type, file):
     return func
 
 
-def functionCompare(info1, info2):
-    (index1, func1, name1, ret1, args1, file1, mod1) = info1
-    (index2, func2, name2, ret2, args2, file2, mod2) = info2
-    if file1 == file2:
-        if func1 < func2:
-            return -1
-        if func1 > func2:
-            return 1
-    if file1 == "python_accessor":
-        return -1
-    if file2 == "python_accessor":
-        return 1
-    if file1 < file2:
-        return -1
-    if file1 > file2:
-        return 1
-    return 0
+def functionSortKey(info):
+    (index, func, name, ret, args, filename, mod) = info
+    return func, filename
 
 def writeDoc(module, name, args, indent, output):
      if module == "libvirt":
@@ -1321,7 +1307,7 @@ def buildWrappers(module):
 
     if "None" in function_classes:
         flist = function_classes["None"]
-        flist.sort(functionCompare)
+        flist.sort(key=functionSortKey)
         oldfile = ""
         for info in flist:
             (index, func, name, ret, args, file, mod) = info
@@ -1470,7 +1456,7 @@ def buildWrappers(module):
                 classes.write("        return self._dom\n\n")
 
             flist = function_classes[classname]
-            flist.sort(functionCompare)
+            flist.sort(key=functionSortKey)
             oldfile = ""
             for info in flist:
                 (index, func, name, ret, args, file, mod) = info
@@ -1777,7 +1763,7 @@ def buildWrappers(module):
     for type,enum in list(enums.items()):
         classes.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
+        items.sort(key=lambda i: int(i[1]))
         for name,value in items:
             classes.write("%s = %s\n" % (name,value))
         classes.write("\n")
@@ -1889,7 +1875,7 @@ def qemuBuildWrappers(module):
     for type,enum in list(qemu_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
+        items.sort(key=lambda i: int(i[1]))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
@@ -2002,7 +1988,7 @@ def lxcBuildWrappers(module):
     for type,enum in list(lxc_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(lambda i1,i2: cmp(int(i1[1]),int(i2[1])))
+        items.sort(key=lambda i: int(i[1]))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
