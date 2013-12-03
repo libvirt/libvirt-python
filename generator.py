@@ -1434,8 +1434,8 @@ def buildWrappers(module):
                 else:
                     classes.write("    def __init__(self, _obj=None):\n")
                 if reference_keepers.has_key(classname):
-                    list = reference_keepers[classname]
-                    for ref in list:
+                    rlist = reference_keepers[classname]
+                    for ref in rlist:
                         classes.write("        self.%s = None\n" % ref[1])
                 if classname in [ "virDomain", "virNetwork", "virInterface",
                                   "virNodeDevice", "virSecret", "virStream",
@@ -1589,8 +1589,8 @@ def buildWrappers(module):
                         #
                         tclass = classes_type[ret[0]][2]
                         if reference_keepers.has_key(tclass):
-                            list = reference_keepers[tclass]
-                            for pref in list:
+                            rlist = reference_keepers[tclass]
+                            for pref in rlist:
                                 if pref[0] == classname:
                                     classes.write("        __tmp.%s = self\n" %
                                                   pref[1])
