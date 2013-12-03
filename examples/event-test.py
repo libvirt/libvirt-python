@@ -236,7 +236,7 @@ class virEventLoopPure:
     def interrupt(self):
         if self.runningPoll and not self.pendingWakeup:
             self.pendingWakeup = True
-            os.write(self.pipetrick[1], 'c')
+            os.write(self.pipetrick[1], 'c'.encode("UTF-8"))
 
 
     # Registers a new file handle 'fd', monitoring  for 'events' (libvirt
