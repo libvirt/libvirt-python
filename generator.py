@@ -48,24 +48,24 @@ class docParser(xml.sax.handler.ContentHandler):
 
     def close(self):
         if debug:
-            print "close"
+            print("close")
 
     def getmethodname(self):
         return self._methodname
 
     def data(self, text):
         if debug:
-            print "data %s" % text
+            print("data %s" % text)
         self._data.append(text)
 
     def cdata(self, text):
         if debug:
-            print "data %s" % text
+            print("data %s" % text)
         self._data.append(text)
 
     def start(self, tag, attrs):
         if debug:
-            print "start %s, %s" % (tag, attrs)
+            print("start %s, %s" % (tag, attrs))
         if tag == 'function':
             self._data = []
             self.in_function = 1
@@ -123,7 +123,7 @@ class docParser(xml.sax.handler.ContentHandler):
 
     def end(self, tag):
         if debug:
-            print "end %s" % tag
+            print("end %s" % tag)
         if tag == 'function':
             # fuctions come from source files, hence 'virerror.c'
             if self.function is not None:
@@ -600,7 +600,7 @@ def print_function_wrapper(module, name, output, export, include):
         if module == "libvirt-qemu":
             (desc, ret, args, file, mod, cond) = qemu_functions[name]
     except:
-        print "failed to get function %s infos" % name
+        print("failed to get function %s infos" % name)
         return
 
     if skipped_modules.has_key(module):
@@ -794,7 +794,7 @@ def buildStubs(module, api_xml):
     global onlyOverrides
 
     if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
-        print "ERROR: Unknown module type: %s" % module
+        print("ERROR: Unknown module type: %s" % module)
         return None
 
     if module == "libvirt":
@@ -818,13 +818,13 @@ def buildStubs(module, api_xml):
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
-    except IOError, msg:
-        print file, ":", msg
+    except IOError as msg:
+        print(file, ":", msg)
         sys.exit(1)
 
     n = len(funcs.keys())
     if not quiet:
-        print "Found %d functions in %s" % ((n), api_xml)
+        print("Found %d functions in %s" % ((n), api_xml))
 
     override_api_xml = "%s-override-api.xml" % module
     py_types['pythonObject'] = ('O', "pythonObject", "pythonObject", "pythonObject")
@@ -837,13 +837,13 @@ def buildStubs(module, api_xml):
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
-    except IOError, msg:
-        print file, ":", msg
+    except IOError as msg:
+        print(file, ":", msg)
 
     if not quiet:
         # XXX: This is not right, same function already in @functions
         # will be overwritten.
-        print "Found %d functions in %s" % ((len(funcs.keys()) - n), override_api_xml)
+        print("Found %d functions in %s" % ((len(funcs.keys()) - n), override_api_xml))
     nb_wrap = 0
     failed = 0
     skipped = 0
@@ -883,15 +883,15 @@ def buildStubs(module, api_xml):
     wrapper.close()
 
     if not quiet:
-        print "Generated %d wrapper functions" % nb_wrap
+        print("Generated %d wrapper functions" % nb_wrap)
 
     if unknown_types:
-        print "Missing type converters: "
+        print("Missing type converters: ")
         for type in unknown_types.keys():
-            print "%s:%d " % (type, len(unknown_types[type])),
+            print("%s:%d " % (type, len(unknown_types[type])))
 
     for f in funcs_failed:
-        print "ERROR: failed %s" % f
+        print("ERROR: failed %s" % f)
 
     if failed > 0:
         return -1
@@ -1229,7 +1229,7 @@ def buildWrappers(module):
     global functions_noexcept
 
     if not module == "libvirt":
-        print "ERROR: Unknown module type: %s" % module
+        print("ERROR: Unknown module type: %s" % module)
         return None
 
     for type in classes_type.keys():
@@ -1786,7 +1786,7 @@ def qemuBuildWrappers(module):
     global qemu_functions
 
     if not module == "libvirt-qemu":
-        print "ERROR: only libvirt-qemu is supported"
+        print("ERROR: only libvirt-qemu is supported")
         return None
 
     extra_file = "%s-override.py" % module
@@ -1897,7 +1897,7 @@ def lxcBuildWrappers(module):
     global lxc_functions
 
     if not module == "libvirt-lxc":
-        print "ERROR: only libvirt-lxc is supported"
+        print("ERROR: only libvirt-lxc is supported")
         return None
 
     extra_file = "%s-override.py" % module
@@ -2018,7 +2018,7 @@ elif sys.argv[1] == "libvirt-lxc":
 elif sys.argv[1] == "libvirt-qemu":
     qemuBuildWrappers(sys.argv[1])
 else:
-    print "ERROR: unknown module %s" % sys.argv[1]
+    print("ERROR: unknown module %s" % sys.argv[1])
     sys.exit(1)
 
 sys.exit(0)
