@@ -122,10 +122,10 @@ class my_build(build):
     def run(self):
         apis = get_api_xml_files()
 
-        self.spawn(["python", "generator.py", "libvirt", apis[0]])
-        self.spawn(["python", "generator.py", "libvirt-qemu", apis[1]])
+        self.spawn([sys.executable, "generator.py", "libvirt", apis[0]])
+        self.spawn([sys.executable, "generator.py", "libvirt-qemu", apis[1]])
         if have_libvirt_lxc:
-            self.spawn(["python", "generator.py", "libvirt-lxc", apis[2]])
+            self.spawn([sys.executable, "generator.py", "libvirt-lxc", apis[2]])
 
         build.run(self)
 
@@ -267,7 +267,7 @@ class my_test(Command):
 
         apis = get_api_xml_files()
 
-        self.spawn(["python", "sanitytest.py", self.build_platlib, apis[0]])
+        self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
 
 
 class my_clean(clean):
