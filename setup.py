@@ -40,7 +40,7 @@ try:
     spawn([pkgcfg,
            "--atleast-version=%s" % MIN_LIBVIRT_LXC,
          "libvirt"])
-except DistutilsExecError,e:
+except DistutilsExecError:
     have_libvirt_lxc=False
 
 def get_pkgconfig_data(args, mod, required=True):
