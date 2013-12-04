@@ -818,7 +818,8 @@ def buildStubs(module, api_xml):
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
-    except IOError, msg:
+    except IOError:
+        msg = sys.exc_info()[1]
         print(file, ":", msg)
         sys.exit(1)
 
@@ -837,7 +838,8 @@ def buildStubs(module, api_xml):
         (parser, target)  = getparser()
         parser.feed(data)
         parser.close()
-    except IOError, msg:
+    except IOError:
+        msg = sys.exc_info()[1]
         print(file, ":", msg)
 
     if not quiet:
