@@ -1822,10 +1822,12 @@ def qemuBuildWrappers(module):
 
     fd.write("try:\n")
     fd.write("    import libvirtmod_qemu\n")
-    fd.write("except ImportError, lib_e:\n")
+    fd.write("except ImportError:\n")
+    fd.write("    lib_e = sys.exc_info()[1]\n")
     fd.write("    try:\n")
     fd.write("        import cygvirtmod_qemu as libvirtmod_qemu\n")
-    fd.write("    except ImportError, cyg_e:\n")
+    fd.write("    except ImportError:\n")
+    fd.write("        cyg_e = sys.exc_info()[1]\n")
     fd.write("        if str(cyg_e).count(\"No module named\"):\n")
     fd.write("            raise lib_e\n\n")
 
@@ -1933,10 +1935,12 @@ def lxcBuildWrappers(module):
 
     fd.write("try:\n")
     fd.write("    import libvirtmod_lxc\n")
-    fd.write("except ImportError, lib_e:\n")
+    fd.write("except ImportError:\n")
+    fd.write("    lib_e = sys.exc_info()[1]\n")
     fd.write("    try:\n")
     fd.write("        import cygvirtmod_lxc as libvirtmod_lxc\n")
-    fd.write("    except ImportError, cyg_e:\n")
+    fd.write("    except ImportError:\n")
+    fd.write("        cyg_e = sys.exc_info()[1]\n")
     fd.write("        if str(cyg_e).count(\"No module named\"):\n")
     fd.write("            raise lib_e\n\n")
 
