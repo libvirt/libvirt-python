@@ -92,7 +92,11 @@ libvirt_charPtrSizeWrap(char *str, Py_ssize_t size)
         Py_INCREF(Py_None);
         return Py_None;
     }
+#if PY_MAJOR_VERSION > 2
+    ret = PyBytes_FromStringAndSize(str, size);
+#else
     ret = PyString_FromStringAndSize(str, size);
+#endif
     return ret;
 }
 
@@ -105,7 +109,11 @@ libvirt_charPtrWrap(char *str)
         Py_INCREF(Py_None);
         return Py_None;
     }
+#if PY_MAJOR_VERSION > 2
+    ret = PyUnicode_FromString(str);
+#else
     ret = PyString_FromString(str);
+#endif
     return ret;
 }
 
@@ -118,7 +126,11 @@ libvirt_constcharPtrWrap(const char *str)
         Py_INCREF(Py_None);
         return Py_None;
     }
+#if PY_MAJOR_VERSION > 2
+    ret = PyUnicode_FromString(str);
+#else
     ret = PyString_FromString(str);
+#endif
     return ret;
 }
 
@@ -326,17 +338,24 @@ libvirt_boolUnwrap(PyObject *obj, bool *val)
 int
 libvirt_charPtrUnwrap(PyObject *obj, char **str)
 {
+#if PY_MAJOR_VERSION < 3
     const char *ret;
+#endif
     *str = NULL;
     if (!obj) {
         PyErr_SetString(PyExc_TypeError, "unexpected type");
         return -1;
     }
 
+#if PY_MAJOR_VERSION > 2
+    if (!(*str = PyUnicode_AsUTF8(obj)))
+        return -1;
+#else
     ret = PyString_AsString(obj);
     if (ret &&
         !(*str = strdup(ret)))
         return -1;
+#endif
 
     return 0;
 }
