@@ -315,6 +315,24 @@ libvirt_boolUnwrap(PyObject *obj, bool *val)
     return 0;
 }
 
+int
+libvirt_charPtrUnwrap(PyObject *obj, char **str)
+{
+    const char *ret;
+    *str = NULL;
+    if (!obj) {
+        PyErr_SetString(PyExc_TypeError, "unexpected type");
+        return -1;
+    }
+
+    ret = PyString_AsString(obj);
+    if (ret &&
+        !(*str = strdup(ret)))
+        return -1;
+
+    return 0;
+}
+
 PyObject *
 libvirt_virDomainPtrWrap(virDomainPtr node)
 {

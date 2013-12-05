@@ -58,18 +58,17 @@ extern void initcygvirtmod(void);
 #define VIR_PY_INT_FAIL (libvirt_intWrap(-1))
 #define VIR_PY_INT_SUCCESS (libvirt_intWrap(0))
 
-/* We don't want to free() returned value. As written in doc:
- * PyString_AsString returns pointer to 'internal buffer of string,
- * not a copy' and 'It must not be deallocated'. */
 static char *py_str(PyObject *obj)
 {
     PyObject *str = PyObject_Str(obj);
+    char *ret;
     if (!str) {
         PyErr_Print();
         PyErr_Clear();
         return NULL;
     };
-    return PyString_AsString(str);
+    libvirt_charPtrUnwrap(str, &ret);
+    return ret;
 }
 
 /* Helper function to convert a virTypedParameter output array into a
@@ -147,9 +146,8 @@ cleanup:
 /* Allocate a new typed parameter array with the same contents and
  * length as info, and using the array params of length nparams as
  * hints on what types to use when creating the new array. The caller
- * must NOT clear the array before freeing it, as it points into info
- * rather than allocated strings.  Return NULL on failure, after
- * raising a python exception.  */
+ * must clear the array before freeing it. Return NULL on failure,
+ * after raising a python exception.  */
 static virTypedParameterPtr ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2)
 setPyVirTypedParameter(PyObject *info,
                        const virTypedParameter *params, int nparams)
@@ -183,7 +181,8 @@ setPyVirTypedParameter(PyObject *info,
     while (PyDict_Next(info, &pos, &key, &value)) {
         char *keystr = NULL;
 
-        if ((keystr = PyString_AsString(key)) == NULL)
+        if (libvirt_charPtrUnwrap(key, &keystr) < 0 ||
+            keystr == NULL)
             goto cleanup;
 
         for (i = 0; i < nparams; i++) {
@@ -194,12 +193,14 @@ setPyVirTypedParameter(PyObject *info,
             PyErr_Format(PyExc_LookupError,
                          "Attribute name \"%s\" could not be recognized",
                          keystr);
+            VIR_FREE(keystr);
             goto cleanup;
         }
 
         strncpy(temp->field, keystr, sizeof(*temp->field) - 1);
         temp->field[sizeof(*temp->field) - 1] = '\0';
         temp->type = params[i].type;
+        VIR_FREE(keystr);
 
         switch (params[i].type) {
         case VIR_TYPED_PARAM_INT:
@@ -237,8 +238,9 @@ setPyVirTypedParameter(PyObject *info,
         }
         case VIR_TYPED_PARAM_STRING:
         {
-            char *string_val = PyString_AsString(value);
-            if (!string_val)
+            char *string_val;
+            if (libvirt_charPtrUnwrap(value, &string_val) < 0 ||
+                !string_val)
                 goto cleanup;
             temp->value.s = string_val;
             break;
@@ -297,6 +299,7 @@ virPyDictToTypedParams(PyObject *dict,
     int n = 0;
     int max = 0;
     int ret = -1;
+    char *keystr = NULL;
 
     *ret_params = NULL;
     *ret_nparams = 0;
@@ -305,10 +308,10 @@ virPyDictToTypedParams(PyObject *dict,
         return -1;
 
     while (PyDict_Next(dict, &pos, &key, &value)) {
-        char *keystr;
         int type = -1;
 
-        if (!(keystr = PyString_AsString(key)))
+        if (libvirt_charPtrUnwrap(key, &keystr) < 0 ||
+            !keystr)
             goto cleanup;
 
         for (i = 0; i < nhints; i++) {
@@ -396,15 +399,20 @@ virPyDictToTypedParams(PyObject *dict,
         }
         case VIR_TYPED_PARAM_STRING:
         {
-            char *val = PyString_AsString(value);
-            if (!val ||
-                virTypedParamsAddString(&params, &n, &max, keystr, val) < 0)
+            char *val;;
+            if (libvirt_charPtrUnwrap(value, &val) < 0 ||
+                !val ||
+                virTypedParamsAddString(&params, &n, &max, keystr, val) < 0) {
+                VIR_FREE(val);
                 goto cleanup;
+            }
+            VIR_FREE(val);
             break;
         }
         case VIR_TYPED_PARAM_LAST:
             break; /* unreachable */
         }
+        VIR_FREE(keystr);
     }
 
     *ret_params = params;
@@ -413,6 +421,7 @@ virPyDictToTypedParams(PyObject *dict,
     ret = 0;
 
 cleanup:
+    VIR_FREE(keystr);
     virTypedParamsFree(params, n);
     return ret;
 }
@@ -957,7 +966,7 @@ libvirt_virDomainSetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -1033,7 +1042,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -1107,7 +1116,7 @@ libvirt_virDomainSetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -1227,7 +1236,7 @@ libvirt_virDomainSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -1347,7 +1356,7 @@ libvirt_virDomainSetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -1468,7 +1477,7 @@ libvirt_virDomainSetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -2163,9 +2172,9 @@ static int virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
             pycreditem = PyTuple_GetItem(pycred, i);
             pyresult = PyList_GetItem(pycreditem, 4);
             if (pyresult != Py_None)
-                result = PyString_AsString(pyresult);
+                libvirt_charPtrUnwrap(pyresult, &result);
             if (result != NULL) {
-                cred[i].result = strdup(result);
+                cred[i].result = result;
                 cred[i].resultlen = strlen(result);
             } else {
                 cred[i].result = NULL;
@@ -2942,7 +2951,7 @@ libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED, PyObject 
         PyObject *entry = PyList_New(2);
         PyList_SetItem(entry, 0, libvirt_constcharPtrWrap(&labels[i].label[0]));
         PyList_SetItem(entry, 1, libvirt_boolWrap(labels[i].enforcing));
-	PyList_Append(py_retval, entry);
+        PyList_Append(py_retval, entry);
     }
     free(labels);
     return py_retval;
@@ -4566,10 +4575,11 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *list;
     virConnectPtr conn;
     unsigned int flags;
-    const char **xmlcpus = NULL;
+    char **xmlcpus = NULL;
     int ncpus = 0;
     char *base_cpu;
     PyObject *pybase_cpu;
+    size_t i, j;
 
     if (!PyArg_ParseTuple(args, (char *)"OOi:virConnectBaselineCPU",
                           &pyobj_conn, &list, &flags))
@@ -4577,15 +4587,15 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
 
     if (PyList_Check(list)) {
-        size_t i;
-
         ncpus = PyList_Size(list);
         if (VIR_ALLOC_N(xmlcpus, ncpus) < 0)
             return VIR_PY_NONE;
 
         for (i = 0; i < ncpus; i++) {
-            xmlcpus[i] = PyString_AsString(PyList_GetItem(list, i));
-            if (xmlcpus[i] == NULL) {
+            if (libvirt_charPtrUnwrap(PyList_GetItem(list, i), &(xmlcpus[i])) < 0 ||
+                xmlcpus[i] == NULL) {
+                for (j = 0 ; j < i ; j++)
+                    VIR_FREE(xmlcpus[j]);
                 VIR_FREE(xmlcpus);
                 return VIR_PY_NONE;
             }
@@ -4593,9 +4603,11 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
     }
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
-    base_cpu = virConnectBaselineCPU(conn, xmlcpus, ncpus, flags);
+    base_cpu = virConnectBaselineCPU(conn, (const char **)xmlcpus, ncpus, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
+    for (i = 0 ; i < ncpus ; i++)
+        VIR_FREE(xmlcpus[i]);
     VIR_FREE(xmlcpus);
 
     if (base_cpu == NULL)
@@ -4821,7 +4833,7 @@ libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
@@ -5105,18 +5117,18 @@ libvirt_virConnectDomainEventDeregister(ATTRIBUTE_UNUSED PyObject * self,
 /*******************************************
  * Event Impl
  *******************************************/
-static PyObject *addHandleObj     = NULL;
-static char *addHandleName        = NULL;
-static PyObject *updateHandleObj  = NULL;
-static char *updateHandleName     = NULL;
-static PyObject *removeHandleObj  = NULL;
-static char *removeHandleName     = NULL;
-static PyObject *addTimeoutObj    = NULL;
-static char *addTimeoutName       = NULL;
-static PyObject *updateTimeoutObj = NULL;
-static char *updateTimeoutName    = NULL;
-static PyObject *removeTimeoutObj = NULL;
-static char *removeTimeoutName    = NULL;
+static PyObject *addHandleObj;
+static char *addHandleName;
+static PyObject *updateHandleObj;
+static char *updateHandleName;
+static PyObject *removeHandleObj;
+static char *removeHandleName;
+static PyObject *addTimeoutObj;
+static char *addTimeoutName;
+static PyObject *updateTimeoutObj;
+static char *updateTimeoutName;
+static PyObject *removeTimeoutObj;
+static char *removeTimeoutName;
 
 #define NAME(fn) ( fn ## Name ? fn ## Name : # fn )
 
@@ -5381,6 +5393,12 @@ libvirt_virEventRegisterImpl(ATTRIBUTE_UNUSED PyObject * self,
     Py_XDECREF(addTimeoutObj);
     Py_XDECREF(updateTimeoutObj);
     Py_XDECREF(removeTimeoutObj);
+    VIR_FREE(addHandleName);
+    VIR_FREE(updateHandleName);
+    VIR_FREE(removeHandleName);
+    VIR_FREE(addTimeoutName);
+    VIR_FREE(updateTimeoutName);
+    VIR_FREE(removeTimeoutName);
 
     /* Parse and check arguments */
     if (!PyArg_ParseTuple(args, (char *) "OOOOOO:virEventRegisterImpl",
@@ -7234,7 +7252,7 @@ libvirt_virNodeSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    VIR_FREE(new_params);
+    virTypedParamsFree(new_params, nparams);
     return ret;
 }
 
