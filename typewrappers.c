@@ -44,6 +44,14 @@ libvirt_intWrap(int val)
 }
 
 PyObject *
+libvirt_uintWrap(uint val)
+{
+    PyObject *ret;
+    ret = PyInt_FromLong((long) val);
+    return ret;
+}
+
+PyObject *
 libvirt_longWrap(long val)
 {
     PyObject *ret;

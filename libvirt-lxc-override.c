@@ -89,7 +89,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     for (i = 0; i < c_retval; i++) {
         PyObject *item = NULL;
 
-        if ((item = PyInt_FromLong(fdlist[i])) == NULL)
+        if ((item = libvirt_intWrap(fdlist[i])) == NULL)
             goto error;
 
         if (PyList_Append(py_retval, item) < 0) {
