@@ -85,7 +85,7 @@ libvirt_qemu_virDomainQemuMonitorCommand(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString(result);
+    py_retval = libvirt_constcharPtrWrap(result);
     VIR_FREE(result);
     return py_retval;
 }
@@ -116,7 +116,7 @@ libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject
     if (!result)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString(result);
+    py_retval = libvirt_constcharPtrWrap(result);
     VIR_FREE(result);
     return py_retval;
 }

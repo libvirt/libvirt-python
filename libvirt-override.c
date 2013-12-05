@@ -2127,15 +2127,15 @@ static int virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
         Py_INCREF(Py_None);
         PyTuple_SetItem(pycred, i, pycreditem);
         PyList_SetItem(pycreditem, 0, PyInt_FromLong((long) cred[i].type));
-        PyList_SetItem(pycreditem, 1, PyString_FromString(cred[i].prompt));
+        PyList_SetItem(pycreditem, 1, libvirt_constcharPtrWrap(cred[i].prompt));
         if (cred[i].challenge) {
-            PyList_SetItem(pycreditem, 2, PyString_FromString(cred[i].challenge));
+            PyList_SetItem(pycreditem, 2, libvirt_constcharPtrWrap(cred[i].challenge));
         } else {
             Py_INCREF(Py_None);
             PyList_SetItem(pycreditem, 2, Py_None);
         }
         if (cred[i].defresult) {
-            PyList_SetItem(pycreditem, 3, PyString_FromString(cred[i].defresult));
+            PyList_SetItem(pycreditem, 3, libvirt_constcharPtrWrap(cred[i].defresult));
         } else {
             Py_INCREF(Py_None);
             PyList_SetItem(pycreditem, 3, Py_None);
@@ -2319,7 +2319,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
 
     for (i = 0; i < c_retval; i++) {
         PyObject *str;
-        if ((str = PyString_FromString(models[i])) == NULL)
+        if ((str = libvirt_constcharPtrWrap(models[i])) == NULL)
             goto error;
 
         PyList_SET_ITEM(rv, i, str);
@@ -2969,7 +2969,7 @@ libvirt_virDomainGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
     if (c_retval < 0)
         return VIR_PY_NONE;
-    py_retval = PyString_FromStringAndSize((char *) &uuid[0], VIR_UUID_BUFLEN);
+    py_retval = libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
 
     return py_retval;
 }
@@ -2997,7 +2997,7 @@ libvirt_virDomainGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString((char *) &uuidstr[0]);
+    py_retval = libvirt_constcharPtrWrap((char *) &uuidstr[0]);
     return py_retval;
 }
 
@@ -3186,7 +3186,7 @@ libvirt_virNetworkGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
     if (c_retval < 0)
         return VIR_PY_NONE;
-    py_retval = PyString_FromStringAndSize((char *) &uuid[0], VIR_UUID_BUFLEN);
+    py_retval = libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
 
     return py_retval;
 }
@@ -3214,7 +3214,7 @@ libvirt_virNetworkGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString((char *) &uuidstr[0]);
+    py_retval = libvirt_constcharPtrWrap((char *) &uuidstr[0]);
     return py_retval;
 }
 
@@ -3816,7 +3816,7 @@ libvirt_virStoragePoolGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromStringAndSize((char *) &uuid[0], VIR_UUID_BUFLEN);
+    py_retval = libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
 
     return py_retval;
 }
@@ -3843,7 +3843,7 @@ libvirt_virStoragePoolGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString((char *) &uuidstr[0]);
+    py_retval = libvirt_constcharPtrWrap((char *) &uuidstr[0]);
     return py_retval;
 }
 
@@ -4030,7 +4030,7 @@ libvirt_virSecretGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
     if (c_retval < 0)
         return VIR_PY_NONE;
-    py_retval = PyString_FromStringAndSize((char *) &uuid[0], VIR_UUID_BUFLEN);
+    py_retval = libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
 
     return py_retval;
 }
@@ -4058,7 +4058,7 @@ libvirt_virSecretGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString((char *) &uuidstr[0]);
+    py_retval = libvirt_constcharPtrWrap((char *) &uuidstr[0]);
     return py_retval;
 }
 
@@ -4201,7 +4201,7 @@ libvirt_virSecretGetValue(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval == NULL)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromStringAndSize((const char *)c_retval, size);
+    py_retval = libvirt_charPtrSizeWrap((char*)c_retval, size);
     VIR_FREE(c_retval);
 
     return py_retval;
@@ -4252,7 +4252,7 @@ libvirt_virNWFilterGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
     if (c_retval < 0)
         return VIR_PY_NONE;
-    py_retval = PyString_FromStringAndSize((char *) &uuid[0], VIR_UUID_BUFLEN);
+    py_retval = libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
 
     return py_retval;
 }
@@ -4280,7 +4280,7 @@ libvirt_virNWFilterGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyString_FromString((char *) &uuidstr[0]);
+    py_retval = libvirt_constcharPtrWrap((char *) &uuidstr[0]);
     return py_retval;
 }
 
@@ -4601,7 +4601,7 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
     if (base_cpu == NULL)
         return VIR_PY_NONE;
 
-    pybase_cpu = PyString_FromString(base_cpu);
+    pybase_cpu = libvirt_constcharPtrWrap(base_cpu);
     VIR_FREE(base_cpu);
 
     if (pybase_cpu == NULL)
@@ -7119,7 +7119,7 @@ libvirt_virDomainBlockPeek(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
     }
 
-    py_retval = PyString_FromStringAndSize(buf, size);
+    py_retval = libvirt_charPtrSizeWrap(buf, size);
 
 cleanup:
     VIR_FREE(buf);
@@ -7156,7 +7156,7 @@ libvirt_virDomainMemoryPeek(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
     }
 
-    py_retval = PyString_FromStringAndSize(buf, size);
+    py_retval = libvirt_charPtrSizeWrap(buf, size);
 
 cleanup:
     VIR_FREE(buf);
