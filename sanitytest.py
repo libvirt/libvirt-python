@@ -39,9 +39,11 @@ for name in dir(libvirt):
     if name[0] == '_':
         continue
     thing = getattr(libvirt, name)
+    # Special-case libvirtError to deal with python 2.4 difference
+    # in Exception class type reporting.
     if type(thing) == int:
         gotenums.append(name)
-    elif type(thing) == type:
+    elif type(thing) == type or name == "libvirtError":
         gottypes.append(name)
         gotfunctions[name] = []
     elif callable(thing):
