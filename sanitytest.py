@@ -232,9 +232,9 @@ for name in sorted(finalklassmap):
     if func in gotfunctions[klass]:
         usedfunctions["%s.%s" % (klass, func)] = 1
         if verbose:
-            print "PASS %s -> %s.%s" % (name, klass, func)
+            print("PASS %s -> %s.%s" % (name, klass, func))
     else:
-        print "FAIL %s -> %s.%s       (C API not mapped to python)" % (name, klass, func)
+        print("FAIL %s -> %s.%s       (C API not mapped to python)" % (name, klass, func))
         fail = True
 
 
@@ -249,11 +249,11 @@ for klass in gotfunctions:
 
         key = "%s.%s" % (klass, func)
         if not key in usedfunctions:
-            print "FAIL %s.%s       (Python API not mapped to C)" % (klass, func)
+            print("FAIL %s.%s       (Python API not mapped to C)" % (klass, func))
             fail = True
         else:
             if verbose:
-                print "PASS %s.%s" % (klass, func)
+                print("PASS %s.%s" % (klass, func))
 
 # Phase 7: Validate that all the low level C APIs have binding
 for name in sorted(finalklassmap):
@@ -273,7 +273,7 @@ for name in sorted(finalklassmap):
     try:
         thing = getattr(libvirt.libvirtmod, pyname)
     except AttributeError:
-        print "FAIL libvirt.libvirtmod.%s      (C binding does not exist)" % pyname
+        print("FAIL libvirt.libvirtmod.%s      (C binding does not exist)" % pyname)
         fail = True
 
 if fail:
