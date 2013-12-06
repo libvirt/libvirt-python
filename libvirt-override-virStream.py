@@ -50,7 +50,8 @@
                 ret = handler(self, got, opaque)
                 if type(ret) is int and ret < 0:
                     raise RuntimeError("recvAll handler returned %d" % ret)
-            except Exception, e:
+            except Exception:
+                e = sys.exc_info()[1]
                 try:
                     self.abort()
                 except:
