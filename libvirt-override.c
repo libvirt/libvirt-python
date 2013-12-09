@@ -322,7 +322,11 @@ virPyDictToTypedParams(PyObject *dict,
         }
 
         if (type == -1) {
+#if PY_MAJOR_VERSION > 2
+            if (PyUnicode_Check(value)) {
+#else
             if (PyString_Check(value)) {
+#endif
                 type = VIR_TYPED_PARAM_STRING;
             } else if (PyBool_Check(value)) {
                 type = VIR_TYPED_PARAM_BOOLEAN;
@@ -332,11 +336,13 @@ virPyDictToTypedParams(PyObject *dict,
                     type = VIR_TYPED_PARAM_LLONG;
                 else
                     type = VIR_TYPED_PARAM_ULLONG;
+#if PY_MAJOR_VERSION < 3
             } else if (PyInt_Check(value)) {
                 if (PyInt_AS_LONG(value) < 0)
                     type = VIR_TYPED_PARAM_LLONG;
                 else
                     type = VIR_TYPED_PARAM_ULLONG;
+#endif
             } else if (PyFloat_Check(value)) {
                 type = VIR_TYPED_PARAM_DOUBLE;
             }
