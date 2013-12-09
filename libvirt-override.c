@@ -6920,21 +6920,22 @@ libvirt_virStreamSend(PyObject *self ATTRIBUTE_UNUSED,
 {
     PyObject *py_retval;
     PyObject *pyobj_stream;
+    PyObject *pyobj_data;
     virStreamPtr stream;
     char *data;
-    int datalen;
+    Py_ssize_t datalen;
     int ret;
-    int nbytes;
 
-    if (!PyArg_ParseTuple(args, (char *) "Oz#i:virStreamRecv",
-                          &pyobj_stream, &data, &datalen, &nbytes)) {
+    if (!PyArg_ParseTuple(args, (char *) "OO:virStreamRecv",
+                          &pyobj_stream, &pyobj_data)) {
         DEBUG("%s failed to parse tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
     stream = PyvirStream_Get(pyobj_stream);
+    libvirt_charPtrSizeUnwrap(pyobj_data, &data, &datalen);
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
-    ret = virStreamSend(stream, data, nbytes);
+    ret = virStreamSend(stream, data, datalen);
     LIBVIRT_END_ALLOW_THREADS;
 
     DEBUG("StreamSend ret=%d\n", ret);

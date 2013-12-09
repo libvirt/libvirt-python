@@ -175,6 +175,7 @@ int libvirt_ulonglongUnwrap(PyObject *obj, unsigned long long *val);
 int libvirt_doubleUnwrap(PyObject *obj, double *val);
 int libvirt_boolUnwrap(PyObject *obj, bool *val);
 int libvirt_charPtrUnwrap(PyObject *obj, char **str);
+int libvirt_charPtrSizeUnwrap(PyObject *obj, char **str, Py_ssize_t *size);
 PyObject * libvirt_virConnectPtrWrap(virConnectPtr node);
 PyObject * libvirt_virDomainPtrWrap(virDomainPtr node);
 PyObject * libvirt_virNetworkPtrWrap(virNetworkPtr node);

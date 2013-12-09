@@ -383,6 +383,33 @@ libvirt_charPtrUnwrap(PyObject *obj, char **str)
     return 0;
 }
 
+int libvirt_charPtrSizeUnwrap(PyObject *obj, char **str, Py_ssize_t *size)
+{
+    int ret;
+#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION <= 4
+    int isize;
+#endif
+    *str = NULL;
+    *size = 0;
+    if (!obj) {
+        PyErr_SetString(PyExc_TypeError, "unexpected type");
+        return -1;
+    }
+
+#if PY_MAJOR_VERSION > 2
+    ret = PyBytes_AsStringAndSize(obj, str, size);
+#else
+# if PY_MINOR_VERSION <= 4
+    ret = PyString_AsStringAndSize(obj, str, &isize);
+    *size = isize;
+# else
+    ret = PyString_AsStringAndSize(obj, str, size);
+# endif
+#endif
+
+    return ret;
+}
+
 PyObject *
 libvirt_virDomainPtrWrap(virDomainPtr node)
 {
