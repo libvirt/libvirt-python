@@ -103,7 +103,7 @@ for cname in wantfunctions:
                 found = True
                 if name not in basicklassmap:
                     basicklassmap[name] = [klassname, name[klen:], cname]
-                elif len(basicklassmap[name]) < klassname:
+                elif len(basicklassmap[name]) < klen:
                     basicklassmap[name] = [klassname, name[klen:], cname]
 
         # Anything which can't map to a class goes into the
