@@ -201,8 +201,8 @@ for name in sorted(basicklassmap):
         klass = "virDomain"
         func = "snapshot" + func
 
-    # Names should stsart with lowercase letter...
-    func = string.lower(func[0:1]) + func[1:]
+    # Names should start with lowercase letter...
+    func = func[0:1].lower() + func[1:]
     if func[0:8] == "nWFilter":
         func = "nwfilter" + func[8:]
 
