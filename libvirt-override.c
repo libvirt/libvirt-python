@@ -5177,10 +5177,8 @@ libvirt_virEventAddHandleFunc  (int fd,
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
-    } else if (!PyInt_Check(result)) {
-        DEBUG("%s: %s should return an int\n", __FUNCTION__, NAME(addHandle));
     } else {
-        retval = (int)PyInt_AsLong(result);
+        libvirt_intUnwrap(result, &retval);
     }
 
     Py_XDECREF(result);
@@ -5304,10 +5302,8 @@ libvirt_virEventAddTimeoutFunc(int timeout,
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
-    } else if (!PyInt_Check(result)) {
-        DEBUG("%s: %s should return an int\n", __FUNCTION__, NAME(addTimeout));
     } else {
-        retval = (int)PyInt_AsLong(result);
+        libvirt_intUnwrap(result, &retval);
     }
 
     Py_XDECREF(result);
@@ -6975,7 +6971,7 @@ libvirt_virDomainSendKey(PyObject *self ATTRIBUTE_UNUSED,
     }
 
     for (i = 0; i < nkeycodes; i++) {
-        keycodes[i] = (int)PyInt_AsLong(PyList_GetItem(pyobj_list, i));
+        libvirt_uintUnwrap(PyList_GetItem(pyobj_list, i), &(keycodes[i]));
     }
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
