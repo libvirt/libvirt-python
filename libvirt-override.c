@@ -6881,7 +6881,9 @@ libvirt_virStreamRecv(PyObject *self ATTRIBUTE_UNUSED,
         return libvirt_intWrap(ret);
     if (ret < 0)
         return VIR_PY_NONE;
-    return libvirt_charPtrSizeWrap((char *) buf, (Py_ssize_t) ret);
+    ret = libvirt_charPtrSizeWrap((char *) buf, (Py_ssize_t) ret);
+    VIR_FREE(buf);
+    return ret;
 }
 
 static PyObject *

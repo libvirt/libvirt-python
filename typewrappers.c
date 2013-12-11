@@ -85,7 +85,6 @@ libvirt_charPtrSizeWrap(char *str, Py_ssize_t size)
         return Py_None;
     }
     ret = PyString_FromStringAndSize(str, size);
-    VIR_FREE(str);
     return ret;
 }
 
@@ -99,7 +98,6 @@ libvirt_charPtrWrap(char *str)
         return Py_None;
     }
     ret = PyString_FromString(str);
-    VIR_FREE(str);
     return ret;
 }
 
