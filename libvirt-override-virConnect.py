@@ -198,6 +198,40 @@
         except AttributeError:
             pass
 
+    def _dispatchNetworkEventLifecycleCallback(self, net, event, detail, cbData):
+        """Dispatches events to python user network lifecycle event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virNetwork(self, _obj=net), event, detail, opaque)
+        return 0
+
+    def networkEventDeregisterAny(self, callbackID):
+        """Removes a Network Event Callback. De-registering for a
+           network callback will disable delivery of this event type"""
+        try:
+            ret = libvirtmod.virConnectNetworkEventDeregisterAny(self._o, callbackID)
+            if ret == -1: raise libvirtError ('virConnectNetworkEventDeregisterAny() failed', conn=self)
+            del self.networkEventCallbackID[callbackID]
+        except AttributeError:
+            pass
+
+    def networkEventRegisterAny(self, net, eventID, cb, opaque):
+        """Adds a Network Event Callback. Registering for a network
+           callback will enable delivery of the events"""
+        if not hasattr(self, 'networkEventCallbackID'):
+            self.networkEventCallbackID = {}
+        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        if net is None:
+            ret = libvirtmod.virConnectNetworkEventRegisterAny(self._o, None, eventID, cbData)
+        else:
+            ret = libvirtmod.virConnectNetworkEventRegisterAny(self._o, net._o, eventID, cbData)
+        if ret == -1:
+            raise libvirtError ('virConnectNetworkEventRegisterAny() failed', conn=self)
+        self.networkEventCallbackID[ret] = opaque
+        return ret
+
     def domainEventRegisterAny(self, dom, eventID, cb, opaque):
         """Adds a Domain Event Callback. Registering for a domain
            callback will enable delivery of the events """

@@ -6515,6 +6515,154 @@ libvirt_virConnectDomainEventDeregisterAny(ATTRIBUTE_UNUSED PyObject * self,
     return py_retval;
 }
 
+#if LIBVIR_CHECK_VERSION(1, 2, 1)
+static void
+libvirt_virConnectNetworkEventFreeFunc(void *opaque)
+{
+    PyObject *pyobj_conn = (PyObject*)opaque;
+    LIBVIRT_ENSURE_THREAD_STATE;
+    Py_DECREF(pyobj_conn);
+    LIBVIRT_RELEASE_THREAD_STATE;
+}
+
+static int
+libvirt_virConnectNetworkEventLifecycleCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                virNetworkPtr net,
+                                                int event,
+                                                int detail,
+                                                void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_net;
+    PyObject *pyobj_ret;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    dictKey = libvirt_constcharPtrWrap("conn");
+    if (!dictKey)
+        return ret;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virNetworkPtr */
+    virNetworkRef(net);
+    pyobj_net = libvirt_virNetworkPtrWrap(net);
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchNetworkEventLifecycleCallback",
+                                    (char*)"OiiO",
+                                    pyobj_net,
+                                    event,
+                                    detail,
+                                    pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_net);
+
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+
+static PyObject *
+libvirt_virConnectNetworkEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
+                                          PyObject *args)
+{
+    PyObject *py_retval;        /* return value */
+    PyObject *pyobj_conn;       /* virConnectPtr */
+    PyObject *pyobj_net;
+    PyObject *pyobj_cbData;     /* hash of callback data */
+    int eventID;
+    virConnectPtr conn;
+    int ret = 0;
+    virConnectNetworkEventGenericCallback cb = NULL;
+    virNetworkPtr net;
+
+    if (!PyArg_ParseTuple
+        (args, (char *) "OOiO:virConnectNetworkEventRegisterAny",
+         &pyobj_conn, &pyobj_net, &eventID, &pyobj_cbData)) {
+        DEBUG("%s failed parsing tuple\n", __FUNCTION__);
+        return VIR_PY_INT_FAIL;
+    }
+
+    DEBUG("libvirt_virConnectNetworkEventRegister(%p %p %d %p) called\n",
+           pyobj_conn, pyobj_net, eventID, pyobj_cbData);
+    conn = PyvirConnect_Get(pyobj_conn);
+    if (pyobj_net == Py_None)
+        net = NULL;
+    else
+        net = PyvirNetwork_Get(pyobj_net);
+
+    switch ((virNetworkEventID) eventID) {
+    case VIR_NETWORK_EVENT_ID_LIFECYCLE:
+        cb = VIR_NETWORK_EVENT_CALLBACK(libvirt_virConnectNetworkEventLifecycleCallback);
+        break;
+
+    case VIR_NETWORK_EVENT_ID_LAST:
+        break;
+    }
+
+    if (!cb) {
+        return VIR_PY_INT_FAIL;
+    }
+
+    Py_INCREF(pyobj_cbData);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    ret = virConnectNetworkEventRegisterAny(conn, net, eventID,
+                                            cb, pyobj_cbData,
+                                            libvirt_virConnectNetworkEventFreeFunc);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (ret < 0) {
+        Py_DECREF(pyobj_cbData);
+    }
+
+    py_retval = libvirt_intWrap(ret);
+    return py_retval;
+}
+
+static PyObject
+*libvirt_virConnectNetworkEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
+                                             PyObject *args)
+{
+    PyObject *py_retval;
+    PyObject *pyobj_conn;
+    int callbackID;
+    virConnectPtr conn;
+    int ret = 0;
+
+    if (!PyArg_ParseTuple
+        (args, (char *) "Oi:virConnectNetworkEventDeregister",
+         &pyobj_conn, &callbackID))
+        return NULL;
+
+    DEBUG("libvirt_virConnectNetworkEventDeregister(%p) called\n", pyobj_conn);
+
+    conn   = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+
+    ret = virConnectNetworkEventDeregisterAny(conn, callbackID);
+
+    LIBVIRT_END_ALLOW_THREADS;
+    py_retval = libvirt_intWrap(ret);
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 1)*/
+
 #if LIBVIR_CHECK_VERSION(0, 10, 0)
 static void
 libvirt_virConnectCloseCallbackDispatch(virConnectPtr conn ATTRIBUTE_UNUSED,
@@ -7315,6 +7463,10 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virConnectDomainEventDeregister", libvirt_virConnectDomainEventDeregister, METH_VARARGS, NULL},
     {(char *) "virConnectDomainEventRegisterAny", libvirt_virConnectDomainEventRegisterAny, METH_VARARGS, NULL},
     {(char *) "virConnectDomainEventDeregisterAny", libvirt_virConnectDomainEventDeregisterAny, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(1, 2, 1)
+    {(char *) "virConnectNetworkEventRegisterAny", libvirt_virConnectNetworkEventRegisterAny, METH_VARARGS, NULL},
+    {(char *) "virConnectNetworkEventDeregisterAny", libvirt_virConnectNetworkEventDeregisterAny, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 1) */
 #if LIBVIR_CHECK_VERSION(0, 10, 0)
     {(char *) "virConnectRegisterCloseCallback", libvirt_virConnectRegisterCloseCallback, METH_VARARGS, NULL},
     {(char *) "virConnectUnregisterCloseCallback", libvirt_virConnectUnregisterCloseCallback, METH_VARARGS, NULL},
