@@ -85,6 +85,8 @@ for cname in wantfunctions:
         continue
     if name[0:21] == "virConnectDomainEvent" and name[-8:] == "Callback":
         continue
+    if name[0:22] == "virConnectNetworkEvent" and name[-8:] == "Callback":
+        continue
 
 
     # virEvent APIs go into main 'libvirt' namespace not any class
