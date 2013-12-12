@@ -361,9 +361,10 @@ libvirt_boolUnwrap(PyObject *obj, bool *val)
 int
 libvirt_charPtrUnwrap(PyObject *obj, char **str)
 {
-#if PY_MAJOR_VERSION < 3
-    const char *ret;
+#if PY_MAJOR_VERSION > 2
+    PyObject *bytes;
 #endif
+    const char *ret;
     *str = NULL;
     if (!obj) {
         PyErr_SetString(PyExc_TypeError, "unexpected type");
@@ -371,16 +372,18 @@ libvirt_charPtrUnwrap(PyObject *obj, char **str)
     }
 
 #if PY_MAJOR_VERSION > 2
-    if (!(*str = PyUnicode_AsUTF8(obj)))
+    if (!(bytes = PyUnicode_AsUTF8String(obj)))
         return -1;
+    ret = PyBytes_AsString(bytes);
 #else
     ret = PyString_AsString(obj);
-    if (ret &&
-        !(*str = strdup(ret)))
-        return -1;
 #endif
-
-    return 0;
+    if (ret)
+        *str = strdup(ret);
+#if PY_MAJOR_VERSION > 2
+    Py_DECREF(bytes);
+#endif
+    return ret && *str ? 0 : -1;
 }
 
 int libvirt_charPtrSizeUnwrap(PyObject *obj, char **str, Py_ssize_t *size)
