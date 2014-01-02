@@ -71,7 +71,7 @@
 #    define __GNUC_PREREQ(maj, min)                                        \
     ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
 #   else
-#    define __GNUC_PREREQ(maj,min) 0
+#    define __GNUC_PREREQ(maj, min) 0
 #   endif
 #  endif /* __GNUC_PREREQ */
 
