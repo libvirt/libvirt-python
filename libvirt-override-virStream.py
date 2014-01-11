@@ -76,6 +76,7 @@
             try:
                 got = handler(self, 1024*64, opaque)
             except:
+                e = sys.exc_info()[1]
                 try:
                     self.abort()
                 except:
