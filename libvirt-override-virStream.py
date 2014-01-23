@@ -122,6 +122,6 @@
         with the call, but may instead be delayed until a
         subsequent call.
         """
-        ret = libvirtmod.virStreamSend(self._o, data, len(data))
+        ret = libvirtmod.virStreamSend(self._o, data)
         if ret == -1: raise libvirtError ('virStreamSend() failed')
         return ret
