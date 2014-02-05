@@ -2,9 +2,9 @@
 #
 #
 #
-#################################################################################
-# Start off by implementing a general purpose event loop for anyones use
-#################################################################################
+##############################################################################
+# Start off by implementing a general purpose event loop for anyone's use
+##############################################################################
 
 import sys
 import getopt
@@ -158,7 +158,7 @@ class virEventLoopPure:
 
     # This is the heart of the event loop, performing one single
     # iteration. It asks when the next timeout is due, and then
-    # calcuates the maximum amount of time it is able to sleep
+    # calculates the maximum amount of time it is able to sleep
     # for in poll() pending file handle events.
     #
     # It then goes into the poll() sleep.
@@ -167,9 +167,9 @@ class virEventLoopPure:
     # events which need to be dispatched to registered callbacks
     # It may also be time to fire some periodic timers.
     #
-    # Due to the coarse granularity of schedular timeslices, if
+    # Due to the coarse granularity of scheduler timeslices, if
     # we ask for a sleep of 500ms in order to satisfy a timer, we
-    # may return up to 1 schedular timeslice early. So even though
+    # may return up to 1 scheduler timeslice early. So even though
     # our sleep timeout was reached, the registered timer may not
     # technically be at its expiry point. This leads to us going
     # back around the loop with a crazy 5ms sleep. So when checking
@@ -227,7 +227,7 @@ class virEventLoopPure:
             self.runningPoll = False
 
 
-    # Actually the event loop forever
+    # Actually run the event loop forever
     def run_loop(self):
         self.quit = False
         while not self.quit:
@@ -429,8 +429,8 @@ def virEventLoopNativeStart():
 ##########################################################################
 # Everything that now follows is a simple demo of domain lifecycle events
 ##########################################################################
-def eventToString(event):
-    eventStrings = ( "Defined",
+def domEventToString(event):
+    domEventStrings = ( "Defined",
                      "Undefined",
                      "Started",
                      "Suspended",
@@ -438,11 +438,12 @@ def eventToString(event):
                      "Stopped",
                      "Shutdown",
                      "PMSuspended",
-                     "Crashed" )
-    return eventStrings[event]
+                     "Crashed",
+    )
+    return domEventStrings[event]
 
-def detailToString(event, detail):
-    eventStrings = (
+def domDetailToString(event, detail):
+    domEventStrings = (
         ( "Added", "Updated" ),
         ( "Removed", ),
         ( "Booted", "Migrated", "Restored", "Snapshot", "Wakeup" ),
@@ -451,19 +452,19 @@ def detailToString(event, detail):
         ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
         ( "Finished", ),
         ( "Memory", "Disk" ),
-        ( "Panicked", )
+        ( "Panicked", ),
         )
-    return eventStrings[event][detail]
+    return domEventStrings[event][detail]
 
 def myDomainEventCallback1 (conn, dom, event, detail, opaque):
     print("myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
-                                                                 eventToString(event),
-                                                                 detailToString(event, detail)))
+                                                                 domEventToString(event),
+                                                                 domDetailToString(event, detail)))
 
 def myDomainEventCallback2 (conn, dom, event, detail, opaque):
     print("myDomainEventCallback2 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
-                                                                 eventToString(event),
-                                                                 detailToString(event, detail)))
+                                                                 domEventToString(event),
+                                                                 domDetailToString(event, detail)))
 
 def myDomainEventRebootCallback(conn, dom, opaque):
     print("myDomainEventRebootCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
@@ -500,6 +501,35 @@ def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
 def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
             dom.name(), dom.ID(), dev))
+
+##########################################################################
+# Network events
+##########################################################################
+def netEventToString(event):
+    netEventStrings = ( "Defined",
+                     "Undefined",
+                     "Started",
+                     "Stopped",
+    )
+    return netEventStrings[event]
+
+def netDetailToString(event, detail):
+    netEventStrings = (
+        ( "Added", ),
+        ( "Removed", ),
+        ( "Started", ),
+        ( "Stopped", ),
+    )
+    return netEventStrings[event][detail]
+
+def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
+    print("myNetworkEventLifecycleCallback: Network %s %s %s" % (net.name(),
+                                                                 netEventToString(event),
+                                                                 netDetailToString(event, detail)))
+
+##########################################################################
+# Set up and run the program
+##########################################################################
 
 run = True
 
@@ -576,6 +606,8 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE, myDomainEventBalloonChangeCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK, myDomainEventPMSuspendDiskCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED, myDomainEventDeviceRemovedCallback, None)
+
+    vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 
     vc.setKeepAlive(5, 3)
 
