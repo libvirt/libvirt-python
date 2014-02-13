@@ -28,7 +28,7 @@
     def recvAll(self, handler, opaque):
         """Receive the entire data stream, sending the data to the
         requested data sink. This is simply a convenient alternative
-        to virStreamRecv, for apps that do blocking-I/o.
+        to virStreamRecv, for apps that do blocking-I/O.
 
         A hypothetical handler function looks like:
 
@@ -62,7 +62,7 @@
         """
         Send the entire data stream, reading the data from the
         requested data source. This is simply a convenient alternative
-        to virStreamSend, for apps that do blocking-I/o.
+        to virStreamSend, for apps that do blocking-I/O.
 
         A hypothetical handler function looks like:
 
