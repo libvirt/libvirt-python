@@ -227,10 +227,9 @@ def enum(type, name, value):
         value = 1
     elif value == 'VIR_DOMAIN_AFFECT_CONFIG':
         value = 2
-    if name[-5:] != '_LAST':
-        if onlyOverrides and name not in enums[type]:
-            return
-        enums[type][name] = value
+    if onlyOverrides and name not in enums[type]:
+        return
+    enums[type][name] = value
 
 def lxc_enum(type, name, value):
     if type not in lxc_enums:
@@ -1765,13 +1764,23 @@ def buildWrappers(module):
     #
     # Generate enum constants
     #
+    def enumsSortKey(data):
+        value = data[1]
+        try:
+            value = int(value)
+        except ValueError:
+            value = float('inf')
+        return value
+
     enumvals = list(enums.items())
     if enumvals is not None:
         enumvals.sort(key=lambda x: x[0])
     for type,enum in enumvals:
         classes.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(key=lambda i: int(i[1]))
+        items.sort(key=enumsSortKey)
+        if items[-1][0].endswith('_LAST'):
+            del items[-1]
         for name,value in items:
             classes.write("%s = %s\n" % (name,value))
         classes.write("\n")
