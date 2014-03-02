@@ -278,7 +278,7 @@ class my_clean(clean):
             remove_tree("build")
 
 setup(name = 'libvirt-python',
-      version = '1.2.1',
+      version = '1.2.2',
       url = 'http://www.libvirt.org',
       maintainer = 'Libvirt Maintainers',
       maintainer_email = 'libvir-list@redhat.com',
