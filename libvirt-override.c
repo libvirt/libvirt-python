@@ -197,8 +197,7 @@ setPyVirTypedParameter(PyObject *info,
             goto cleanup;
         }
 
-        strncpy(temp->field, keystr, sizeof(*temp->field) - 1);
-        temp->field[sizeof(*temp->field) - 1] = '\0';
+        strncpy(temp->field, keystr, VIR_TYPED_PARAM_FIELD_LENGTH - 1);
         temp->type = params[i].type;
         VIR_FREE(keystr);
 
