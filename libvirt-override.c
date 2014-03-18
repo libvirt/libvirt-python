@@ -259,7 +259,7 @@ setPyVirTypedParameter(PyObject *info,
     return ret;
 
 cleanup:
-    VIR_FREE(ret);
+    virTypedParamsFree(ret, size);
     return NULL;
 }
 
