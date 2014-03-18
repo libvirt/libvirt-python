@@ -267,7 +267,12 @@ class my_test(Command):
 
         apis = get_api_xml_files()
 
+        if "PYTHONPATH" in os.environ:
+            os.environ["PYTHONPATH"] = self.build_platlib + ":" + os.environ["PYTHONPATH"]
+        else:
+            os.environ["PYTHONPATH"] = self.build_platlib
         self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
+        self.spawn(["nosetests"])
 
 
 class my_clean(clean):
