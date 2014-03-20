@@ -2326,7 +2326,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     if (c_retval == -1)
-        return VIR_PY_INT_FAIL;
+        return VIR_PY_NONE;
 
     if ((rv = PyList_New(c_retval)) == NULL)
         goto error;
@@ -2350,7 +2350,7 @@ done:
 
 error:
     Py_XDECREF(rv);
-    rv = VIR_PY_INT_FAIL;
+    rv = VIR_PY_NONE;
     goto done;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 3) */
