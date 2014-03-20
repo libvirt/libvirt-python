@@ -2350,7 +2350,7 @@ done:
 
 error:
     Py_XDECREF(rv);
-    rv = VIR_PY_NONE;
+    rv = NULL;
     goto done;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 3) */
