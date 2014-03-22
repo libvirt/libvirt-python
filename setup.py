@@ -11,7 +11,6 @@ from distutils.errors import DistutilsExecError
 import distutils
 
 import sys
-import datetime
 import os
 import os.path
 import re
