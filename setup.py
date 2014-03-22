@@ -72,49 +72,59 @@ def get_api_xml_files():
 
     return (libvirt_api, libvirt_qemu_api, libvirt_lxc_api)
 
-ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
-cflags = get_pkgconfig_data(["--cflags"], "libvirt", False)
+def get_module_lists():
+    """
+    Determine which modules we are actually building, and all their
+    required config
+    """
+    c_modules = []
+    py_modules = []
+    ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
+    cflags = get_pkgconfig_data(["--cflags"], "libvirt", False)
 
-c_modules = []
-py_modules = []
-
-module = Extension('libvirtmod',
-                   sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
-                   libraries = [ "virt" ],
-                   include_dirs = [ "." ])
-if cflags != "":
-    module.extra_compile_args.append(cflags)
-if ldflags != "":
-    module.extra_link_args.append(ldflags)
-
-c_modules.append(module)
-py_modules.append("libvirt")
-
-moduleqemu = Extension('libvirtmod_qemu',
-                       sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
-                       libraries = [ "virt-qemu" ],
+    module = Extension('libvirtmod',
+                       sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
+                       libraries = [ "virt" ],
                        include_dirs = [ "." ])
-if cflags != "":
-    moduleqemu.extra_compile_args.append(cflags)
-if ldflags != "":
-    moduleqemu.extra_link_args.append(ldflags)
-
-c_modules.append(moduleqemu)
-py_modules.append("libvirt_qemu")
-
-if have_libvirt_lxc:
-    modulelxc = Extension('libvirtmod_lxc',
-                          sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
-                          libraries = [ "virt-lxc" ],
-                          include_dirs = [ "." ])
     if cflags != "":
-        modulelxc.extra_compile_args.append(cflags)
+        module.extra_compile_args.append(cflags)
     if ldflags != "":
-        modulelxc.extra_link_args.append(ldflags)
+        module.extra_link_args.append(ldflags)
 
-    c_modules.append(modulelxc)
-    py_modules.append("libvirt_lxc")
+    c_modules.append(module)
+    py_modules.append("libvirt")
 
+    moduleqemu = Extension('libvirtmod_qemu',
+                           sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
+                           libraries = [ "virt-qemu" ],
+                           include_dirs = [ "." ])
+    if cflags != "":
+        moduleqemu.extra_compile_args.append(cflags)
+    if ldflags != "":
+        moduleqemu.extra_link_args.append(ldflags)
+
+    c_modules.append(moduleqemu)
+    py_modules.append("libvirt_qemu")
+
+    if have_libvirt_lxc:
+        modulelxc = Extension('libvirtmod_lxc',
+                              sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
+                              libraries = [ "virt-lxc" ],
+                              include_dirs = [ "." ])
+        if cflags != "":
+            modulelxc.extra_compile_args.append(cflags)
+        if ldflags != "":
+            modulelxc.extra_link_args.append(ldflags)
+
+        c_modules.append(modulelxc)
+        py_modules.append("libvirt_lxc")
+
+    return c_modules, py_modules
+
+
+###################
+# Custom commands #
+###################
 
 class my_build(build):
 
@@ -281,14 +291,21 @@ class my_clean(clean):
         if os.path.exists("build"):
             remove_tree("build")
 
+
+##################
+# Invoke setup() #
+##################
+
+_c_modules, _py_modules = get_module_lists()
+
 setup(name = 'libvirt-python',
       version = '1.2.3',
       url = 'http://www.libvirt.org',
       maintainer = 'Libvirt Maintainers',
       maintainer_email = 'libvir-list@redhat.com',
       description = 'The libvirt virtualization API',
-      ext_modules = c_modules,
-      py_modules = py_modules,
+      ext_modules = _c_modules,
+      py_modules = _py_modules,
       package_dir = {
           '': 'build'
       },
