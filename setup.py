@@ -34,13 +34,14 @@ spawn([pkgcfg,
        "--atleast-version=%s" % MIN_LIBVIRT,
        "libvirt"])
 
-have_libvirt_lxc=True
-try:
-    spawn([pkgcfg,
-           "--atleast-version=%s" % MIN_LIBVIRT_LXC,
-         "libvirt"])
-except DistutilsExecError:
-    have_libvirt_lxc=False
+def have_libvirt_lxc():
+    try:
+        spawn([pkgcfg,
+               "--atleast-version=%s" % MIN_LIBVIRT_LXC,
+             "libvirt"])
+        return True
+    except DistutilsExecError:
+        return False
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
@@ -106,7 +107,7 @@ def get_module_lists():
     c_modules.append(moduleqemu)
     py_modules.append("libvirt_qemu")
 
-    if have_libvirt_lxc:
+    if have_libvirt_lxc():
         modulelxc = Extension('libvirtmod_lxc',
                               sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
                               libraries = [ "virt-lxc" ],
@@ -133,7 +134,7 @@ class my_build(build):
 
         self.spawn([sys.executable, "generator.py", "libvirt", apis[0]])
         self.spawn([sys.executable, "generator.py", "libvirt-qemu", apis[1]])
-        if have_libvirt_lxc:
+        if have_libvirt_lxc():
             self.spawn([sys.executable, "generator.py", "libvirt-lxc", apis[2]])
 
         build.run(self)
