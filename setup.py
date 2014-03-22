@@ -24,19 +24,24 @@ MIN_LIBVIRT_LXC = "1.0.2"
 if not os.path.exists("build"):
     os.mkdir("build")
 
-pkgcfg = distutils.spawn.find_executable("pkg-config")
+_pkgcfg = -1
+def get_pkgcfg(do_fail=True):
+    global _pkgcfg
+    if _pkgcfg == -1:
+        _pkgcfg = distutils.spawn.find_executable("pkg-config")
+    if _pkgcfg is None and do_fail:
+        raise Exception("pkg-config binary is required to compile libvirt-python")
+    return _pkgcfg
 
-if pkgcfg is None:
-    raise Exception("pkg-config binary is required to compile libvirt-python")
-
-spawn([pkgcfg,
-       "--print-errors",
-       "--atleast-version=%s" % MIN_LIBVIRT,
-       "libvirt"])
+def check_minimum_libvirt_version():
+    spawn([get_pkgcfg(),
+           "--print-errors",
+           "--atleast-version=%s" % MIN_LIBVIRT,
+           "libvirt"])
 
 def have_libvirt_lxc():
     try:
-        spawn([pkgcfg,
+        spawn([get_pkgcfg(),
                "--atleast-version=%s" % MIN_LIBVIRT_LXC,
              "libvirt"])
         return True
@@ -45,7 +50,7 @@ def have_libvirt_lxc():
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
-    f = os.popen("%s %s %s" % (pkgcfg, " ".join(args), mod))
+    f = os.popen("%s %s %s" % (get_pkgcfg(), " ".join(args), mod))
 
     line = f.readline()
     if line is not None:
@@ -78,6 +83,9 @@ def get_module_lists():
     Determine which modules we are actually building, and all their
     required config
     """
+    if get_pkgcfg(do_fail=False) is None:
+        return [], []
+
     c_modules = []
     py_modules = []
     ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
@@ -130,6 +138,7 @@ def get_module_lists():
 class my_build(build):
 
     def run(self):
+        check_minimum_libvirt_version()
         apis = get_api_xml_files()
 
         self.spawn([sys.executable, "generator.py", "libvirt", apis[0]])
