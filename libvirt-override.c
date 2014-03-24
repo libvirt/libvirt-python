@@ -4,7 +4,7 @@
  *           entry points where an automatically generated stub is
  *           unpractical
  *
- * Copyright (C) 2005, 2007-2013 Red Hat, Inc.
+ * Copyright (C) 2005, 2007-2014 Red Hat, Inc.
  *
  * Daniel Veillard <veillard@redhat.com>
  */
@@ -272,6 +272,12 @@ typedef struct {
 } virPyTypedParamsHint;
 typedef virPyTypedParamsHint *virPyTypedParamsHintPtr;
 
+# if PY_MAJOR_VERSION > 2
+#  define libvirt_PyString_Check PyUnicode_Check
+# else
+#  define libvirt_PyString_Check PyString_Check
+# endif
+
 /* Automatically convert dict into type parameters based on types reported
  * by python. All integer types are converted into LLONG (in case of a negative
  * value) or ULLONG (in case of a positive value). If you need different
@@ -321,11 +327,7 @@ virPyDictToTypedParams(PyObject *dict,
         }
 
         if (type == -1) {
-#if PY_MAJOR_VERSION > 2
-            if (PyUnicode_Check(value)) {
-#else
-            if (PyString_Check(value)) {
-#endif
+            if (libvirt_PyString_Check(value)) {
                 type = VIR_TYPED_PARAM_STRING;
             } else if (PyBool_Check(value)) {
                 type = VIR_TYPED_PARAM_BOOLEAN;
