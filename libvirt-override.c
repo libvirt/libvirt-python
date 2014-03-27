@@ -914,7 +914,7 @@ libvirt_virDomainSetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
     int i_retval;
     int nparams = 0;
     Py_ssize_t size = 0;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"OO:virDomainSetScedulerParameters",
                           &pyobj_domain, &info))
@@ -973,7 +973,7 @@ libvirt_virDomainSetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -1064,7 +1064,7 @@ libvirt_virDomainSetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
     int nparams = 0;
     Py_ssize_t size = 0;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OOi:virDomainSetBlkioParameters",
@@ -1123,7 +1123,7 @@ libvirt_virDomainSetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -1184,7 +1184,7 @@ libvirt_virDomainSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     int nparams = 0;
     Py_ssize_t size = 0;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OOi:virDomainSetMemoryParameters",
@@ -1243,7 +1243,7 @@ libvirt_virDomainSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -1304,7 +1304,7 @@ libvirt_virDomainSetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
     int nparams = 0;
     Py_ssize_t size = 0;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OOi:virDomainSetNumaParameters",
@@ -1363,7 +1363,7 @@ libvirt_virDomainSetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -1425,7 +1425,7 @@ libvirt_virDomainSetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
     Py_ssize_t size = 0;
     unsigned int flags;
     const char *device = NULL;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OzOi:virDomainSetInterfaceParameters",
@@ -1484,7 +1484,7 @@ libvirt_virDomainSetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -4782,7 +4782,7 @@ libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
     Py_ssize_t size = 0;
     const char *disk;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"OzOi:virDomainSetBlockIoTune",
                           &pyobj_domain, &disk, &info, &flags))
@@ -4840,7 +4840,7 @@ libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
 
 cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
