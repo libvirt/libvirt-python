@@ -291,7 +291,7 @@ class my_test(Command):
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
         self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
-        self.spawn(["nosetests"])
+        self.spawn([sys.executable, "/usr/bin/nosetests"])
 
 
 class my_clean(clean):
