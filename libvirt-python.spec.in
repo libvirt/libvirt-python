@@ -15,9 +15,11 @@ Group: Development/Libraries
 BuildRequires: libvirt-devel >= @C_VERSION@
 BuildRequires: python-devel
 BuildRequires: python-nose
+BuildRequires: python-lxml
 %if %{with_python3}
 BuildRequires: python3-devel
 BuildRequires: python3-nose
+BuildRequires: python3-lxml
 %endif
 
 %if %{with_python3}
