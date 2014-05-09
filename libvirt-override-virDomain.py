@@ -47,3 +47,15 @@
         ret = libvirtmod.virDomainCreateWithFiles(self._o, files, flags)
         if ret == -1: raise libvirtError ('virDomainCreateWithFiles() failed', dom=self)
         return ret
+
+    def fsFreeze(self, mountpoints=None, flags=0):
+        """Freeze specified filesystems within the guest """
+        ret = libvirtmod.virDomainFSFreeze(self._o, mountpoints, flags)
+        if ret == -1: raise libvirtError ('virDomainFSFreeze() failed', dom=self)
+        return ret
+
+    def fsThaw(self, mountpoints=None, flags=0):
+        """Thaw specified filesystems within the guest """
+        ret = libvirtmod.virDomainFSThaw(self._o, mountpoints, flags)
+        if ret == -1: raise libvirtError ('virDomainFSThaw() failed', dom=self)
+        return ret

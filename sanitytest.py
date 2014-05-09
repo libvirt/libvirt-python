@@ -207,6 +207,8 @@ for name in sorted(basicklassmap):
     func = func[0:1].lower() + func[1:]
     if func[0:8] == "nWFilter":
         func = "nwfilter" + func[8:]
+    if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw":
+        func = "fs" + func[2:]
 
     # ...except when they don't. More stupid naming
     # decisions we can't fix

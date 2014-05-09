@@ -517,6 +517,9 @@ skip_function = (
     'virDomainCreateXMLWithFiles', # overridden in virConnect.py
     'virDomainCreateWithFiles', # overridden in virDomain.py
 
+    'virDomainFSFreeze', # overridden in virDomain.py
+    'virDomainFSThaw', # overridden in virDomain.py
+
     # 'Ref' functions have no use for bindings users.
     "virConnectRef",
     "virDomainRef",

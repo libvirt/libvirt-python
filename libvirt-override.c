@@ -7554,6 +7554,99 @@ cleanup:
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
 
 
+#if LIBVIR_CHECK_VERSION(1, 2, 5)
+static PyObject *
+libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval = NULL;
+    int c_retval;
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    PyObject *pyobj_list;
+    unsigned int flags;
+    unsigned int nmountpoints = 0;
+    char **mountpoints = NULL;
+    size_t i = 0, j;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainFSFreeze",
+                          &pyobj_domain, &pyobj_list, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if (PyList_Check(pyobj_list)) {
+        nmountpoints = PyList_Size(pyobj_list);
+
+        if (VIR_ALLOC_N(mountpoints, nmountpoints) < 0)
+            return PyErr_NoMemory();
+
+        for (i = 0; i < nmountpoints; i++) {
+            if (libvirt_charPtrUnwrap(PyList_GetItem(pyobj_list, i),
+                                      mountpoints+i) < 0 ||
+                mountpoints[i] == NULL)
+                goto cleanup;
+        }
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainFSFreeze(domain, (const char **) mountpoints,
+                                 nmountpoints, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    py_retval = libvirt_intWrap(c_retval);
+
+cleanup:
+    for (j = 0 ; j < i ; j++)
+        VIR_FREE(mountpoints[j]);
+    VIR_FREE(mountpoints);
+    return py_retval;
+}
+
+
+static PyObject *
+libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval = NULL;
+    int c_retval;
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    PyObject *pyobj_list;
+    unsigned int flags;
+    unsigned int nmountpoints = 0;
+    char **mountpoints = NULL;
+    size_t i = 0, j;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainFSThaw",
+                          &pyobj_domain, &pyobj_list, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if (PyList_Check(pyobj_list)) {
+        nmountpoints = PyList_Size(pyobj_list);
+
+        if (VIR_ALLOC_N(mountpoints, nmountpoints) < 0)
+            return PyErr_NoMemory();
+
+        for (i = 0; i < nmountpoints; i++) {
+            if (libvirt_charPtrUnwrap(PyList_GetItem(pyobj_list, i),
+                                      mountpoints+i) < 0 ||
+                mountpoints[i] == NULL)
+                goto cleanup;
+        }
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainFSThaw(domain, (const char **) mountpoints,
+                               nmountpoints, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    py_retval = libvirt_intWrap(c_retval);
+
+ cleanup:
+    for (j = 0 ; j < i ; j++)
+        VIR_FREE(mountpoints[j]);
+    VIR_FREE(mountpoints);
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -7729,6 +7822,10 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainCreateXMLWithFiles", libvirt_virDomainCreateXMLWithFiles, METH_VARARGS, NULL},
     {(char *) "virDomainCreateWithFiles", libvirt_virDomainCreateWithFiles, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
+#if LIBVIR_CHECK_VERSION(1, 2, 5)
+    {(char *) "virDomainFSFreeze", libvirt_virDomainFSFreeze, METH_VARARGS, NULL},
+    {(char *) "virDomainFSThaw", libvirt_virDomainFSThaw, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
     {NULL, NULL, 0, NULL}
 };
 
