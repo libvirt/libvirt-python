@@ -152,7 +152,7 @@ for name in sorted(basicklassmap):
     # and virDomainSnapshot namespaces which stupidly used a different
     # convention which we now can't fix without breaking API
     if func[0:3] == "Get" and klass not in ["virConnect", "virDomainSnapshot", "libvirt"]:
-        if func not in ["GetCPUStats"]:
+        if func not in ["GetCPUStats", "GetTime"]:
             func = func[3:]
 
     # The object creation and lookup APIs all have to get re-mapped

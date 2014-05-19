@@ -7645,6 +7645,99 @@ libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     VIR_FREE(mountpoints);
     return py_retval;
 }
+
+static PyObject *
+libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval = NULL;
+    PyObject *dict = NULL;
+    PyObject *pyobj_domain, *pyobj_seconds, *pyobj_nseconds;
+    virDomainPtr domain;
+    long long seconds;
+    unsigned int nseconds;
+    unsigned int flags;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char*)"Oi:virDomainGetTime",
+                          &pyobj_domain, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if (!(dict = PyDict_New()))
+        goto cleanup;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainGetTime(domain, &seconds, &nseconds, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        goto cleanup;
+
+    if (!(pyobj_seconds = libvirt_longlongWrap(seconds)) ||
+        PyDict_SetItemString(dict, "seconds", pyobj_seconds) < 0)
+        goto cleanup;
+    Py_DECREF(pyobj_seconds);
+
+    if (!(pyobj_nseconds = libvirt_uintWrap(nseconds)) ||
+        PyDict_SetItemString(dict, "nseconds", pyobj_nseconds) < 0)
+        goto cleanup;
+    Py_DECREF(pyobj_nseconds);
+
+    py_retval = dict;
+    dict = NULL;
+ cleanup:
+    Py_XDECREF(dict);
+    return py_retval;
+}
+
+
+static PyObject *
+libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    PyObject *py_retval = NULL;
+    PyObject *pyobj_domain;
+    PyObject *py_dict;
+    virDomainPtr domain;
+    long long seconds = 0;
+    unsigned int nseconds = 0;
+    unsigned int flags;
+    ssize_t py_dict_size;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char*)"OOi:virDomainSetTime",
+                          &pyobj_domain, &py_dict, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    py_dict_size = PyDict_Size(py_dict);
+
+    if (py_dict_size == 2) {
+        PyObject *pyobj_seconds, *pyobj_nseconds;
+
+        if (!(pyobj_seconds = PyDict_GetItemString(py_dict, "seconds")) ||
+            (libvirt_longlongUnwrap(pyobj_seconds, &seconds) < 0)) {
+            PyErr_Format(PyExc_LookupError, "malformed or missing 'seconds'");
+            goto cleanup;
+        }
+
+        if (!(pyobj_nseconds = PyDict_GetItemString(py_dict, "nseconds")) ||
+            (libvirt_uintUnwrap(pyobj_nseconds, &nseconds) < 0)) {
+            PyErr_Format(PyExc_LookupError, "malformed or missing 'nseconds'");
+            goto cleanup;
+        }
+    } else if (py_dict_size > 0) {
+        PyErr_Format(PyExc_LookupError, "Dictionary must contain "
+                     "'seconds' and 'nseconds'");
+        goto cleanup;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainSetTime(domain, seconds, nseconds, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    py_retval = libvirt_intWrap(c_retval);
+
+ cleanup:
+    return py_retval;
+}
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
 
 /************************************************************************
@@ -7825,6 +7918,8 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 2, 5)
     {(char *) "virDomainFSFreeze", libvirt_virDomainFSFreeze, METH_VARARGS, NULL},
     {(char *) "virDomainFSThaw", libvirt_virDomainFSThaw, METH_VARARGS, NULL},
+    {(char *) "virDomainGetTime", libvirt_virDomainGetTime, METH_VARARGS, NULL},
+    {(char *) "virDomainSetTime", libvirt_virDomainSetTime, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
     {NULL, NULL, 0, NULL}
 };

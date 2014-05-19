@@ -519,6 +519,8 @@ skip_function = (
 
     'virDomainFSFreeze', # overridden in virDomain.py
     'virDomainFSThaw', # overridden in virDomain.py
+    'virDomainGetTime', # overridden in virDomain.py
+    'virDomainSetTime', # overridden in virDomain.py
 
     # 'Ref' functions have no use for bindings users.
     "virConnectRef",
