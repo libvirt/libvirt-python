@@ -734,6 +734,7 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     size_t i;
     virDomainMemoryStatStruct stats[VIR_DOMAIN_MEMORY_STAT_NR];
     PyObject *info;
+    PyObject *key = NULL, *val = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"O:virDomainMemoryStats", &pyobj_domain))
         return NULL;
@@ -749,31 +750,50 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
         return VIR_PY_NONE;
 
     for (i = 0; i < nr_stats; i++) {
-        if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_SWAP_IN)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("swap_in"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_SWAP_OUT)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("swap_out"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_MAJOR_FAULT)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("major_fault"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_MINOR_FAULT)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("minor_fault"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_UNUSED)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("unused"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_AVAILABLE)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("available"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("actual"),
-                           libvirt_ulonglongWrap(stats[i].val));
-        else if (stats[i].tag == VIR_DOMAIN_MEMORY_STAT_RSS)
-            PyDict_SetItem(info, libvirt_constcharPtrWrap("rss"),
-                           libvirt_ulonglongWrap(stats[i].val));
+        switch (stats[i].tag) {
+        case VIR_DOMAIN_MEMORY_STAT_SWAP_IN:
+            key = libvirt_constcharPtrWrap("swap_in");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_SWAP_OUT:
+            key = libvirt_constcharPtrWrap("swap_out");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_MAJOR_FAULT:
+            key = libvirt_constcharPtrWrap("major_fault");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_MINOR_FAULT:
+            key = libvirt_constcharPtrWrap("minor_fault");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_UNUSED:
+            key = libvirt_constcharPtrWrap("unused");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_AVAILABLE:
+            key = libvirt_constcharPtrWrap("available");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON:
+            key = libvirt_constcharPtrWrap("actual");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_RSS:
+            key = libvirt_constcharPtrWrap("rss");
+            break;
+        default:
+            continue;
+        }
+        val = libvirt_ulonglongWrap(stats[i].val);
+
+        if (!key || !val || PyDict_SetItem(info, key, val) < 0) {
+            Py_DECREF(info);
+            info = NULL;
+            goto cleanup;
+        }
+        Py_DECREF(key);
+        Py_DECREF(val);
+        key = NULL;
+        val = NULL;
     }
+
+ cleanup:
+    Py_XDECREF(key);
+    Py_XDECREF(val);
     return info;
 }
 
