@@ -456,6 +456,14 @@ def domDetailToString(event, detail):
         )
     return domEventStrings[event][detail]
 
+def blockJobTypeToString(type):
+    blockJobTypes = ( "unknown", "Pull", "Copy", "Commit", "ActiveCommit", )
+    return blockJobTypes[type]
+
+def blockJobStatusToString(status):
+    blockJobStatus = ( "Completed", "Failed", "Canceled", "Ready", )
+    return blockJobStatus[status]
+
 def myDomainEventCallback1 (conn, dom, event, detail, opaque):
     print("myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
                                                                  domEventToString(event),
@@ -477,10 +485,14 @@ def myDomainEventWatchdogCallback(conn, dom, action, opaque):
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
     print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action))
-
+def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
+    print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %d %s" % (dom.name(), dom.ID(), srcpath, devalias, action, reason))
 def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
     print("myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme))
-
+def myDomainEventControlErrorCallback(conn, dom, opaque):
+    print("myDomainEventControlErrorCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
+def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
+    print("myDomainEventBlockJobCallback: Domain %s(%s) %s on disk %s %s" % (dom.name(), dom.ID(), blockJobTypeToString(type), disk, blockJobStatusToString(status)))
 def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
     print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
             dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, reason))
@@ -501,6 +513,8 @@ def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
 def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
             dom.name(), dom.ID(), dev))
+def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
+    print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (dom.name(), dom.ID(), blockJobTypeToString(type), disk, blockJobStatusToString(status)))
 
 ##########################################################################
 # Network events
@@ -591,14 +605,17 @@ def main():
 
     vc.registerCloseCallback(myConnectionCloseCallback, None)
 
-    #Add 2 callbacks to prove this works with more than just one
+    #Add 2 lifecycle callbacks to prove this works with more than just one
     vc.domainEventRegister(myDomainEventCallback1,None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_LIFECYCLE, myDomainEventCallback2, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_REBOOT, myDomainEventRebootCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_RTC_CHANGE, myDomainEventRTCChangeCallback, None)
-    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_IO_ERROR, myDomainEventIOErrorCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_WATCHDOG, myDomainEventWatchdogCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_IO_ERROR, myDomainEventIOErrorCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_GRAPHICS, myDomainEventGraphicsCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_IO_ERROR_REASON, myDomainEventIOErrorReasonCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_CONTROL_ERROR, myDomainEventControlErrorCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_JOB, myDomainEventBlockJobCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DISK_CHANGE, myDomainEventDiskChangeCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_TRAY_CHANGE, myDomainEventTrayChangeCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_PMWAKEUP, myDomainEventPMWakeupCallback, None)
@@ -606,6 +623,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE, myDomainEventBalloonChangeCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK, myDomainEventPMSuspendDiskCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED, myDomainEventDeviceRemovedCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2, myDomainEventBlockJob2Callback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 
