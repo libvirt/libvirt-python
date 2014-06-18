@@ -113,14 +113,14 @@
            authScheme, subject, opaque)
         return 0
 
-    def _dispatchDomainEventBlockPullCallback(self, dom, path, type, status, cbData):
-        """Dispatches events to python user domain blockJob event callbacks
+    def _dispatchDomainEventBlockJobCallback(self, dom, disk, type, status, cbData):
+        """Dispatches events to python user domain blockJob/blockJob2 event callbacks
         """
         try:
             cb = cbData["cb"]
             opaque = cbData["opaque"]
 
-            cb(self, virDomain(self, _obj=dom), path, type, status, opaque)
+            cb(self, virDomain(self, _obj=dom), disk, type, status, opaque)
             return 0
         except AttributeError:
             pass

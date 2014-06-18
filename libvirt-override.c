@@ -6085,7 +6085,7 @@ libvirt_virConnectDomainEventGraphicsCallback(virConnectPtr conn ATTRIBUTE_UNUSE
 static int
 libvirt_virConnectDomainEventBlockJobCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                               virDomainPtr dom,
-                                              const char *path,
+                                              const char *disk,
                                               int type,
                                               int status,
                                               void *opaque)
@@ -6114,9 +6114,9 @@ libvirt_virConnectDomainEventBlockJobCallback(virConnectPtr conn ATTRIBUTE_UNUSE
 
     /* Call the Callback Dispatcher */
     pyobj_ret = PyObject_CallMethod(pyobj_conn,
-                                    (char*)"_dispatchDomainEventBlockPullCallback",
+                                    (char*)"_dispatchDomainEventBlockJobCallback",
                                     (char*)"OsiiO",
-                                    pyobj_dom, path, type, status, pyobj_cbData);
+                                    pyobj_dom, disk, type, status, pyobj_cbData);
 
     Py_DECREF(pyobj_cbData);
     Py_DECREF(pyobj_dom);
@@ -6506,6 +6506,7 @@ libvirt_virConnectDomainEventDeviceRemovedCallback(virConnectPtr conn ATTRIBUTE_
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
 
+
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
                                          PyObject *args)
@@ -6561,6 +6562,9 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventGenericCallback);
         break;
     case VIR_DOMAIN_EVENT_ID_BLOCK_JOB:
+#if LIBVIR_CHECK_VERSION(1, 2, 6)
+    case VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2:
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventBlockJobCallback);
         break;
     case VIR_DOMAIN_EVENT_ID_DISK_CHANGE:
