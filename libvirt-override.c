@@ -7764,6 +7764,110 @@ libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
 
+
+#if LIBVIR_CHECK_VERSION(1, 2, 6)
+static PyObject *
+libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
+                            PyObject *args) {
+    PyObject *py_retval = NULL;
+    PyObject *pyobj_conn;
+    PyObject *pyobj_pagesize;
+    PyObject *pyobj_counts = NULL;
+    virConnectPtr conn;
+    unsigned int *pages = NULL;
+    int startCell;
+    unsigned int cellCount;
+    unsigned int flags;
+    unsigned long long *counts = NULL;
+    int c_retval;
+    ssize_t pyobj_pagesize_size, i, j;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOiii:virNodeGetFreePages",
+                          &pyobj_conn, &pyobj_pagesize, &startCell,
+                          &cellCount, &flags))
+        return NULL;
+
+    if (!PyList_Check(pyobj_pagesize)) {
+        PyErr_Format(PyExc_TypeError, "pagesize must be list");
+        return NULL;
+    }
+
+    if (cellCount == 0) {
+        PyErr_Format(PyExc_LookupError, "cellCount must not be zero");
+        return NULL;
+    }
+
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    pyobj_pagesize_size = PyList_Size(pyobj_pagesize);
+    if (VIR_ALLOC_N(pages, pyobj_pagesize_size) < 0 ||
+        VIR_ALLOC_N(counts, pyobj_pagesize_size * cellCount) < 0 ||
+        !(pyobj_counts = PyDict_New()))
+        goto cleanup;
+
+    for (i = 0; i < pyobj_pagesize_size; i++) {
+        PyObject *tmp = PyList_GetItem(pyobj_pagesize, i);
+
+        if (libvirt_intUnwrap(tmp, &pages[i]) < 0)
+            goto cleanup;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNodeGetFreePages(conn,
+                                   pyobj_pagesize_size, pages,
+                                   startCell, cellCount,
+                                   counts, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0) {
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    for (i = 0; i < c_retval;) {
+        PyObject *per_node = NULL;
+        PyObject *node = NULL;
+
+        if (!(per_node = PyDict_New()) ||
+            !(node = libvirt_intWrap(startCell + i/pyobj_pagesize_size))) {
+            Py_XDECREF(per_node);
+            Py_XDECREF(node);
+            goto cleanup;
+        }
+
+        for (j = 0; j < pyobj_pagesize_size; j ++) {
+            PyObject *page = NULL;
+            PyObject *count = NULL;
+
+            if (!(page = libvirt_intWrap(pages[j])) ||
+                !(count = libvirt_intWrap(counts[i + j])) ||
+                PyDict_SetItem(per_node, page, count) < 0) {
+                Py_XDECREF(page);
+                Py_XDECREF(count);
+                Py_XDECREF(per_node);
+                Py_XDECREF(node);
+                goto cleanup;
+            }
+        }
+        i += pyobj_pagesize_size;
+
+        if (PyDict_SetItem(pyobj_counts, node, per_node) < 0) {
+            Py_XDECREF(per_node);
+            Py_XDECREF(node);
+            goto cleanup;
+        }
+    }
+
+    py_retval = pyobj_counts;
+    pyobj_counts = NULL;
+ cleanup:
+    Py_XDECREF(pyobj_counts);
+    VIR_FREE(pages);
+    VIR_FREE(counts);
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -7945,6 +8049,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetTime", libvirt_virDomainGetTime, METH_VARARGS, NULL},
     {(char *) "virDomainSetTime", libvirt_virDomainSetTime, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
+#if LIBVIR_CHECK_VERSION(1, 2, 6)
+    {(char *) "virNodeGetFreePages", libvirt_virNodeGetFreePages, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
     {NULL, NULL, 0, NULL}
 };
 

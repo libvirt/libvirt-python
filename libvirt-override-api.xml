@@ -624,5 +624,14 @@
       <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
       <arg name='flags' type='int' info='unused, pass 0'/>
     </function>
+    <function name="virNodeGetFreePages" file='python'>
+      <info>Returns the number of available pages for a list of cells and page sizes</info>
+      <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
+      <arg name='pages' type='char *' info='list of desired page sizes'/>
+      <arg name='startCell' type='int' info='first cell in the list'/>
+      <arg name='maxCells' type='int' info='number of cell in the list'/>
+      <arg name='flags' type='int' info='unused, pass 0'/>
+      <return type='char *' info='the list available memory in the cells'/>
+    </function>
   </symbols>
 </api>

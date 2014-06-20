@@ -462,6 +462,7 @@ skip_impl = (
     'virDomainMigrate3',
     'virDomainMigrateToURI3',
     'virConnectGetCPUModelNames',
+    'virNodeGetFreePages',
 )
 
 lxc_skip_impl = (
