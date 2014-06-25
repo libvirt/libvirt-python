@@ -7808,7 +7808,7 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
     for (i = 0; i < pyobj_pagesize_size; i++) {
         PyObject *tmp = PyList_GetItem(pyobj_pagesize, i);
 
-        if (libvirt_intUnwrap(tmp, &pages[i]) < 0)
+        if (libvirt_uintUnwrap(tmp, &pages[i]) < 0)
             goto cleanup;
     }
 
