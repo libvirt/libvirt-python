@@ -21,6 +21,21 @@ or to install as non-root
   python setup.py build
   python setup.py install --user
 
+If python-nose is installed, you can test the package with
+
+  python setup.py test
+
+A makefile shim is provided so that you can do
+
+  make && make check
+
+rather than directly invoking setup.py.
+
+As of libvirt 1.2.6, it is possible to develop against an uninstalled
+libvirt.git checkout, by setting some environment variables:
+
+  export PKG_CONFIG_PATH=/path/to/libvirt/git/src/
+  export LD_LIBRARY_PATH=/path/to/libvirt/git/src/.libs/
 
 Patches for this code should be sent to the main libvirt
 development mailing list
