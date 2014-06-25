@@ -633,5 +633,12 @@
       <arg name='flags' type='int' info='unused, pass 0'/>
       <return type='char *' info='the list available memory in the cells'/>
     </function>
+    <function name="virNetworkGetDHCPLeases" file='python'>
+      <info>Returns a list of dhcp leases for interfaces connected to the given virtual network</info>
+      <arg name='network' type='virNetworkPtr' info='a network object'/>
+      <arg name='mac' type='const char *' info='optional mac address'/>
+      <arg name='flags' type='unsigned int' info='unused, pass 0'/>
+      <return type='char *' info="list of leases"/>
+    </function>
   </symbols>
 </api>

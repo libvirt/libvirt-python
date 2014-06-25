@@ -78,6 +78,9 @@ for cname in wantfunctions:
     if name[0:14] == "virTypedParams":
         continue
 
+    if name[0:23] == "virNetworkDHCPLeaseFree":
+        continue
+
     # These aren't functions, they're callback signatures
     if name in ["virConnectAuthCallbackPtr", "virConnectCloseFunc",
                 "virStreamSinkFunc", "virStreamSourceFunc", "virStreamEventCallback",
@@ -209,6 +212,9 @@ for name in sorted(basicklassmap):
         func = "nwfilter" + func[8:]
     if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw":
         func = "fs" + func[2:]
+
+    if klass == "virNetwork":
+        func = func.replace("dHCP", "DHCP")
 
     # ...except when they don't. More stupid naming
     # decisions we can't fix

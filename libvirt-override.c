@@ -7866,6 +7866,93 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(counts);
     return py_retval;
 }
+
+
+static PyObject *
+libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
+                                PyObject *args)
+{
+    PyObject *py_retval = NULL;
+    PyObject *py_lease = NULL;
+    virNetworkPtr network;
+    PyObject *pyobj_network;
+    unsigned int flags;
+    virNetworkDHCPLeasePtr *leases = NULL;
+    int leases_count;
+    char *mac = NULL;
+    size_t i;
+
+    if (!PyArg_ParseTuple(args, (char *) "Ozi:virNetworkDHCPLeasePtr",
+                          &pyobj_network, &mac, &flags))
+        return NULL;
+
+    network = (virNetworkPtr) PyvirNetwork_Get(pyobj_network);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    leases_count = virNetworkGetDHCPLeases(network, mac, &leases, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (leases_count < 0) {
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    if (!(py_retval = PyList_New(leases_count)))
+        goto no_memory;
+
+    for (i = 0; i < leases_count; i++) {
+        virNetworkDHCPLeasePtr lease = leases[i];
+
+        if ((py_lease = PyDict_New()) == NULL)
+            goto no_memory;
+
+#define VIR_SET_LEASE_ITEM(NAME, VALUE_OBJ_FUNC)                            \
+        do {                                                                \
+            PyObject *tmp_val;                                              \
+                                                                            \
+            if (!(tmp_val = VALUE_OBJ_FUNC))                                \
+                goto no_memory;                                             \
+                                                                            \
+            if (PyDict_SetItemString(py_lease, NAME, tmp_val) < 0) {        \
+                Py_DECREF(tmp_val);                                         \
+                goto no_memory;                                             \
+            }                                                               \
+        } while (0)
+
+        VIR_SET_LEASE_ITEM("iface", libvirt_charPtrWrap(lease->iface));
+        VIR_SET_LEASE_ITEM("expirytime", libvirt_longlongWrap(lease->expirytime));
+        VIR_SET_LEASE_ITEM("type", libvirt_intWrap(lease->type));
+        VIR_SET_LEASE_ITEM("mac", libvirt_charPtrWrap(lease->mac));
+        VIR_SET_LEASE_ITEM("ipaddr", libvirt_charPtrWrap(lease->ipaddr));
+        VIR_SET_LEASE_ITEM("prefix", libvirt_uintWrap(lease->prefix));
+        VIR_SET_LEASE_ITEM("hostname", libvirt_charPtrWrap(lease->hostname));
+        VIR_SET_LEASE_ITEM("clientid", libvirt_charPtrWrap(lease->clientid));
+        VIR_SET_LEASE_ITEM("iaid", libvirt_charPtrWrap(lease->iaid));
+
+#undef VIR_SET_LEASE_ITEM
+
+        if (PyList_SetItem(py_retval, i, py_lease) < 0)
+            goto no_memory;
+
+        py_lease = NULL;
+    }
+
+ cleanup:
+    Py_XDECREF(py_lease);
+    if (leases) {
+        for (i = 0; i < leases_count; i++)
+            virNetworkDHCPLeaseFree(leases[i]);
+    }
+    VIR_FREE(leases);
+
+    return py_retval;
+
+ no_memory:
+    Py_XDECREF(py_retval);
+    py_retval = PyErr_NoMemory();
+    goto cleanup;
+}
+
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
 
 /************************************************************************
@@ -8051,6 +8138,7 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
 #if LIBVIR_CHECK_VERSION(1, 2, 6)
     {(char *) "virNodeGetFreePages", libvirt_virNodeGetFreePages, METH_VARARGS, NULL},
+    {(char *) "virNetworkGetDHCPLeases", libvirt_virNetworkGetDHCPLeases, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
     {NULL, NULL, 0, NULL}
 };

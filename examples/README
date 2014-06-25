@@ -10,6 +10,7 @@ domsave.py  - save all running domU's into a directory
 domrestore.py - restore domU's from their saved files in a directory
 esxlist.py  - list active domains of an VMware ESX host and print some info.
               also demonstrates how to use the libvirt.openAuth() method
+dhcpleases.py - list dhcp leases for a given virtual network
 
 The XML files in this directory are examples of the XML format that libvirt
 expects, and will have to be adapted for your setup. They are only needed
