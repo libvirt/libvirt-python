@@ -32,10 +32,11 @@ A makefile shim is provided so that you can do
 rather than directly invoking setup.py.
 
 As of libvirt 1.2.6, it is possible to develop against an uninstalled
-libvirt.git checkout, by setting some environment variables:
+libvirt.git checkout, by setting PKG_CONFIG_PATH and LD_LIBRARY_PATH
+environment variables to point into that libvirt tree; you can even
+automate this by using libvirt's run script:
 
-  export PKG_CONFIG_PATH=/path/to/libvirt/git/src/
-  export LD_LIBRARY_PATH=/path/to/libvirt/git/src/.libs/
+  /path/to/libvirt/run python setup.py build
 
 Patches for this code should be sent to the main libvirt
 development mailing list
