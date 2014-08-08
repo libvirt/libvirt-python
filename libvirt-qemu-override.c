@@ -301,8 +301,9 @@ libvirt_qemu_virConnectDomainQemuMonitorEventRegister(PyObject *self ATTRIBUTE_U
                                                    flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    if (ret < 0)
+    if (ret < 0) {
         Py_DECREF(pyobj_cbData);
+    }
 
     py_retval = libvirt_intWrap(ret);
     return py_retval;
