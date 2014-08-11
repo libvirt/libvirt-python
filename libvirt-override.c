@@ -1625,7 +1625,7 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
             PyTuple_SetItem(info, 1, item) < 0)
             goto itemError;
 
-        if ((item = libvirt_longlongWrap((long long)cpuinfo[i].cpuTime)) == NULL ||
+        if ((item = libvirt_ulonglongWrap(cpuinfo[i].cpuTime)) == NULL ||
             PyTuple_SetItem(info, 2, item) < 0)
             goto itemError;
 
@@ -2794,7 +2794,7 @@ libvirt_virDomainGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyList_SetItem(py_retval, 2, libvirt_ulongWrap(info.memory));
     PyList_SetItem(py_retval, 3, libvirt_intWrap((int) info.nrVirtCpu));
     PyList_SetItem(py_retval, 4,
-                   libvirt_longlongWrap((unsigned long long) info.cpuTime));
+                   libvirt_ulonglongWrap(info.cpuTime));
     return py_retval;
 }
 
@@ -2849,7 +2849,7 @@ libvirt_virDomainGetControlInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     py_retval = PyList_New(3);
     PyList_SetItem(py_retval, 0, libvirt_intWrap(info.state));
     PyList_SetItem(py_retval, 1, libvirt_intWrap(info.details));
-    PyList_SetItem(py_retval, 2, libvirt_longlongWrap(info.stateTime));
+    PyList_SetItem(py_retval, 2, libvirt_ulonglongWrap(info.stateTime));
     return py_retval;
 }
 
@@ -3354,7 +3354,7 @@ libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED, PyObject *arg
     py_retval = PyList_New(c_retval);
     for (i = 0; i < c_retval; i++) {
         PyList_SetItem(py_retval, i,
-                libvirt_longlongWrap((long long) freeMems[i]));
+                libvirt_ulonglongWrap(freeMems[i]));
     }
     VIR_FREE(freeMems);
     return py_retval;
@@ -3794,11 +3794,11 @@ libvirt_virStoragePoolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
     PyList_SetItem(py_retval, 0, libvirt_intWrap((int) info.state));
     PyList_SetItem(py_retval, 1,
-                   libvirt_longlongWrap((unsigned long long) info.capacity));
+                   libvirt_ulonglongWrap(info.capacity));
     PyList_SetItem(py_retval, 2,
-                   libvirt_longlongWrap((unsigned long long) info.allocation));
+                   libvirt_ulonglongWrap(info.allocation));
     PyList_SetItem(py_retval, 3,
-                   libvirt_longlongWrap((unsigned long long) info.available));
+                   libvirt_ulonglongWrap(info.available));
     return py_retval;
 }
 
@@ -3825,9 +3825,9 @@ libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
         return VIR_PY_NONE;
     PyList_SetItem(py_retval, 0, libvirt_intWrap((int) info.type));
     PyList_SetItem(py_retval, 1,
-                   libvirt_longlongWrap((unsigned long long) info.capacity));
+                   libvirt_ulonglongWrap(info.capacity));
     PyList_SetItem(py_retval, 2,
-                   libvirt_longlongWrap((unsigned long long) info.allocation));
+                   libvirt_ulonglongWrap(info.allocation));
     return py_retval;
 }
 
