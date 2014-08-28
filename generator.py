@@ -571,6 +571,7 @@ skip_function = (
     "virTypedParamsGetULLong",
 
     'virNetworkDHCPLeaseFree', # only useful in C, python code uses list
+    'virDomainStatsRecordListFree', # only useful in C, python uses dict
 )
 
 lxc_skip_function = (
