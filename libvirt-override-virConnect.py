@@ -383,3 +383,56 @@
         if ret is None:raise libvirtError('virDomainCreateXMLWithFiles() failed', conn=self)
         __tmp = virDomain(self,_obj=ret)
         return __tmp
+
+    def getAllDomainStats(self, stats = 0, flags=0):
+        """Query statistics for all domains on a given connection.
+
+        Report statistics of various parameters for a running VM according to @stats
+        field. The statistics are returned as an array of structures for each queried
+        domain. The structure contains an array of typed parameters containing the
+        individual statistics. The typed parameter name for each statistic field
+        consists of a dot-separated string containing name of the requested group
+        followed by a group specific description of the statistic value.
+
+        The statistic groups are enabled using the @stats parameter which is a
+        binary-OR of enum virDomainStatsTypes. The following groups are available
+        (although not necessarily implemented for each hypervisor):
+
+        VIR_DOMAIN_STATS_STATE: Return domain state and reason for entering that
+        state. The typed parameter keys are in this format:
+        "state.state" - state of the VM, returned as int from virDomainState enum
+        "state.reason" - reason for entering given state, returned as int from
+                         virDomain*Reason enum corresponding to given state.
+
+        Using 0 for @stats returns all stats groups supported by the given
+        hypervisor.
+
+        Specifying VIR_CONNECT_GET_ALL_DOMAINS_STATS_ENFORCE_STATS as @flags makes
+        the function return error in case some of the stat types in @stats were
+        not recognized by the daemon.
+
+        Similarly to virConnectListAllDomains, @flags can contain various flags to
+        filter the list of domains to provide stats for.
+
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_ACTIVE selects online domains while
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_INACTIVE selects offline ones.
+
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_PERSISTENT and
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_TRANSIENT allow to filter the list
+        according to their persistence.
+
+        To filter the list of VMs by domain state @flags can contain
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_RUNNING,
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_PAUSED,
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_SHUTOFF and/or
+        VIR_CONNECT_GET_ALL_DOMAINS_STATS_OTHER for all other states. """
+        ret = libvirtmod.virConnectGetAllDomainStats(self._o, stats, flags)
+        if ret is None:
+            raise libvirtError("virConnectGetAllDomainStats() failed", conn=self)
+
+        retlist = list()
+        for elem in ret:
+            record = (virDomain(self, _obj=elem[0]) , elem[1])
+            retlist.append(record)
+
+        return retlist
