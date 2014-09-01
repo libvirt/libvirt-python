@@ -8096,6 +8096,40 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+
+static PyObject *
+libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *pyobj_dict = NULL;
+
+    virDomainPtr dom;
+    char *disk = NULL;
+    char *destxml = NULL;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *) "Ozz|Oi:virDomainBlockCopy",
+                          &pyobj_dom, &disk, &destxml, &pyobj_dict, &params,
+                          &flags))
+        return VIR_PY_INT_FAIL;
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams, NULL, 0) < 0)
+            return VIR_PY_INT_FAIL;
+    }
+
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainBlockCopy(dom, disk, destxml, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    return libvirt_intWrap(c_retval);
+}
+
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
 
 /************************************************************************
@@ -8286,6 +8320,7 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 2, 8)
     {(char *) "virConnectGetAllDomainStats", libvirt_virConnectGetAllDomainStats, METH_VARARGS, NULL},
     {(char *) "virDomainListGetStats", libvirt_virDomainListGetStats, METH_VARARGS, NULL},
+    {(char *) "virDomainBlockCopy", libvirt_virDomainBlockCopy, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
     {NULL, NULL, 0, NULL}
 };

@@ -464,6 +464,7 @@ skip_impl = (
     'virConnectGetCPUModelNames',
     'virNodeGetFreePages',
     'virNetworkGetDHCPLeases',
+    'virDomainBlockCopy',
 )
 
 lxc_skip_impl = (

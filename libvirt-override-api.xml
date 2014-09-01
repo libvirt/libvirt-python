@@ -640,5 +640,14 @@
       <arg name='flags' type='unsigned int' info='unused, pass 0'/>
       <return type='char *' info="list of leases"/>
     </function>
+    <function name="virDomainBlockCopy" file="python">
+      <info>Copy the guest-visible contents of a disk image to a new file described by destxml</info>
+      <arg name='dom' type='virDomainPtr' info='pointer to domain object'/>
+      <arg name='disk' type='const char *' info='path to the block device, or device shorthand'/>
+      <arg name='destxml' type='const char *' info='XML description of the copy destination'/>
+      <arg name='params' type='virTypedParameterPtr' info='optional pointer to block copy parameter object, or NULL'/>
+      <arg name='flags' type='unsigned int' info='bitwise-OR of virDomainBlockCopyFlags'/>
+      <return type='int' info='0 if the operation has started, -1 on failure'/>
+    </function>
   </symbols>
 </api>
