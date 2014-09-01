@@ -1785,12 +1785,26 @@ def buildWrappers(module):
             value = float('inf')
         return value
 
+    # Resolve only one level of reference
+    def resolveEnum(enum, data):
+        for name,val in enum.items():
+            try:
+                int(val)
+            except ValueError:
+                enum[name] = data[val]
+        return enum
+
     enumvals = list(enums.items())
+    # convert list of dicts to one dict
+    enumData = {}
+    for type,enum in enumvals:
+        enumData.update(enum)
+
     if enumvals is not None:
         enumvals.sort(key=lambda x: x[0])
     for type,enum in enumvals:
         classes.write("# %s\n" % type)
-        items = list(enum.items())
+        items = list(resolveEnum(enum, enumData).items())
         items.sort(key=enumsSortKey)
         if items[-1][0].endswith('_LAST'):
             del items[-1]
