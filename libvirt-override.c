@@ -8045,6 +8045,57 @@ libvirt_virConnectGetAllDomainStats(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
+
+static PyObject *
+libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
+    PyObject *pyobj_conn;
+    PyObject *py_retval;
+    PyObject *py_domlist;
+    virConnectPtr conn;
+    virDomainStatsRecordPtr *records = NULL;
+    virDomainPtr *doms = NULL;
+    int nrecords;
+    int ndoms;
+    size_t i;
+    unsigned int flags;
+    unsigned int stats;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOii:virDomainListGetStats",
+                          &pyobj_conn, &py_domlist, &stats, &flags))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    if (PyList_Check(py_domlist)) {
+        ndoms = PyList_Size(py_domlist);
+
+        if (VIR_ALLOC_N(doms, ndoms + 1) < 0)
+            return PyErr_NoMemory();
+
+        for (i = 0; i < ndoms; i++)
+            doms[i] = PyvirDomain_Get(PyList_GetItem(py_domlist, i));
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    nrecords = virDomainListGetStats(doms, stats, &records, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (nrecords < 0) {
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    if (!(py_retval = convertDomainStatsRecord(records, nrecords)))
+        py_retval = VIR_PY_NONE;
+
+ cleanup:
+    virDomainStatsRecordListFree(records);
+    VIR_FREE(doms);
+
+    return py_retval;
+}
+
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
 
 /************************************************************************
@@ -8234,6 +8285,7 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
 #if LIBVIR_CHECK_VERSION(1, 2, 8)
     {(char *) "virConnectGetAllDomainStats", libvirt_virConnectGetAllDomainStats, METH_VARARGS, NULL},
+    {(char *) "virDomainListGetStats", libvirt_virDomainListGetStats, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
     {NULL, NULL, 0, NULL}
 };

@@ -508,6 +508,7 @@ skip_function = (
     'virConnectListAllNWFilters', # overridden in virConnect.py
     'virConnectListAllSecrets', # overridden in virConnect.py
     'virConnectGetAllDomainStats', # overridden in virConnect.py
+    'virDomainListGetStats', # overriden in virConnect.py
 
     'virStreamRecvAll', # Pure python libvirt-override-virStream.py
     'virStreamSendAll', # Pure python libvirt-override-virStream.py
