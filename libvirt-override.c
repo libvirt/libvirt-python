@@ -8039,7 +8039,6 @@ libvirt_virConnectGetAllDomainStats(PyObject *self ATTRIBUTE_UNUSED,
     if (!(py_retval = convertDomainStatsRecord(records, nrecords)))
         py_retval = VIR_PY_NONE;
 
- cleanup:
     virDomainStatsRecordListFree(records);
 
     return py_retval;
@@ -8053,7 +8052,6 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_conn;
     PyObject *py_retval;
     PyObject *py_domlist;
-    virConnectPtr conn;
     virDomainStatsRecordPtr *records = NULL;
     virDomainPtr *doms = NULL;
     int nrecords;
@@ -8065,7 +8063,6 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
     if (!PyArg_ParseTuple(args, (char *)"OOii:virDomainListGetStats",
                           &pyobj_conn, &py_domlist, &stats, &flags))
         return NULL;
-    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
 
     if (PyList_Check(py_domlist)) {
         ndoms = PyList_Size(py_domlist);
