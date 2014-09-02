@@ -7963,8 +7963,8 @@ convertDomainStatsRecord(virDomainStatsRecordPtr *records,
 {
     PyObject *py_retval;
     PyObject *py_record;
-    PyObject *py_record_domain;
-    PyObject *py_record_stats;
+    PyObject *py_record_domain = NULL;
+    PyObject *py_record_stats = NULL;
     size_t i;
 
     if (!(py_retval = PyList_New(nrecords)))
