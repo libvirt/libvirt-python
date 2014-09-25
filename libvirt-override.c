@@ -8129,6 +8129,70 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
 
+#if LIBVIR_CHECK_VERSION(1, 2, 9)
+static PyObject *
+libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    PyObject *pyobj_conn;
+    PyObject *pyobj_pages;
+    Py_ssize_t size = 0;
+    Py_ssize_t pos = 0;
+    PyObject *key, *value;
+    virConnectPtr conn;
+    unsigned int npages = 0;
+    unsigned int *pageSizes = NULL;
+    unsigned long long *pageCounts = NULL;
+    int startCell = -1;
+    unsigned int cellCount = 1;
+    unsigned int flags = VIR_NODE_ALLOC_PAGES_ADD;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOiii:virConnectGetAllDomainStats",
+                          &pyobj_conn, &pyobj_pages,
+                          &startCell, &cellCount, &flags))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    if ((size = PyDict_Size(pyobj_pages)) < 0)
+        return NULL;
+
+    if (size == 0) {
+        PyErr_Format(PyExc_LookupError,
+                     "Need non-empty dictionary to pages attribute");
+        return NULL;
+    }
+
+    if (VIR_ALLOC_N(pageSizes, size) < 0 ||
+        VIR_ALLOC_N(pageCounts, size) < 0) {
+        PyErr_NoMemory();
+        goto error;
+    }
+
+    while (PyDict_Next(pyobj_pages, &pos, &key, &value)) {
+        if (libvirt_uintUnwrap(key, &pageSizes[npages]) < 0 ||
+            libvirt_ulonglongUnwrap(value, &pageCounts[npages]) < 0)
+            goto error;
+        npages++;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNodeAllocPages(conn, npages, pageSizes,
+                                 pageCounts, startCell, cellCount, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    VIR_FREE(pageSizes);
+    VIR_FREE(pageCounts);
+
+    return libvirt_intWrap(c_retval);
+
+ error:
+    VIR_FREE(pageSizes);
+    VIR_FREE(pageCounts);
+    return NULL;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -8319,6 +8383,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainListGetStats", libvirt_virDomainListGetStats, METH_VARARGS, NULL},
     {(char *) "virDomainBlockCopy", libvirt_virDomainBlockCopy, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
+#if LIBVIR_CHECK_VERSION(1, 2, 9)
+    {(char *) "virNodeAllocPages", libvirt_virNodeAllocPages, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 9) */
     {NULL, NULL, 0, NULL}
 };
 

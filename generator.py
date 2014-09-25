@@ -465,6 +465,7 @@ skip_impl = (
     'virNodeGetFreePages',
     'virNetworkGetDHCPLeases',
     'virDomainBlockCopy',
+    'virNodeAllocPages',
 )
 
 lxc_skip_impl = (

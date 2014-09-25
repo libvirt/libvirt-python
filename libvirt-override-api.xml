@@ -649,5 +649,14 @@
       <arg name='flags' type='unsigned int' info='bitwise-OR of virDomainBlockCopyFlags'/>
       <return type='int' info='0 if the operation has started, -1 on failure'/>
     </function>
+    <function name="virNodeAllocPages" file='python'>
+      <info>Allocate or free some pages in the huge pages pool</info>
+      <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
+      <arg name='pages' type='char *' info='dictionary of desired page sizes, key is page size, value is page count'/>
+      <arg name='startCell' type='int' info='optional first cell in the list'/>
+      <arg name='cellCount' type='int' info='optional number of cell in the list'/>
+      <arg name='flags' type='unsigned int' info='an OR&apos;ed set of virNodeAllocPagesFlags'/>
+      <return type='int' info='the number of nodes successfully adjusted or -1 in case of an error'/>
+    </function>
   </symbols>
 </api>
