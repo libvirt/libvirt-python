@@ -9,6 +9,9 @@ import string
 sys.path.insert(0, sys.argv[1])
 import libvirt
 
+if sys.version > '3':
+    long = int
+
 # Path to the libvirt API XML file
 xml = sys.argv[2]
 
