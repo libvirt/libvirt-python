@@ -84,7 +84,7 @@ for name in dir(libvirt):
     thing = getattr(libvirt, name)
     # Special-case libvirtError to deal with python 2.4 difference
     # in Exception class type reporting.
-    if type(thing) == int:
+    if type(thing) in (int, long):
         gotenums.append(name)
     elif type(thing) == type or name == "libvirtError":
         gottypes.append(name)
