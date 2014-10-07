@@ -245,8 +245,8 @@ class my_rpm(Command):
         """
 
         self.run_command('sdist')
-        os.system('rpmbuild -ta --clean dist/libvirt-python-%s.tar.gz' %
-                  self.distribution.get_version())
+        self.spawn(["/usr/bin/rpmbuild", "-ta", "--clean",
+            "dist/libvirt-python-%s.tar.gz" % self.distribution.get_version()])
 
 class my_test(Command):
     user_options = [
