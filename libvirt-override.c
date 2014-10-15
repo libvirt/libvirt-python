@@ -437,10 +437,10 @@ cleanup:
 
 /*
  * Utility function to retrieve the number of node CPUs present.
- * It first tries virGetNodeCPUMap, which will return the
+ * It first tries virNodeGetCPUMap, which will return the
  * number reliably, if available.
  * As a fallback and for compatibility with backlevel libvirt
- * versions virGetNodeInfo will be called to calculate the
+ * versions virNodeGetInfo will be called to calculate the
  * CPU number, which has the potential to return a too small
  * number if some host CPUs are offline.
  */
