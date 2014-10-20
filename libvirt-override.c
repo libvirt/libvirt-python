@@ -7757,8 +7757,10 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     c_retval = virDomainGetTime(domain, &seconds, &nseconds, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    if (c_retval < 0)
+    if (c_retval < 0) {
+        py_retval = VIR_PY_NONE;
         goto cleanup;
+    }
 
     if (!(pyobj_seconds = libvirt_longlongWrap(seconds)) ||
         PyDict_SetItemString(dict, "seconds", pyobj_seconds) < 0)
