@@ -8090,7 +8090,7 @@ libvirt_virConnectGetAllDomainStats(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int stats;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oii:virConnectGetAllDomainStats",
+    if (!PyArg_ParseTuple(args, (char *)"OII:virConnectGetAllDomainStats",
                           &pyobj_conn, &stats, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -8126,7 +8126,7 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int stats;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOii:virDomainListGetStats",
+    if (!PyArg_ParseTuple(args, (char *)"OOII:virDomainListGetStats",
                           &pyobj_conn, &py_domlist, &stats, &flags))
         return NULL;
 
