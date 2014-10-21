@@ -8214,7 +8214,7 @@ libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags = VIR_NODE_ALLOC_PAGES_ADD;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOiii:virConnectGetAllDomainStats",
+    if (!PyArg_ParseTuple(args, (char *)"OOiii:virNodeAllocPages",
                           &pyobj_conn, &pyobj_pages,
                           &startCell, &cellCount, &flags))
         return NULL;
