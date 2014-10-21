@@ -292,7 +292,7 @@ py_types = {
     'int':  ('i', None, "int", "int"),
     'long':  ('l', None, "long", "long"),
     'double':  ('d', None, "double", "double"),
-    'unsigned int':  ('i', None, "int", "int"),
+    'unsigned int':  ('I', None, "int", "int"),
     'unsigned long':  ('l', None, "long", "long"),
     'long long':  ('L', None, "longlong", "long long"),
     'unsigned long long':  ('L', None, "longlong", "long long"),

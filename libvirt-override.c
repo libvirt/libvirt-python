@@ -521,7 +521,7 @@ libvirt_virDomainBlockStatsFlags(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params;
     const char *path;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virDomainBlockStatsFlags",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainBlockStatsFlags",
                           &pyobj_domain, &path, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -571,7 +571,7 @@ libvirt_virDomainGetCPUStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     bool totalflag;
     virTypedParameterPtr params = NULL, cpuparams;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainGetCPUStats",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainGetCPUStats",
                           &pyobj_domain, &totalbool, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -888,7 +888,7 @@ libvirt_virDomainGetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetScedulerParametersFlags",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetScedulerParametersFlags",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1012,7 +1012,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOi:virDomainSetScedulerParametersFlags",
+                          (char *)"OOI:virDomainSetScedulerParametersFlags",
                           &pyobj_domain, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1087,7 +1087,7 @@ libvirt_virDomainSetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOi:virDomainSetBlkioParameters",
+                          (char *)"OOI:virDomainSetBlkioParameters",
                           &pyobj_domain, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1159,7 +1159,7 @@ libvirt_virDomainGetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetBlkioParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetBlkioParameters",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1207,7 +1207,7 @@ libvirt_virDomainSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOi:virDomainSetMemoryParameters",
+                          (char *)"OOI:virDomainSetMemoryParameters",
                           &pyobj_domain, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1279,7 +1279,7 @@ libvirt_virDomainGetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetMemoryParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetMemoryParameters",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1327,7 +1327,7 @@ libvirt_virDomainSetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOi:virDomainSetNumaParameters",
+                          (char *)"OOI:virDomainSetNumaParameters",
                           &pyobj_domain, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1399,7 +1399,7 @@ libvirt_virDomainGetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetNumaParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetNumaParameters",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1448,7 +1448,7 @@ libvirt_virDomainSetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OzOi:virDomainSetInterfaceParameters",
+                          (char *)"OzOI:virDomainSetInterfaceParameters",
                           &pyobj_domain, &device, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1757,7 +1757,7 @@ libvirt_virDomainPinVcpuFlags(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     int i_retval;
 
-    if (!PyArg_ParseTuple(args, (char *)"OiOi:virDomainPinVcpuFlags",
+    if (!PyArg_ParseTuple(args, (char *)"OiOI:virDomainPinVcpuFlags",
                           &pyobj_domain, &vcpu, &pycpumap, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1819,7 +1819,7 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     int i_retval, cpunum;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetVcpuPinInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetVcpuPinInfo",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -1886,7 +1886,7 @@ libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
     int i_retval;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainPinVcpu",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainPinVcpu",
                           &pyobj_domain, &pycpumap, &flags))
         return NULL;
 
@@ -1953,7 +1953,7 @@ libvirt_virDomainGetEmulatorPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     int ret;
     int cpunum;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainEmulatorPinInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainEmulatorPinInfo",
                           &pyobj_domain, &flags))
         return NULL;
 
@@ -2232,7 +2232,7 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     virConnectAuth auth;
 
     memset(&auth, 0, sizeof(auth));
-    if (!PyArg_ParseTuple(args, (char *)"zOi:virConnectOpenAuth", &name, &pyauth, &flags))
+    if (!PyArg_ParseTuple(args, (char *)"zOI:virConnectOpenAuth", &name, &pyauth, &flags))
         return NULL;
 
     pycredtype = PyList_GetItem(pyauth, 0);
@@ -2336,7 +2336,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
     int flags = 0;
     const char *arch = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"Osi:virConnectGetCPUModelNames",
+    if (!PyArg_ParseTuple(args, (char *)"OsI:virConnectGetCPUModelNames",
                           &pyobj_conn, &arch, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -2461,7 +2461,7 @@ libvirt_virConnectListAllDomains(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllDomains",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllDomains",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -2554,7 +2554,7 @@ libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_snap;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainSnapshotListNames",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainSnapshotListNames",
                           &pyobj_dom, &flags))
         return NULL;
     dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
@@ -2612,7 +2612,7 @@ libvirt_virDomainListAllSnapshots(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     PyObject *pyobj_snap;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainListAllSnapshots",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainListAllSnapshots",
                           &pyobj_dom, &flags))
         return NULL;
     dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
@@ -2658,7 +2658,7 @@ libvirt_virDomainSnapshotListChildrenNames(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_snap;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainSnapshotListChildrenNames",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainSnapshotListChildrenNames",
                           &pyobj_snap, &flags))
         return NULL;
     snap = (virDomainSnapshotPtr) PyvirDomainSnapshot_Get(pyobj_snap);
@@ -2715,7 +2715,7 @@ libvirt_virDomainSnapshotListAllChildren(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     PyObject *pyobj_snap;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainSnapshotListAllChildren",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainSnapshotListAllChildren",
                           &pyobj_parent, &flags))
         return NULL;
     parent = (virDomainSnapshotPtr) PyvirDomainSnapshot_Get(pyobj_parent);
@@ -2758,7 +2758,7 @@ libvirt_virDomainRevertToSnapshot(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_dom;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainRevertToSnapshot", &pyobj_dom, &pyobj_snap, &flags))
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainRevertToSnapshot", &pyobj_dom, &pyobj_snap, &flags))
         return NULL;
     snap = (virDomainSnapshotPtr) PyvirDomainSnapshot_Get(pyobj_snap);
 
@@ -2809,7 +2809,7 @@ libvirt_virDomainGetState(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     int reason;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetState",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetState",
                           &pyobj_domain, &flags))
         return NULL;
 
@@ -2836,7 +2836,7 @@ libvirt_virDomainGetControlInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     virDomainControlInfo info;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainGetControlInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetControlInfo",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -2863,7 +2863,7 @@ libvirt_virDomainGetBlockInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     const char *path;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virDomainGetInfo", &pyobj_domain, &path, &flags))
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetInfo", &pyobj_domain, &path, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
@@ -3166,7 +3166,7 @@ libvirt_virConnectListAllNetworks(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllNetworks",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllNetworks",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -3374,7 +3374,7 @@ libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     int nparams = 0;
     virNodeCPUStatsPtr stats = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oii:virNodeGetCPUStats", &pyobj_conn, &cpuNum, &flags))
+    if (!PyArg_ParseTuple(args, (char *)"OiI:virNodeGetCPUStats", &pyobj_conn, &cpuNum, &flags))
         return ret;
     conn = (virConnectPtr)(PyvirConnect_Get(pyobj_conn));
 
@@ -3438,7 +3438,7 @@ libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     int nparams = 0;
     virNodeMemoryStatsPtr stats = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oii:virNodeGetMemoryStats", &pyobj_conn, &cellNum, &flags))
+    if (!PyArg_ParseTuple(args, (char *)"OiI:virNodeGetMemoryStats", &pyobj_conn, &cellNum, &flags))
         return ret;
     conn = (virConnectPtr)(PyvirConnect_Get(pyobj_conn));
 
@@ -3609,7 +3609,7 @@ libvirt_virConnectListAllStoragePools(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllStoragePools",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllStoragePools",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -3711,7 +3711,7 @@ libvirt_virStoragePoolListAllVolumes(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     PyObject *pyobj_pool;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virStoragePoolListAllVolumes",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virStoragePoolListAllVolumes",
                           &pyobj_pool, &flags))
         return NULL;
 
@@ -3918,7 +3918,7 @@ libvirt_virNodeListDevices(PyObject *self ATTRIBUTE_UNUSED,
     char *cap;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virNodeListDevices",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virNodeListDevices",
                           &pyobj_conn, &cap, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -3967,7 +3967,7 @@ libvirt_virConnectListAllNodeDevices(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllNodeDevices",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllNodeDevices",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -4180,7 +4180,7 @@ libvirt_virConnectListAllSecrets(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllSecrets",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllSecrets",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -4225,7 +4225,7 @@ libvirt_virSecretGetValue(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_secret;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virSecretGetValue", &pyobj_secret,
+    if (!PyArg_ParseTuple(args, (char *)"OI:virSecretGetValue", &pyobj_secret,
                           &flags))
         return NULL;
     secret = (virSecretPtr) PyvirSecret_Get(pyobj_secret);
@@ -4254,7 +4254,7 @@ libvirt_virSecretSetValue(PyObject *self ATTRIBUTE_UNUSED,
     int size;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oz#i:virSecretSetValue", &pyobj_secret,
+    if (!PyArg_ParseTuple(args, (char *)"Oz#I:virSecretSetValue", &pyobj_secret,
                           &value, &size, &flags))
         return NULL;
     secret = (virSecretPtr) PyvirSecret_Get(pyobj_secret);
@@ -4402,7 +4402,7 @@ libvirt_virConnectListAllNWFilters(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllNWFilters",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllNWFilters",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -4560,7 +4560,7 @@ libvirt_virConnectListAllInterfaces(PyObject *self ATTRIBUTE_UNUSED,
     size_t i;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virConnectListAllInterfaces",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllInterfaces",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -4608,7 +4608,7 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pybase_cpu;
     size_t i, j;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virConnectBaselineCPU",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virConnectBaselineCPU",
                           &pyobj_conn, &list, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -4697,7 +4697,7 @@ libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     PyObject *dict = NULL;
     int rc;
 
-    if (!PyArg_ParseTuple(args, (char *) "Oi:virDomainGetJobStats",
+    if (!PyArg_ParseTuple(args, (char *) "OI:virDomainGetJobStats",
                           &pyobj_domain, &flags))
         goto cleanup;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -4740,7 +4740,7 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *type = NULL, *bandwidth = NULL, *cur = NULL, *end = NULL;
     PyObject *dict;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virDomainGetBlockJobInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetBlockJobInfo",
                           &pyobj_domain, &path, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -4804,7 +4804,7 @@ libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params = NULL, new_params = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"OzOi:virDomainSetBlockIoTune",
+    if (!PyArg_ParseTuple(args, (char *)"OzOI:virDomainSetBlockIoTune",
                           &pyobj_domain, &disk, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -4877,7 +4877,7 @@ libvirt_virDomainGetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virDomainGetBlockIoTune",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetBlockIoTune",
                           &pyobj_domain, &disk, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -4924,7 +4924,7 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
     int count;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *) "Oi:virDomainGetDiskErrors",
+    if (!PyArg_ParseTuple(args, (char *) "OI:virDomainGetDiskErrors",
                           &pyobj_domain, &flags))
         return NULL;
 
@@ -7131,7 +7131,7 @@ libvirt_virDomainSendKey(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int keycodes[VIR_DOMAIN_SEND_KEY_MAX_KEYS];
     unsigned int nkeycodes;
 
-    if (!PyArg_ParseTuple(args, (char *)"OiiOii:virDomainSendKey",
+    if (!PyArg_ParseTuple(args, (char *)"OiiOiI:virDomainSendKey",
                           &pyobj_domain, &codeset, &holdtime, &pyobj_list,
                           &nkeycodes, &flags)) {
         DEBUG("%s failed to parse tuple\n", __FUNCTION__);
@@ -7174,7 +7174,7 @@ libvirt_virDomainMigrateGetCompressionCache(PyObject *self ATTRIBUTE_UNUSED,
     int rc;
 
     if (!PyArg_ParseTuple(args,
-                          (char *) "Oi:virDomainMigrateGetCompressionCache",
+                          (char *) "OI:virDomainMigrateGetCompressionCache",
                           &pyobj_domain, &flags))
         return VIR_PY_NONE;
 
@@ -7200,7 +7200,7 @@ libvirt_virDomainMigrateGetMaxSpeed(PyObject *self ATTRIBUTE_UNUSED, PyObject *a
     PyObject *pyobj_domain;
     unsigned int flags = 0;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainMigrateGetMaxSpeed",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainMigrateGetMaxSpeed",
                           &pyobj_domain, &flags))
         return NULL;
 
@@ -7231,7 +7231,7 @@ libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
     int nparams;
     virDomainPtr ddom = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *) "OOOi:virDomainMigrate3",
+    if (!PyArg_ParseTuple(args, (char *) "OOOI:virDomainMigrate3",
                           &pyobj_domain, &pyobj_dconn, &dict, &flags))
         return NULL;
 
@@ -7262,7 +7262,7 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
     int nparams;
     int ret = -1;
 
-    if (!PyArg_ParseTuple(args, (char *) "OzOi:virDomainMigrate3",
+    if (!PyArg_ParseTuple(args, (char *) "OzOI:virDomainMigrate3",
                           &pyobj_domain, &dconnuri, &dict, &flags))
         return NULL;
 
@@ -7293,7 +7293,7 @@ libvirt_virDomainBlockPeek(PyObject *self ATTRIBUTE_UNUSED,
     char *buf;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OzLni:virDomainBlockPeek", &pyobj_domain,
+    if (!PyArg_ParseTuple(args, (char *)"OzLnI:virDomainBlockPeek", &pyobj_domain,
                           &disk, &offset, &size, &flags))
         return NULL;
 
@@ -7330,7 +7330,7 @@ libvirt_virDomainMemoryPeek(PyObject *self ATTRIBUTE_UNUSED,
     char *buf;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OLni:virDomainMemoryPeek", &pyobj_domain,
+    if (!PyArg_ParseTuple(args, (char *)"OLnI:virDomainMemoryPeek", &pyobj_domain,
                           &start, &size, &flags))
         return NULL;
 
@@ -7370,7 +7370,7 @@ libvirt_virNodeSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOi:virNodeSetMemoryParameters",
+                          (char *)"OOI:virNodeSetMemoryParameters",
                           &pyobj_conn, &info, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -7442,7 +7442,7 @@ libvirt_virNodeGetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virNodeGetMemoryParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virNodeGetMemoryParameters",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -7495,7 +7495,7 @@ libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virNodeGetCPUMap",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virNodeGetCPUMap",
                           &pyobj_conn, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -7562,7 +7562,7 @@ libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED, PyObject *args
     int *files = NULL;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainCreateWithFiles",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainCreateWithFiles",
                           &pyobj_domain, &pyobj_files, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -7608,7 +7608,7 @@ libvirt_virDomainCreateXMLWithFiles(PyObject *self ATTRIBUTE_UNUSED, PyObject *a
     int *files = NULL;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *)"OzOi:virDomainCreateXMLWithFiles",
+    if (!PyArg_ParseTuple(args, (char *)"OzOI:virDomainCreateXMLWithFiles",
                           &pyobj_conn, &xmlDesc, &pyobj_files, &flags))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
@@ -7655,7 +7655,7 @@ libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     char **mountpoints = NULL;
     size_t i = 0, j;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainFSFreeze",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainFSFreeze",
                           &pyobj_domain, &pyobj_list, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -7701,7 +7701,7 @@ libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     char **mountpoints = NULL;
     size_t i = 0, j;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainFSThaw",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainFSThaw",
                           &pyobj_domain, &pyobj_list, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -7745,7 +7745,7 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     unsigned int flags;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char*)"Oi:virDomainGetTime",
+    if (!PyArg_ParseTuple(args, (char*)"OI:virDomainGetTime",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -7792,7 +7792,7 @@ libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     ssize_t py_dict_size;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char*)"OOi:virDomainSetTime",
+    if (!PyArg_ParseTuple(args, (char*)"OOI:virDomainSetTime",
                           &pyobj_domain, &py_dict, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -7848,7 +7848,7 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
     int c_retval;
     ssize_t pyobj_pagesize_size, i, j;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOiii:virNodeGetFreePages",
+    if (!PyArg_ParseTuple(args, (char *)"OOiiI:virNodeGetFreePages",
                           &pyobj_conn, &pyobj_pagesize, &startCell,
                           &cellCount, &flags))
         return NULL;
@@ -7948,7 +7948,7 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
     char *mac = NULL;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *) "Ozi:virNetworkDHCPLeasePtr",
+    if (!PyArg_ParseTuple(args, (char *) "OzI:virNetworkDHCPLeasePtr",
                           &pyobj_network, &mac, &flags))
         return NULL;
 
@@ -8174,7 +8174,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     unsigned int flags;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char *) "Ozz|Oi:virDomainBlockCopy",
+    if (!PyArg_ParseTuple(args, (char *) "Ozz|OI:virDomainBlockCopy",
                           &pyobj_dom, &disk, &destxml, &pyobj_dict, &params,
                           &flags))
         return VIR_PY_INT_FAIL;
@@ -8214,7 +8214,7 @@ libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags = VIR_NODE_ALLOC_PAGES_ADD;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOiii:virNodeAllocPages",
+    if (!PyArg_ParseTuple(args, (char *)"OOiiI:virNodeAllocPages",
                           &pyobj_conn, &pyobj_pages,
                           &startCell, &cellCount, &flags))
         return NULL;
