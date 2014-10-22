@@ -8171,7 +8171,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     char *destxml = NULL;
     virTypedParameterPtr params = NULL;
     int nparams = 0;
-    unsigned int flags;
+    unsigned int flags = 0;
     int c_retval;
 
     if (!PyArg_ParseTuple(args, (char *) "Ozz|OI:virDomainBlockCopy",
