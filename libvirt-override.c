@@ -8175,8 +8175,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
     int c_retval;
 
     if (!PyArg_ParseTuple(args, (char *) "Ozz|OI:virDomainBlockCopy",
-                          &pyobj_dom, &disk, &destxml, &pyobj_dict, &params,
-                          &flags))
+                          &pyobj_dom, &disk, &destxml, &pyobj_dict, &flags))
         return VIR_PY_INT_FAIL;
 
     if (PyDict_Check(pyobj_dict)) {
