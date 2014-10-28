@@ -29,6 +29,21 @@ import xml.sax
 debug = 0
 onlyOverrides = False
 
+libvirt_headers = [
+    "libvirt",
+    "libvirt-domain",
+    "libvirt-domain-snapshot",
+    "libvirt-event",
+    "libvirt-host",
+    "libvirt-interface",
+    "libvirt-network",
+    "libvirt-nodedev",
+    "libvirt-nwfilter",
+    "libvirt-secret",
+    "libvirt-storage",
+    "libvirt-stream",
+]
+
 def getparser():
     # Attach parser to an unmarshalling object. return both objects.
     target = docParser()
@@ -112,9 +127,7 @@ class docParser(xml.sax.handler.ContentHandler):
                     self.function_return_field = attrs['field']
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
-            if (attrs['file'] == "libvirt" or
-                attrs['file'] == "virterror" or
-                attrs['file'] == "virerror"):
+            if attrs['file'] in libvirt_headers + ["virerror", "virterror"]:
                 enum(attrs['type'],attrs['name'],attrs['value'])
             elif attrs['file'] == "libvirt-lxc":
                 lxc_enum(attrs['type'],attrs['name'],attrs['value'])
@@ -127,11 +140,8 @@ class docParser(xml.sax.handler.ContentHandler):
         if tag == 'function':
             # fuctions come from source files, hence 'virerror.c'
             if self.function is not None:
-                if (self.function_module == "libvirt" or
-                    self.function_module == "event" or
-                    self.function_module == "virevent" or
-                    self.function_module == "virerror" or
-                    self.function_module == "virterror"):
+                if self.function_module in libvirt_headers + \
+                            ["event", "virevent", "virerror", "virterror"]:
                     function(self.function, self.function_descr,
                              self.function_return, self.function_args,
                              self.function_file, self.function_module,
