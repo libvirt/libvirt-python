@@ -7785,12 +7785,14 @@ static PyObject *
 libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyObject *py_retval = NULL;
     PyObject *pyobj_domain;
+    PyObject *pyobj_seconds;
+    PyObject *pyobj_nseconds;
     PyObject *py_dict;
     virDomainPtr domain;
     long long seconds = 0;
     unsigned int nseconds = 0;
     unsigned int flags;
-    ssize_t py_dict_size;
+    ssize_t py_dict_size = 0;
     int c_retval;
 
     if (!PyArg_ParseTuple(args, (char*)"OOI:virDomainSetTime",
@@ -7798,25 +7800,30 @@ libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
-    py_dict_size = PyDict_Size(py_dict);
-
-    if (py_dict_size == 2) {
-        PyObject *pyobj_seconds, *pyobj_nseconds;
-
-        if (!(pyobj_seconds = PyDict_GetItemString(py_dict, "seconds")) ||
-            (libvirt_longlongUnwrap(pyobj_seconds, &seconds) < 0)) {
-            PyErr_Format(PyExc_LookupError, "malformed or missing 'seconds'");
+    if (PyDict_Check(py_dict)) {
+        py_dict_size = PyDict_Size(py_dict);
+        if ((pyobj_seconds = PyDict_GetItemString(py_dict, "seconds"))) {
+            if (libvirt_longlongUnwrap(pyobj_seconds, &seconds) < 0) {
+                PyErr_Format(PyExc_LookupError, "malformed 'seconds'");
+                goto cleanup;
+            }
+        } else {
+            PyErr_Format(PyExc_LookupError, "Dictionary must contains 'seconds'");
             goto cleanup;
         }
 
-        if (!(pyobj_nseconds = PyDict_GetItemString(py_dict, "nseconds")) ||
-            (libvirt_uintUnwrap(pyobj_nseconds, &nseconds) < 0)) {
-            PyErr_Format(PyExc_LookupError, "malformed or missing 'nseconds'");
+        if ((pyobj_nseconds = PyDict_GetItemString(py_dict, "nseconds"))) {
+            if (libvirt_uintUnwrap(pyobj_nseconds, &nseconds) < 0) {
+                PyErr_Format(PyExc_LookupError, "malformed 'nseconds'");
+                goto cleanup;
+            }
+        } else if (py_dict_size > 1) {
+            PyErr_Format(PyExc_LookupError, "Dictionary contains unknown key");
             goto cleanup;
         }
-    } else if (py_dict_size > 0) {
-        PyErr_Format(PyExc_LookupError, "Dictionary must contain "
-                     "'seconds' and 'nseconds'");
+    } else if (py_dict != Py_None || !flags) {
+        PyErr_Format(PyExc_TypeError, "time must be a dictionary "
+                     "or None with flags set");
         goto cleanup;
     }
 

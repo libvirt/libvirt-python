@@ -67,8 +67,8 @@
         return ret
 
     def setTime(self, time=None, flags=0):
-        """Set guest time to the given value. @time is a dict conatining
-        'seconds' field for seconds and 'nseconds' field for nanosecons """
+        """Set guest time to the given value. @time is a dict containing
+        'seconds' field for seconds and 'nseconds' field for nanoseconds """
         ret = libvirtmod.virDomainSetTime(self._o, time, flags)
         if ret == -1: raise libvirtError ('virDomainSetTime() failed', dom=self)
         return ret
