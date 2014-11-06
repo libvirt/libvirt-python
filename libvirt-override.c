@@ -7149,7 +7149,8 @@ libvirt_virDomainSendKey(PyObject *self ATTRIBUTE_UNUSED,
     }
 
     for (i = 0; i < nkeycodes; i++) {
-        libvirt_uintUnwrap(PyList_GetItem(pyobj_list, i), &(keycodes[i]));
+        if (libvirt_uintUnwrap(PyList_GetItem(pyobj_list, i), &keycodes[i]) < 0)
+            return NULL;
     }
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
