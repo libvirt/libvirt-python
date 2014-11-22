@@ -137,6 +137,9 @@ for cname in wantfunctions:
     if name[0:28] == "virDomainStatsRecordListFree":
         continue
 
+    if name[0:19] == "virDomainFSInfoFree":
+        continue
+
     if name[0:21] == "virDomainListGetStats":
         name = "virConnectDomainListGetStats"
 
@@ -269,7 +272,7 @@ for name in sorted(basicklassmap):
     func = func[0:1].lower() + func[1:]
     if func[0:8] == "nWFilter":
         func = "nwfilter" + func[8:]
-    if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw":
+    if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw" or func[0:6] == "fSInfo":
         func = "fs" + func[2:]
 
     if klass == "virNetwork":

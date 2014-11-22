@@ -658,5 +658,11 @@
       <arg name='flags' type='unsigned int' info='an OR&apos;ed set of virNodeAllocPagesFlags'/>
       <return type='int' info='the number of nodes successfully adjusted or -1 in case of an error'/>
     </function>
+    <function name="virDomainGetFSInfo" file='python'>
+      <info>Get a list of mapping information for each mounted file systems within the specified guest and the disks.</info>
+      <arg name='domain' type='virDomainPtr' info='pointer to domain object'/>
+      <arg name='flags' type='unsigned int' info='unused, pass 0'/>
+      <return type='char *' info="list of mounted filesystems information"/>
+    </function>
   </symbols>
 </api>

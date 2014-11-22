@@ -8266,6 +8266,73 @@ libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 8) */
 
+#if LIBVIR_CHECK_VERSION(1, 2, 11)
+
+static PyObject *
+libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    unsigned int flags;
+    virDomainFSInfoPtr *fsinfo = NULL;
+    char **dev;
+    int c_retval, i;
+    PyObject *py_retval = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainFSInfo",
+        &pyobj_domain, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainGetFSInfo(domain, &fsinfo, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        goto cleanup;
+
+    /* convert to a Python list */
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
+
+    for (i = 0; i < c_retval; i++) {
+        virDomainFSInfoPtr fs = fsinfo[i];
+        PyObject *info, *alias;
+
+        if (fs == NULL)
+            goto cleanup;
+        info = PyTuple_New(4);
+        if (info == NULL)
+            goto cleanup;
+        PyList_SetItem(py_retval, i, info);
+        alias = PyList_New(0);
+        if (alias == NULL)
+            goto cleanup;
+
+        PyTuple_SetItem(info, 0, libvirt_constcharPtrWrap(fs->mountpoint));
+        PyTuple_SetItem(info, 1, libvirt_constcharPtrWrap(fs->name));
+        PyTuple_SetItem(info, 2, libvirt_constcharPtrWrap(fs->fstype));
+        PyTuple_SetItem(info, 3, alias);
+
+        for (dev = fs->devAlias; dev && *dev; dev++)
+            if (PyList_Append(alias, libvirt_constcharPtrWrap(*dev)) < 0)
+                goto cleanup;
+    }
+
+    for (i = 0; i < c_retval; i++)
+        virDomainFSInfoFree(fsinfo[i]);
+    VIR_FREE(fsinfo);
+    return py_retval;
+
+ cleanup:
+    for (i = 0; i < c_retval; i++)
+        virDomainFSInfoFree(fsinfo[i]);
+    VIR_FREE(fsinfo);
+    Py_XDECREF(py_retval);
+    return VIR_PY_NONE;
+}
+
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -8459,6 +8526,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 2, 9)
     {(char *) "virNodeAllocPages", libvirt_virNodeAllocPages, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 9) */
+#if LIBVIR_CHECK_VERSION(1, 2, 11)
+    {(char *) "virDomainGetFSInfo", libvirt_virDomainGetFSInfo, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
     {NULL, NULL, 0, NULL}
 };
 
