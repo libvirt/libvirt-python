@@ -464,6 +464,14 @@ def blockJobStatusToString(status):
     blockJobStatus = ( "Completed", "Failed", "Canceled", "Ready", )
     return blockJobStatus[status]
 
+def agentLifecycleStateToString(state):
+    agentStates = ( "unknown", "connected", "disconnected", )
+    return agentStates[state]
+
+def agentLifecycleReasonToString(reason):
+    agentReasons = ( "unknown", "domain started", "channel event", )
+    return agentReasons[reason]
+
 def myDomainEventCallback1 (conn, dom, event, detail, opaque):
     print("myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
                                                                  domEventToString(event),
@@ -517,6 +525,8 @@ def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
     print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (dom.name(), dom.ID(), blockJobTypeToString(type), disk, blockJobStatusToString(status)))
 def myDomainEventTunableCallback(conn, dom, params, opaque):
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
+def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
+    print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (dom.name(), dom.ID(), agentLifecycleStateToString(state), agentLifecycleReasonToString(reason)))
 
 ##########################################################################
 # Network events
@@ -627,6 +637,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED, myDomainEventDeviceRemovedCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2, myDomainEventBlockJob2Callback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_TUNABLE, myDomainEventTunableCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE, myDomainEventAgentLifecycleCallback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 

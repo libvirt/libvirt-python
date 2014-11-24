@@ -197,6 +197,16 @@
         cb(self, virDomain(self, _obj=dom), params, opaque)
         return 0
 
+    def _dispatchDomainEventAgentLifecycleCallback(self, dom, state, reason, cbData):
+        """Dispatches event to python user domain agent lifecycle event callback
+        """
+
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virDomain(self, _obj=dom), state, reason, opaque)
+        return 0
+
     def domainEventDeregisterAny(self, callbackID):
         """Removes a Domain Event Callback. De-registering for a
            domain callback will disable delivery of this event type """
