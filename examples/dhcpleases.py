@@ -6,8 +6,8 @@ import sys
 import time
 
 def usage():
-    print "Usage: %s [URI] NETWORK" % sys.argv[0]
-    print "        Print leases info for a given virtual network"
+    print("Usage: %s [URI] NETWORK" % sys.argv[0])
+    print("        Print leases info for a given virtual network")
 
 uri = None
 network = None
@@ -24,18 +24,18 @@ else:
 
 conn = libvirt.open(uri)
 if conn == None:
-    print "Unable to open connection to libvirt"
+    print("Unable to open connection to libvirt")
     sys.exit(1)
 
 try:
     net = conn.networkLookupByName(network)
 except libvirt.libvirtError:
-    print "Network %s not found" % network
+    print("Network %s not found" % network)
     sys.exit(0)
 
 leases = net.DHCPLeases();
 if (leases == None):
-    print "Failed to get leases for %s" % net.name()
+    print("Failed to get leases for %s" % net.name())
     sys.exit(0)
 
 def toIPAddrType(addrType):
@@ -44,10 +44,20 @@ def toIPAddrType(addrType):
     elif addrType == libvirt.VIR_IP_ADDR_TYPE_IPV6:
         return "ipv6"
 
-print " {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format("Expiry Time", "MAC address", "Protocol", "IP address", "Hostname", "Client ID or DUID")
-print "-"*115
+print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format("Expiry Time",
+                                                      "MAC address",
+                                                      "Protocol",
+                                                      "IP address",
+                                                      "Hostname",
+                                                      "Client ID or DUID"))
+print("-"*115)
 
 for lease in leases:
-    print " {0:20}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(lease['expirytime']))),
-    print "{0:18} {1:9}".format(lease['mac'], toIPAddrType(lease['type'])),
-    print "{0:<25} {1:15} {2}".format("{}/{}".format(lease['ipaddr'], lease['prefix']), lease['hostname'], lease['clientid'])
+    print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format(
+        time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(lease['expirytime'])),
+        lease['mac'],
+        toIPAddrType(lease['type']),
+        "{}/{}".format(lease['ipaddr'], lease['prefix']),
+        lease['hostname'],
+        lease['clientid']
+    ))

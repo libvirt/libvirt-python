@@ -220,7 +220,7 @@ class virEventLoopPure:
                     t.set_last_fired(now)
                     t.dispatch()
 
-        except (os.error, select.error), e:
+        except (os.error, select.error) as e:
             if e.args[0] != errno.EINTR:
                 raise
         finally:
@@ -576,7 +576,7 @@ def usage():
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hdl", ["help", "debug", "loop"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err)) # will print something like "option -a not recognized"
         usage()
