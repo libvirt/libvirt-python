@@ -8334,8 +8334,8 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     PyObject *pyobj_domain;
     unsigned int flags;
     virDomainFSInfoPtr *fsinfo = NULL;
-    char **dev;
     int c_retval, i;
+    size_t j;
     PyObject *py_retval = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainFSInfo",
@@ -8373,8 +8373,9 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
         PyTuple_SetItem(info, 2, libvirt_constcharPtrWrap(fs->fstype));
         PyTuple_SetItem(info, 3, alias);
 
-        for (dev = fs->devAlias; dev && *dev; dev++)
-            if (PyList_Append(alias, libvirt_constcharPtrWrap(*dev)) < 0)
+        for (j = 0; j < fs->ndevAlias; j++)
+            if (PyList_Append(alias,
+                              libvirt_constcharPtrWrap(fs->devAlias[j])) < 0)
                 goto cleanup;
     }
 
