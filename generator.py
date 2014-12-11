@@ -821,6 +821,27 @@ def print_function_wrapper(module, name, output, export, include):
             return 0
     return 1
 
+def print_c_pointer(classname, output, export, include):
+    output.write("PyObject *\n")
+    output.write("libvirt_%s_pointer(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)\n" % classname)
+    output.write("{\n")
+    output.write("    %sPtr ptr;\n" % classname)
+    output.write("    PyObject *pyptr;\n")
+    output.write("    PyObject *pylong;\n")
+    output.write("\n")
+    output.write("    if (!PyArg_ParseTuple(args, (char *) \"O\", &pyptr))\n")
+    output.write("        return NULL;\n")
+    output.write("    ptr = (%sPtr) Py%s_Get(pyptr);\n" % (classname, classname))
+    output.write("    pylong = PyLong_FromVoidPtr(ptr);\n")
+    output.write("    return pylong;\n")
+    output.write("}\n")
+    output.write("\n")
+
+    include.write("PyObject *libvirt_%s_pointer(PyObject *self, PyObject *args);\n" % classname)
+
+    export.write("    { (char *)\"%s_pointer\", libvirt_%s_pointer, METH_VARARGS, NULL },\n" %
+                 (classname, classname))
+
 def buildStubs(module, api_xml):
     global py_types
     global py_return_types
@@ -917,6 +938,12 @@ def buildStubs(module, api_xml):
             del funcs[function]
         if ret == 1:
             nb_wrap = nb_wrap + 1
+
+    if module == "libvirt":
+        # Write C pointer conversion functions.
+        for classname in primary_classes:
+            print_c_pointer(classname, wrapper, export, include)
+
     include.close()
     export.close()
     wrapper.close()
@@ -1495,6 +1522,11 @@ def buildWrappers(module):
             if classname in class_domain_impl:
                 classes.write("    def domain(self):\n")
                 classes.write("        return self._dom\n\n")
+
+            classes.write("    def c_pointer(self):\n")
+            classes.write("        \"\"\"Get C pointer to underlying object\"\"\"\n")
+            classes.write("        return libvirtmod.%s_pointer(self._o)\n\n" %
+                          classname)
 
             flist = function_classes[classname]
             flist.sort(key=functionSortKey)

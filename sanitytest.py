@@ -109,6 +109,8 @@ for klassname in gottypes:
     for name in dir(klassobj):
         if name[0] == '_':
             continue
+        if name == 'c_pointer':
+            continue
         thing = getattr(klassobj, name)
         if callable(thing):
             gotfunctions[klassname].append(name)
