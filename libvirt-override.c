@@ -4,7 +4,7 @@
  *           entry points where an automatically generated stub is
  *           unpractical
  *
- * Copyright (C) 2005, 2007-2014 Red Hat, Inc.
+ * Copyright (C) 2005, 2007-2015 Red Hat, Inc.
  *
  * Daniel Veillard <veillard@redhat.com>
  */
@@ -6346,7 +6346,7 @@ libvirt_virConnectDomainEventPMSuspendCallback(virConnectPtr conn ATTRIBUTE_UNUS
 }
 
 
-#if LIBVIR_CHECK_VERSION(0, 10, 0)
+#ifdef VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE
 static int
 libvirt_virConnectDomainEventBalloonChangeCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                    virDomainPtr dom,
@@ -6398,9 +6398,9 @@ libvirt_virConnectDomainEventBalloonChangeCallback(virConnectPtr conn ATTRIBUTE_
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
-#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
+#endif /* VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE */
 
-#if LIBVIR_CHECK_VERSION(1, 0, 0)
+#ifdef VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK
 static int
 libvirt_virConnectDomainEventPMSuspendDiskCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                    virDomainPtr dom,
@@ -6452,9 +6452,9 @@ libvirt_virConnectDomainEventPMSuspendDiskCallback(virConnectPtr conn ATTRIBUTE_
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
-#endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
+#endif /* VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK */
 
-#if LIBVIR_CHECK_VERSION(1, 1, 1)
+#ifdef VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED
 static int
 libvirt_virConnectDomainEventDeviceRemovedCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                    virDomainPtr dom,
@@ -6504,9 +6504,9 @@ libvirt_virConnectDomainEventDeviceRemovedCallback(virConnectPtr conn ATTRIBUTE_
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
 }
-#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
+#endif /* VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED */
 
-#if LIBVIR_CHECK_VERSION(1, 2, 9)
+#ifdef VIR_DOMAIN_EVENT_ID_TUNABLE
 static int
 libvirt_virConnectDomainEventTunableCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                              virDomainPtr dom,
@@ -6564,9 +6564,9 @@ libvirt_virConnectDomainEventTunableCallback(virConnectPtr conn ATTRIBUTE_UNUSED
     return ret;
 
 }
-#endif /* LIBVIR_CHECK_VERSION(1, 2, 9) */
+#endif /* VIR_DOMAIN_EVENT_ID_TUNABLE */
 
-#if LIBVIR_CHECK_VERSION(1, 2, 11)
+#ifdef VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE
 static int
 libvirt_virConnectDomainEventAgentLifecycleCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
                                                     virDomainPtr dom,
@@ -6618,7 +6618,7 @@ libvirt_virConnectDomainEventAgentLifecycleCallback(virConnectPtr conn ATTRIBUTE
     return ret;
 
 }
-#endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
+#endif /* VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE */
 
 
 static PyObject *
@@ -6676,9 +6676,9 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventGenericCallback);
         break;
     case VIR_DOMAIN_EVENT_ID_BLOCK_JOB:
-#if LIBVIR_CHECK_VERSION(1, 2, 6)
+#ifdef VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2
     case VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2:
-#endif /* LIBVIR_CHECK_VERSION(1, 2, 6) */
+#endif /* VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2 */
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventBlockJobCallback);
         break;
     case VIR_DOMAIN_EVENT_ID_DISK_CHANGE:
@@ -6693,31 +6693,31 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
     case VIR_DOMAIN_EVENT_ID_PMSUSPEND:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventPMSuspendCallback);
         break;
-#if LIBVIR_CHECK_VERSION(0, 10, 0)
+#ifdef VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE
     case VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventBalloonChangeCallback);
         break;
-#endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
-#if LIBVIR_CHECK_VERSION(1, 0, 0)
+#endif /* VIR_DOMAIN_EVENT_ID_BALLOON_CHANGE */
+#ifdef VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK
     case VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventPMSuspendDiskCallback);
         break;
-#endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
-#if LIBVIR_CHECK_VERSION(1, 1, 1)
+#endif /* VIR_DOMAIN_EVENT_ID_PMSUSPEND_DISK */
+#ifdef VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED
     case VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventDeviceRemovedCallback);
         break;
-#endif /* LIBVIR_CHECK_VERSION(1, 1, 1) */
-#if LIBVIR_CHECK_VERSION(1, 2, 9)
+#endif /* VIR_DOMAIN_EVENT_ID_DEVICE_REMOVED */
+#ifdef VIR_DOMAIN_EVENT_ID_TUNABLE
     case VIR_DOMAIN_EVENT_ID_TUNABLE:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventTunableCallback);
         break;
-#endif /* LIBVIR_CHECK_VERSION(1, 2, 9) */
-#if LIBVIR_CHECK_VERSION(1, 2, 11)
+#endif /* VIR_DOMAIN_EVENT_ID_TUNABLE */
+#ifdef VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE
     case VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE:
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventAgentLifecycleCallback);
         break;
-#endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
+#endif /* VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
