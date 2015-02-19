@@ -2081,6 +2081,70 @@ cleanup:
     return py_retval;
 }
 
+static PyObject *
+libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
+{
+    virDomainPtr domain;
+    PyObject *pyobj_domain, *pycpumap;
+    PyObject *ret = NULL;
+    unsigned char *cpumap;
+    int cpumaplen, iothread_val, tuple_size, cpunum;
+    size_t i;
+    unsigned int flags;
+    int i_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OiOI:virDomainPinIOThread",
+                          &pyobj_domain, &iothread_val, &pycpumap, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
+        return VIR_PY_INT_FAIL;
+
+    if (PyTuple_Check(pycpumap)) {
+        if ((tuple_size = PyTuple_Size(pycpumap)) == -1)
+            return ret;
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+        return ret;
+    }
+
+    cpumaplen = VIR_CPU_MAPLEN(cpunum);
+    if (VIR_ALLOC_N(cpumap, cpumaplen) < 0)
+        return PyErr_NoMemory();
+
+    for (i = 0; i < tuple_size; i++) {
+        PyObject *flag = PyTuple_GetItem(pycpumap, i);
+        bool b;
+
+        if (!flag || libvirt_boolUnwrap(flag, &b) < 0)
+            goto cleanup;
+
+        if (b)
+            VIR_USE_CPU(cpumap, i);
+        else
+            VIR_UNUSE_CPU(cpumap, i);
+    }
+
+    for (; i < cpunum; i++)
+        VIR_UNUSE_CPU(cpumap, i);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virDomainPinIOThread(domain, iothread_val,
+                                    cpumap, cpumaplen, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (i_retval < 0) {
+        ret = VIR_PY_INT_FAIL;
+        goto cleanup;
+    }
+    ret = VIR_PY_INT_SUCCESS;
+
+cleanup:
+    VIR_FREE(cpumap);
+    return ret;
+}
+
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
 
 /************************************************************************
@@ -8577,6 +8641,7 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 #if LIBVIR_CHECK_VERSION(1, 2, 14)
     {(char *) "virDomainGetIOThreadsInfo", libvirt_virDomainGetIOThreadsInfo, METH_VARARGS, NULL},
+    {(char *) "virDomainPinIOThread", libvirt_virDomainPinIOThread, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedStoragePools", libvirt_virConnectListDefinedStoragePools, METH_VARARGS, NULL},
