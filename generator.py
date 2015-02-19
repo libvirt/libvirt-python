@@ -435,6 +435,7 @@ skip_impl = (
     'virDomainGetVcpuPinInfo',
     'virDomainGetEmulatorPinInfo',
     'virDomainPinEmulator',
+    'virDomainGetIOThreadsInfo',
     'virSecretGetValue',
     'virSecretSetValue',
     'virSecretGetUUID',
@@ -592,6 +593,7 @@ skip_function = (
     'virNetworkDHCPLeaseFree', # only useful in C, python code uses list
     'virDomainStatsRecordListFree', # only useful in C, python uses dict
     'virDomainFSInfoFree', # only useful in C, python code uses list
+    'virDomainIOThreadsInfoFree', # only useful in C, python code uses list
 )
 
 lxc_skip_function = (
@@ -1144,6 +1146,9 @@ def nameFixup(name, classe, type, file):
     elif name[0:20] == "virDomainGetCPUStats":
         func = name[9:]
         func = func[0:1].lower() + func[1:]
+    elif name[0:25] == "virDomainGetIOThreadsInfo":
+        func = name[12:]
+        func = func[0:2].lower() + func[2:]
     elif name[0:18] == "virDomainGetFSInfo":
         func = name[12:]
         func = func[0:2].lower() + func[2:]

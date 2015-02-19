@@ -1990,6 +1990,98 @@ libvirt_virDomainGetEmulatorPinInfo(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 
+#if LIBVIR_CHECK_VERSION(1, 2, 14)
+static PyObject *
+libvirt_virDomainGetIOThreadsInfo(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    PyObject *py_retval = NULL;
+    PyObject *py_iothrinfo = NULL;
+    virDomainIOThreadInfoPtr *iothrinfo = NULL;
+    unsigned int flags;
+    size_t pcpu, i;
+    int niothreads, cpunum;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetIOThreadsInfo",
+                          &pyobj_domain, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
+        return VIR_PY_NONE;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    niothreads = virDomainGetIOThreadsInfo(domain, &iothrinfo, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (niothreads < 0) {
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    /* convert to a Python list */
+    if ((py_iothrinfo = PyList_New(niothreads)) == NULL)
+        goto cleanup;
+
+    /* NOTE: If there are zero IOThreads we will return an empty list */
+    for (i = 0; i < niothreads; i++) {
+        PyObject *iothrtpl = NULL;
+        PyObject *iothrid = NULL;
+        PyObject *iothrmap = NULL;
+        virDomainIOThreadInfoPtr iothr = iothrinfo[i];
+
+        if (iothr == NULL) {
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
+        }
+
+        if ((iothrtpl = PyTuple_New(2)) == NULL ||
+            PyList_SetItem(py_iothrinfo, i, iothrtpl) < 0) {
+            Py_XDECREF(iothrtpl);
+            goto cleanup;
+        }
+
+        /* 0: IOThread ID */
+        if ((iothrid = libvirt_uintWrap(iothr->iothread_id)) == NULL ||
+            PyTuple_SetItem(iothrtpl, 0, iothrid) < 0) {
+            Py_XDECREF(iothrid);
+            goto cleanup;
+        }
+
+        /* 1: CPU map */
+        if ((iothrmap = PyList_New(cpunum)) == NULL ||
+            PyTuple_SetItem(iothrtpl, 1, iothrmap) < 0) {
+            Py_XDECREF(iothrmap);
+            goto cleanup;
+        }
+        for (pcpu = 0; pcpu < cpunum; pcpu++) {
+            PyObject *pyused;
+            if ((pyused = PyBool_FromLong(VIR_CPU_USED(iothr->cpumap,
+                                                       pcpu))) == NULL) {
+                py_retval = VIR_PY_NONE;
+                goto cleanup;
+            }
+            if (PyList_SetItem(iothrmap, pcpu, pyused) < 0) {
+                Py_XDECREF(pyused);
+                goto cleanup;
+            }
+        }
+    }
+
+    py_retval = py_iothrinfo;
+    py_iothrinfo = NULL;
+
+cleanup:
+    for (i = 0; i < niothreads; i++)
+        virDomainIOThreadsInfoFree(iothrinfo[i]);
+    VIR_FREE(iothrinfo);
+    Py_XDECREF(py_iothrinfo);
+    return py_retval;
+}
+
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
 
 /************************************************************************
  *									*
@@ -8483,6 +8575,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetEmulatorPinInfo", libvirt_virDomainGetEmulatorPinInfo, METH_VARARGS, NULL},
     {(char *) "virDomainPinEmulator", libvirt_virDomainPinEmulator, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
+#if LIBVIR_CHECK_VERSION(1, 2, 14)
+    {(char *) "virDomainGetIOThreadsInfo", libvirt_virDomainGetIOThreadsInfo, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedStoragePools", libvirt_virConnectListDefinedStoragePools, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 10, 2)

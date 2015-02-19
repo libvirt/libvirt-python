@@ -142,6 +142,9 @@ for cname in wantfunctions:
     if name[0:19] == "virDomainFSInfoFree":
         continue
 
+    if name[0:26] == "virDomainIOThreadsInfoFree":
+        continue
+
     if name[0:21] == "virDomainListGetStats":
         name = "virConnectDomainListGetStats"
 
@@ -276,6 +279,8 @@ for name in sorted(basicklassmap):
         func = "nwfilter" + func[8:]
     if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw" or func[0:6] == "fSInfo":
         func = "fs" + func[2:]
+    if func[0:13] == "iOThreadsInfo":
+        func = "ioThreadsInfo"
 
     if klass == "virNetwork":
         func = func.replace("dHCP", "DHCP")
