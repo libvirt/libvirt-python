@@ -105,7 +105,7 @@
       <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
     </function>
     <function name='virNodeGetSecurityModel' file='python'>
-      <info>Extract information about the host security model</info>
+      <info>Extract information about the hypervisor security model</info>
       <return type='char *' info='the list of information or None in case of error'/>
       <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
     </function>
