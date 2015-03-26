@@ -1992,8 +1992,8 @@ libvirt_virDomainGetEmulatorPinInfo(PyObject *self ATTRIBUTE_UNUSED,
 
 #if LIBVIR_CHECK_VERSION(1, 2, 14)
 static PyObject *
-libvirt_virDomainGetIOThreadsInfo(PyObject *self ATTRIBUTE_UNUSED,
-                                  PyObject *args)
+libvirt_virDomainGetIOThreadInfo(PyObject *self ATTRIBUTE_UNUSED,
+                                 PyObject *args)
 {
     virDomainPtr domain;
     PyObject *pyobj_domain;
@@ -2004,7 +2004,7 @@ libvirt_virDomainGetIOThreadsInfo(PyObject *self ATTRIBUTE_UNUSED,
     size_t pcpu, i;
     int niothreads, cpunum;
 
-    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetIOThreadsInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetIOThreadInfo",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -2013,7 +2013,7 @@ libvirt_virDomainGetIOThreadsInfo(PyObject *self ATTRIBUTE_UNUSED,
         return VIR_PY_NONE;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
-    niothreads = virDomainGetIOThreadsInfo(domain, &iothrinfo, flags);
+    niothreads = virDomainGetIOThreadInfo(domain, &iothrinfo, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
     if (niothreads < 0) {
@@ -8640,7 +8640,7 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainPinEmulator", libvirt_virDomainPinEmulator, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 #if LIBVIR_CHECK_VERSION(1, 2, 14)
-    {(char *) "virDomainGetIOThreadsInfo", libvirt_virDomainGetIOThreadsInfo, METH_VARARGS, NULL},
+    {(char *) "virDomainGetIOThreadInfo", libvirt_virDomainGetIOThreadInfo, METH_VARARGS, NULL},
     {(char *) "virDomainPinIOThread", libvirt_virDomainPinIOThread, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},

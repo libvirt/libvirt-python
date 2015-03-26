@@ -279,8 +279,8 @@ for name in sorted(basicklassmap):
         func = "nwfilter" + func[8:]
     if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw" or func[0:6] == "fSInfo":
         func = "fs" + func[2:]
-    if func[0:13] == "iOThreadsInfo":
-        func = "ioThreadsInfo"
+    if func[0:12] == "iOThreadInfo":
+        func = "ioThreadInfo"
 
     if klass == "virNetwork":
         func = func.replace("dHCP", "DHCP")
