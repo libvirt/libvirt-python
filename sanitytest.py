@@ -142,7 +142,7 @@ for cname in wantfunctions:
     if name[0:19] == "virDomainFSInfoFree":
         continue
 
-    if name[0:26] == "virDomainIOThreadsInfoFree":
+    if name[0:25] == "virDomainIOThreadInfoFree":
         continue
 
     if name[0:21] == "virDomainListGetStats":

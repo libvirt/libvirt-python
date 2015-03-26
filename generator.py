@@ -594,7 +594,7 @@ skip_function = (
     'virNetworkDHCPLeaseFree', # only useful in C, python code uses list
     'virDomainStatsRecordListFree', # only useful in C, python uses dict
     'virDomainFSInfoFree', # only useful in C, python code uses list
-    'virDomainIOThreadsInfoFree', # only useful in C, python code uses list
+    'virDomainIOThreadInfoFree', # only useful in C, python code uses list
 )
 
 lxc_skip_function = (
