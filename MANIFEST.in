@@ -4,6 +4,7 @@ include COPYING
 include COPYING.LESSER
 include ChangeLog
 include examples/consolecallback.py
+include examples/domipaddrs.py
 include examples/dominfo.py
 include examples/domrestore.py
 include examples/domsave.py

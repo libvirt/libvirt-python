@@ -5120,6 +5120,131 @@ cleanup:
     return py_retval;
 }
 
+
+#if LIBVIR_CHECK_VERSION(1, 2, 14)
+static PyObject *
+libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    PyObject *py_retval = VIR_PY_NONE;
+    PyObject *pyobj_domain;
+    virDomainPtr domain;
+    virDomainInterfacePtr *ifaces = NULL;
+    unsigned int source;
+    unsigned int flags;
+    int ifaces_count = 0;
+    size_t i, j;
+
+    if (!PyArg_ParseTuple(args, (char *) "Oii:virDomainInterfaceAddresses",
+                          &pyobj_domain, &source, &flags))
+        goto error;
+
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    ifaces_count = virDomainInterfaceAddresses(domain, &ifaces, source, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (ifaces_count < 0)
+        goto cleanup;
+
+    if (!(py_retval = PyDict_New()))
+        goto error;
+
+    for (i = 0; i < ifaces_count; i++) {
+        virDomainInterfacePtr iface = ifaces[i];
+        PyObject *py_addrs = NULL;
+        PyObject *py_iface = NULL;
+        PyObject *py_iname = NULL;
+        PyObject *py_ivalue = NULL;
+
+        if (!(py_iface = PyDict_New()))
+            goto error;
+
+        if ((py_iname = libvirt_charPtrWrap(iface->name)) == NULL ||
+            PyDict_SetItem(py_retval, py_iname, py_iface) < 0) {
+            Py_XDECREF(py_iname);
+            Py_DECREF(py_iface);
+            goto error;
+        }
+
+        if (iface->naddrs) {
+            if (!(py_addrs = PyList_New(iface->naddrs))) {
+                goto error;
+            }
+        } else {
+            py_addrs = VIR_PY_NONE;
+        }
+
+        if ((py_iname = libvirt_constcharPtrWrap("addrs")) == NULL ||
+            PyDict_SetItem(py_iface, py_iname, py_addrs) < 0) {
+            Py_XDECREF(py_iname);
+            Py_DECREF(py_addrs);
+            goto error;
+        }
+
+        if ((py_iname = libvirt_constcharPtrWrap("hwaddr")) == NULL ||
+            (py_ivalue = libvirt_constcharPtrWrap(iface->hwaddr)) == NULL ||
+            PyDict_SetItem(py_iface, py_iname, py_ivalue) < 0) {
+            Py_XDECREF(py_iname);
+            Py_XDECREF(py_ivalue);
+            goto error;
+        }
+
+        for (j = 0; j < iface->naddrs; j++) {
+            virDomainIPAddressPtr addr = &(iface->addrs[j]);
+            PyObject *py_addr = PyDict_New();
+
+            if (!py_addr)
+                goto error;
+
+            if (PyList_SetItem(py_addrs, j, py_addr) < 0) {
+                Py_DECREF(py_addr);
+                goto error;
+            }
+
+            if ((py_iname = libvirt_constcharPtrWrap("addr")) == NULL ||
+                (py_ivalue = libvirt_constcharPtrWrap(addr->addr)) == NULL ||
+                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
+                Py_XDECREF(py_iname);
+                Py_XDECREF(py_ivalue);
+                goto error;
+            }
+            if ((py_iname = libvirt_constcharPtrWrap("prefix")) == NULL ||
+                (py_ivalue = libvirt_intWrap(addr->prefix)) == NULL ||
+                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
+                Py_XDECREF(py_iname);
+                Py_XDECREF(py_ivalue);
+                goto error;
+            }
+            if ((py_iname = libvirt_constcharPtrWrap("type")) == NULL ||
+                (py_ivalue = libvirt_intWrap(addr->type)) == NULL ||
+                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
+                Py_XDECREF(py_iname);
+                Py_XDECREF(py_ivalue);
+                goto error;
+            }
+        }
+    }
+
+cleanup:
+    if (ifaces && ifaces_count > 0) {
+        for (i = 0; i < ifaces_count; i++) {
+            virDomainInterfaceFree(ifaces[i]);
+        }
+    }
+    VIR_FREE(ifaces);
+
+    return py_retval;
+
+error:
+    Py_XDECREF(py_retval);
+    py_retval = NULL;
+    goto cleanup;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
+
+
 /*******************************************
  * Helper functions to avoid importing modules
  * for every callback
@@ -8750,6 +8875,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 2, 11)
     {(char *) "virDomainGetFSInfo", libvirt_virDomainGetFSInfo, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
+#if LIBVIR_CHECK_VERSION(1, 2, 14)
+    {(char *) "virDomainInterfaceAddresses", libvirt_virDomainInterfaceAddresses, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
     {NULL, NULL, 0, NULL}
 };
 

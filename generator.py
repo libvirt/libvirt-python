@@ -483,6 +483,7 @@ skip_impl = (
     'virDomainBlockCopy',
     'virNodeAllocPages',
     'virDomainGetFSInfo',
+    'virDomainInterfaceAddresses',
 )
 
 lxc_skip_impl = (
@@ -595,6 +596,7 @@ skip_function = (
     'virDomainStatsRecordListFree', # only useful in C, python uses dict
     'virDomainFSInfoFree', # only useful in C, python code uses list
     'virDomainIOThreadInfoFree', # only useful in C, python code uses list
+    'virDomainInterfaceFree', # only useful in C, python code uses list
 )
 
 lxc_skip_function = (

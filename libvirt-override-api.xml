@@ -678,5 +678,12 @@
       <arg name='flags' type='unsigned int' info='unused, pass 0'/>
       <return type='char *' info="list of mounted filesystems information"/>
     </function>
+    <function name='virDomainInterfaceAddresses' file='python'>
+      <info>returns a dictionary of domain interfaces along with their MAC and IP addresses</info>
+      <arg name='dom' type='virDomainPtr' info='pointer to the domain'/>
+      <arg name='source' type='unsigned int' info='the data source'/>
+      <arg name='flags' type='unsigned int' info='extra flags; not used yet, so callers should always pass 0'/>
+      <return type='char *' info="dictionary of domain interfaces along with their MAC and IP addresses"/>
+    </function>
   </symbols>
 </api>

@@ -145,6 +145,9 @@ for cname in wantfunctions:
     if name[0:25] == "virDomainIOThreadInfoFree":
         continue
 
+    if name[0:22] == "virDomainInterfaceFree":
+        continue
+
     if name[0:21] == "virDomainListGetStats":
         name = "virConnectDomainListGetStats"
 
