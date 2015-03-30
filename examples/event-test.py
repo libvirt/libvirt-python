@@ -527,6 +527,9 @@ def myDomainEventTunableCallback(conn, dom, params, opaque):
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
 def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
     print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (dom.name(), dom.ID(), agentLifecycleStateToString(state), agentLifecycleReasonToString(reason)))
+def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
+    print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
+            dom.name(), dom.ID(), dev))
 
 ##########################################################################
 # Network events
@@ -638,6 +641,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_JOB_2, myDomainEventBlockJob2Callback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_TUNABLE, myDomainEventTunableCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE, myDomainEventAgentLifecycleCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_ADDED, myDomainEventDeviceAddedCallback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 

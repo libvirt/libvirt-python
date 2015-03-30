@@ -6901,6 +6901,58 @@ libvirt_virConnectDomainEventAgentLifecycleCallback(virConnectPtr conn ATTRIBUTE
 }
 #endif /* VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE */
 
+#ifdef VIR_DOMAIN_EVENT_ID_DEVICE_ADDED
+static int
+libvirt_virConnectDomainEventDeviceAddedCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                 virDomainPtr dom,
+                                                 const char *devAlias,
+                                                 void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dom;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virDomainPtr */
+    virDomainRef(dom);
+    if (!(pyobj_dom = libvirt_virDomainPtrWrap(dom))) {
+        virDomainFree(dom);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchDomainEventDeviceAddedCallback",
+                                    (char*)"OsO",
+                                    pyobj_dom, devAlias, pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dom);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+
+}
+#endif /* VIR_DOMAIN_EVENT_ID_DEVICE_ADDED */
 
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
@@ -6999,6 +7051,11 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventAgentLifecycleCallback);
         break;
 #endif /* VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE */
+#ifdef VIR_DOMAIN_EVENT_ID_DEVICE_ADDED
+    case VIR_DOMAIN_EVENT_ID_DEVICE_ADDED:
+        cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventDeviceAddedCallback);
+        break;
+#endif /* VIR_DOMAIN_EVENT_ID_DEVICE_ADDED */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
