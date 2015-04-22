@@ -325,4 +325,13 @@ setup(name = 'libvirt-python',
           'sdist': my_sdist,
           'rpm': my_rpm,
           'test': my_test
-      })
+      },
+      classifiers = [
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+          "Programming Language :: Python",
+          "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 3",
+      ]
+)
