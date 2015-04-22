@@ -5,18 +5,31 @@ import lxml
 import lxml.etree
 import string
 
-# Munge import path to insert build location for libvirt mod
-sys.path.insert(0, sys.argv[1])
+if len(sys.argv) >= 2:
+    # Munge import path to insert build location for libvirt mod
+    sys.path.insert(0, sys.argv[1])
 import libvirt
 
 if sys.version > '3':
     long = int
 
-# Path to the libvirt API XML file
-xml = sys.argv[2]
+def get_libvirt_api_xml_path():
+    import subprocess
+    args = ["pkg-config", "--variable", "libvirt_api", "libvirt"]
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+    stdout, _ = proc.communicate()
+    if proc.returncode:
+        sys.exit(proc.returncode)
+    return stdout.splitlines()[0]
 
-f = open(xml, "r")
-tree = lxml.etree.parse(f)
+# Path to the libvirt API XML file
+if len(sys.argv) >= 3:
+    xml = sys.argv[2]
+else:
+    xml = get_libvirt_api_xml_path()
+
+with open(xml, "r") as fp:
+    tree = lxml.etree.parse(fp)
 
 verbose = False
 fail = False
