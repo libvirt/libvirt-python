@@ -176,7 +176,9 @@ class my_sdist(sdist):
         f = os.popen("git log --pretty=format:'%aN <%aE>'")
         authors = []
         for line in f:
-            authors.append("   " + line.strip())
+            line = "   " + line.strip()
+            if line not in authors:
+                authors.append(line)
 
         authors.sort(key=str.lower)
 
