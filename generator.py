@@ -1940,7 +1940,7 @@ def qemuBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in list(qemu_functions.keys()):
+    for name in sorted(qemu_functions.keys()):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = qemu_functions[name]
         fd.write("def %s(" % func)
@@ -1990,7 +1990,7 @@ def qemuBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in list(qemu_enums.items()):
+    for type,enum in sorted(qemu_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
         items.sort(key=lambda i: int(i[1]))
@@ -2053,7 +2053,7 @@ def lxcBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in list(lxc_functions.keys()):
+    for name in sorted(lxc_functions.keys()):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = lxc_functions[name]
         fd.write("def %s(" % func)
@@ -2103,7 +2103,7 @@ def lxcBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in list(lxc_enums.items()):
+    for type,enum in sorted(lxc_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
         items.sort(key=lambda i: int(i[1]))
