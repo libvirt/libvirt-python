@@ -1852,7 +1852,7 @@ def buildWrappers(module):
             value = int(value)
         except ValueError:
             value = float('inf')
-        return value
+        return value, data[0]
 
     # Resolve only one level of reference
     def resolveEnum(enum, data):
@@ -1990,7 +1990,7 @@ def qemuBuildWrappers(module):
     for type,enum in sorted(qemu_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(key=lambda i: int(i[1]))
+        items.sort(key=lambda i: (int(i[1]), i[0]))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
@@ -2103,7 +2103,7 @@ def lxcBuildWrappers(module):
     for type,enum in sorted(lxc_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
-        items.sort(key=lambda i: int(i[1]))
+        items.sort(key=lambda i: (int(i[1]), i[0]))
         for name,value in items:
             fd.write("%s = %s\n" % (name,value))
         fd.write("\n")
