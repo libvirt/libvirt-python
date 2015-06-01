@@ -34,6 +34,8 @@ include MANIFEST
 include README
 include sanitytest.py
 include setup.py
+include tests/test_conn.py
+include tests/test_domain.py
 include tox.ini
 include typewrappers.c
 include typewrappers.h
