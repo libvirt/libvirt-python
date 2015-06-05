@@ -10,6 +10,7 @@ enums = {} # { enumType: { enumConstant: enumValue } }
 lxc_enums = {} # { enumType: { enumConstant: enumValue } }
 qemu_enums = {} # { enumType: { enumConstant: enumValue } }
 event_ids = []
+params = [] # [ (parameName, paramValue)... ]
 
 import os
 import sys
@@ -134,6 +135,9 @@ class docParser(xml.sax.handler.ContentHandler):
                 lxc_enum(attrs['type'],attrs['name'],attrs['value'])
             elif attrs['file'] == "libvirt-qemu":
                 qemu_enum(attrs['type'],attrs['name'],attrs['value'])
+        elif tag == "macro":
+            if "string" in attrs:
+                params.append((attrs['name'], attrs['string']))
 
     def end(self, tag):
         if debug:
@@ -1880,6 +1884,10 @@ def buildWrappers(module):
         for name,value in items:
             classes.write("%s = %s\n" % (name,value))
         classes.write("\n")
+
+    classes.write("# typed parameter names\n")
+    for name, value in params:
+        classes.write("%s = \"%s\"\n" % (name, value))
 
     classes.close()
 
