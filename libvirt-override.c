@@ -278,6 +278,126 @@ typedef virPyTypedParamsHint *virPyTypedParamsHintPtr;
 #  define libvirt_PyString_Check PyString_Check
 # endif
 
+static int
+virPyDictToTypedParamOne(virTypedParameterPtr *params,
+                         int *n,
+                         int *max,
+                         virPyTypedParamsHintPtr hints,
+                         int nhints,
+                         const char *keystr,
+                         PyObject *value)
+{
+    int rv = -1, type = -1;
+    size_t i;
+
+    for (i = 0; i < nhints; i++) {
+        if (STREQ(hints[i].name, keystr)) {
+            type = hints[i].type;
+            break;
+        }
+    }
+
+    if (type == -1) {
+        if (libvirt_PyString_Check(value)) {
+            type = VIR_TYPED_PARAM_STRING;
+        } else if (PyBool_Check(value)) {
+            type = VIR_TYPED_PARAM_BOOLEAN;
+        } else if (PyLong_Check(value)) {
+            unsigned long long ull = PyLong_AsUnsignedLongLong(value);
+            if (ull == (unsigned long long) -1 && PyErr_Occurred())
+                type = VIR_TYPED_PARAM_LLONG;
+            else
+                type = VIR_TYPED_PARAM_ULLONG;
+#if PY_MAJOR_VERSION < 3
+        } else if (PyInt_Check(value)) {
+            if (PyInt_AS_LONG(value) < 0)
+                type = VIR_TYPED_PARAM_LLONG;
+            else
+                type = VIR_TYPED_PARAM_ULLONG;
+#endif
+        } else if (PyFloat_Check(value)) {
+            type = VIR_TYPED_PARAM_DOUBLE;
+        }
+    }
+
+    if (type == -1) {
+        PyErr_Format(PyExc_TypeError,
+                     "Unknown type of \"%s\" field", keystr);
+        goto cleanup;
+    }
+
+    switch ((virTypedParameterType) type) {
+    case VIR_TYPED_PARAM_INT:
+    {
+        int val;
+        if (libvirt_intUnwrap(value, &val) < 0 ||
+            virTypedParamsAddInt(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_UINT:
+    {
+        unsigned int val;
+        if (libvirt_uintUnwrap(value, &val) < 0 ||
+            virTypedParamsAddUInt(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_LLONG:
+    {
+        long long val;
+        if (libvirt_longlongUnwrap(value, &val) < 0 ||
+            virTypedParamsAddLLong(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_ULLONG:
+    {
+        unsigned long long val;
+        if (libvirt_ulonglongUnwrap(value, &val) < 0 ||
+            virTypedParamsAddULLong(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_DOUBLE:
+    {
+        double val;
+        if (libvirt_doubleUnwrap(value, &val) < 0 ||
+            virTypedParamsAddDouble(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_BOOLEAN:
+    {
+        bool val;
+        if (libvirt_boolUnwrap(value, &val) < 0 ||
+            virTypedParamsAddBoolean(params, n, max, keystr, val) < 0)
+            goto cleanup;
+        break;
+    }
+    case VIR_TYPED_PARAM_STRING:
+    {
+        char *val;;
+        if (libvirt_charPtrUnwrap(value, &val) < 0 ||
+            !val ||
+            virTypedParamsAddString(params, n, max, keystr, val) < 0) {
+            VIR_FREE(val);
+            goto cleanup;
+        }
+        VIR_FREE(val);
+        break;
+    }
+    case VIR_TYPED_PARAM_LAST:
+        break; /* unreachable */
+    }
+
+    rv = 0;
+
+ cleanup:
+    return rv;
+}
+
+
 /* Automatically convert dict into type parameters based on types reported
  * by python. All integer types are converted into LLONG (in case of a negative
  * value) or ULLONG (in case of a positive value). If you need different
@@ -300,7 +420,6 @@ virPyDictToTypedParams(PyObject *dict,
     Py_ssize_t pos = 0;
 #endif
     virTypedParameterPtr params = NULL;
-    size_t i;
     int n = 0;
     int max = 0;
     int ret = -1;
@@ -313,112 +432,23 @@ virPyDictToTypedParams(PyObject *dict,
         return -1;
 
     while (PyDict_Next(dict, &pos, &key, &value)) {
-        int type = -1;
-
         if (libvirt_charPtrUnwrap(key, &keystr) < 0 ||
             !keystr)
             goto cleanup;
 
-        for (i = 0; i < nhints; i++) {
-            if (STREQ(hints[i].name, keystr)) {
-                type = hints[i].type;
-                break;
-            }
-        }
+        if (PyList_Check(value) || PyTuple_Check(value)) {
+            Py_ssize_t i, size = PySequence_Size(value);
 
-        if (type == -1) {
-            if (libvirt_PyString_Check(value)) {
-                type = VIR_TYPED_PARAM_STRING;
-            } else if (PyBool_Check(value)) {
-                type = VIR_TYPED_PARAM_BOOLEAN;
-            } else if (PyLong_Check(value)) {
-                unsigned long long ull = PyLong_AsUnsignedLongLong(value);
-                if (ull == (unsigned long long) -1 && PyErr_Occurred())
-                    type = VIR_TYPED_PARAM_LLONG;
-                else
-                    type = VIR_TYPED_PARAM_ULLONG;
-#if PY_MAJOR_VERSION < 3
-            } else if (PyInt_Check(value)) {
-                if (PyInt_AS_LONG(value) < 0)
-                    type = VIR_TYPED_PARAM_LLONG;
-                else
-                    type = VIR_TYPED_PARAM_ULLONG;
-#endif
-            } else if (PyFloat_Check(value)) {
-                type = VIR_TYPED_PARAM_DOUBLE;
+            for (i = 0; i < size; i++) {
+                PyObject *v = PySequence_ITEM(value, i);
+                if (virPyDictToTypedParamOne(&params, &n, &max,
+                                             hints, nhints, keystr, v) < 0)
+                    goto cleanup;
             }
-        }
-
-        if (type == -1) {
-            PyErr_Format(PyExc_TypeError,
-                         "Unknown type of \"%s\" field", keystr);
+        } else if (virPyDictToTypedParamOne(&params, &n, &max,
+                                            hints, nhints, keystr, value) < 0)
             goto cleanup;
-        }
 
-        switch ((virTypedParameterType) type) {
-        case VIR_TYPED_PARAM_INT:
-        {
-            int val;
-            if (libvirt_intUnwrap(value, &val) < 0 ||
-                virTypedParamsAddInt(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_UINT:
-        {
-            unsigned int val;
-            if (libvirt_uintUnwrap(value, &val) < 0 ||
-                virTypedParamsAddUInt(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_LLONG:
-        {
-            long long val;
-            if (libvirt_longlongUnwrap(value, &val) < 0 ||
-                virTypedParamsAddLLong(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_ULLONG:
-        {
-            unsigned long long val;
-            if (libvirt_ulonglongUnwrap(value, &val) < 0 ||
-                virTypedParamsAddULLong(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_DOUBLE:
-        {
-            double val;
-            if (libvirt_doubleUnwrap(value, &val) < 0 ||
-                virTypedParamsAddDouble(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_BOOLEAN:
-        {
-            bool val;
-            if (libvirt_boolUnwrap(value, &val) < 0 ||
-                virTypedParamsAddBoolean(&params, &n, &max, keystr, val) < 0)
-                goto cleanup;
-            break;
-        }
-        case VIR_TYPED_PARAM_STRING:
-        {
-            char *val;;
-            if (libvirt_charPtrUnwrap(value, &val) < 0 ||
-                !val ||
-                virTypedParamsAddString(&params, &n, &max, keystr, val) < 0) {
-                VIR_FREE(val);
-                goto cleanup;
-            }
-            VIR_FREE(val);
-            break;
-        }
-        case VIR_TYPED_PARAM_LAST:
-            break; /* unreachable */
-        }
         VIR_FREE(keystr);
     }
 
