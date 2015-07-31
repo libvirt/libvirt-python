@@ -14,6 +14,9 @@ dhcpleases.py - list dhcp leases for a given virtual network
 domipaddrs.py - list IP addresses for guest domains
 guest-vcpus - two helpers to make the guest agent event useful with agent based
               vCPU state modification
+nodestats.py - print total memory and free memory for each host NUMA node and
+               the memory strictly bound to certain host nodes for each running
+               domain.
 
 The XML files in this directory are examples of the XML format that libvirt
 expects, and will have to be adapted for your setup. They are only needed
