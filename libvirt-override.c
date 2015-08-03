@@ -3144,32 +3144,62 @@ libvirt_virDomainGetSecurityLabel(PyObject *self ATTRIBUTE_UNUSED, PyObject *arg
 
 #if LIBVIR_CHECK_VERSION(0, 10, 0)
 static PyObject *
-libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED,
+                                      PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr dom;
     PyObject *pyobj_dom;
-    virSecurityLabel *labels;
+    virSecurityLabel *labels = NULL;
     size_t i;
 
     if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityLabel", &pyobj_dom))
         return NULL;
+
     dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     c_retval = virDomainGetSecurityLabelList(dom, &labels);
     LIBVIRT_END_ALLOW_THREADS;
+
     if (c_retval < 0)
         return VIR_PY_NONE;
-    py_retval = PyList_New(0);
+
+    if (!(py_retval = PyList_New(0)))
+        goto error;
+
     for (i = 0 ; i < c_retval ; i++) {
-        PyObject *entry = PyList_New(2);
-        PyList_SetItem(entry, 0, libvirt_constcharPtrWrap(&labels[i].label[0]));
-        PyList_SetItem(entry, 1, libvirt_boolWrap(labels[i].enforcing));
-        PyList_Append(py_retval, entry);
+        PyObject *entry;
+        PyObject *value;
+
+        if (!(entry = PyList_New(2)) ||
+            PyList_Append(py_retval, entry) < 0) {
+            Py_XDECREF(entry);
+            goto error;
+        }
+
+        if (!(value = libvirt_constcharPtrWrap(&labels[i].label[0])) ||
+            PyList_SetItem(entry, 0, value) < 0) {
+            Py_XDECREF(value);
+            goto error;
+        }
+
+        if (!(value = libvirt_boolWrap(labels[i].enforcing)) ||
+            PyList_SetItem(entry, 1, value) < 0) {
+            Py_XDECREF(value);
+            goto error;
+        }
     }
-    free(labels);
+
+ cleanup:
+    VIR_FREE(labels);
     return py_retval;
+
+ error:
+    Py_XDECREF(py_retval);
+    py_retval = NULL;
+    goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 
