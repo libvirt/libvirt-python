@@ -1209,13 +1209,13 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
-        return VIR_PY_INT_FAIL;
+        return VIR_PY_NONE;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainGetInfo(domain, &dominfo);
     LIBVIRT_END_ALLOW_THREADS;
     if (i_retval < 0)
-        return VIR_PY_INT_FAIL;
+        return VIR_PY_NONE;
 
     if (VIR_ALLOC_N(cpuinfo, dominfo.nrVirtCpu) < 0)
         return PyErr_NoMemory();
@@ -1233,7 +1233,7 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
                                  cpumap, cpumaplen);
     LIBVIRT_END_ALLOW_THREADS;
     if (i_retval < 0) {
-        error = VIR_PY_INT_FAIL;
+        error = VIR_PY_NONE;
         goto cleanup;
     }
 
@@ -1449,7 +1449,7 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
                                 PyObject *args)
 {
     virDomainPtr domain;
-    PyObject *pyobj_domain, *pycpumaps = NULL;
+    PyObject *pyobj_domain, *pycpumaps = NULL, *error = NULL;
     virDomainInfo dominfo;
     unsigned char *cpumaps = NULL;
     size_t cpumaplen, vcpu, pcpu;
@@ -1462,7 +1462,7 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
-        return VIR_PY_INT_FAIL;
+        return VIR_PY_NONE;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainGetInfo(domain, &dominfo);
@@ -1479,8 +1479,11 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     i_retval = virDomainGetVcpuPinInfo(domain, dominfo.nrVirtCpu,
                                        cpumaps, cpumaplen, flags);
     LIBVIRT_END_ALLOW_THREADS;
-    if (i_retval < 0)
+
+    if (i_retval < 0) {
+        error = VIR_PY_NONE;
         goto cleanup;
+    }
 
     if ((pycpumaps = PyList_New(dominfo.nrVirtCpu)) == NULL)
         goto cleanup;
@@ -1507,7 +1510,7 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
 
     Py_XDECREF(pycpumaps);
 
-    return NULL;
+    return error;
 }
 
 
@@ -3655,7 +3658,7 @@ libvirt_virStoragePoolGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     if (c_retval < 0)
-        return VIR_PY_NONE;
+        return VIR_PY_INT_FAIL;
 
     py_retval = libvirt_intWrap(autostart);
     return py_retval;
@@ -4633,7 +4636,7 @@ libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED,
     rc = virDomainGetJobStats(domain, &type, &params, &nparams, flags);
     LIBVIRT_END_ALLOW_THREADS;
     if (rc < 0)
-        goto cleanup;
+        return VIR_PY_NONE;
 
     if (!(dict = getPyVirTypedParameter(params, nparams)))
         goto cleanup;
@@ -4866,8 +4869,10 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
         count = virDomainGetDiskErrors(domain, disks, ndisks, 0);
         LIBVIRT_END_ALLOW_THREADS;
 
-        if (count < 0)
+        if (count < 0) {
+            py_retval = VIR_PY_NONE;
             goto cleanup;
+        }
     }
 
     if (!(py_retval = PyDict_New()))
@@ -8442,8 +8447,10 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
     c_retval = virDomainGetFSInfo(domain, &fsinfo, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    if (c_retval < 0)
+    if (c_retval < 0) {
+        py_retval = VIR_PY_NONE;
         goto cleanup;
+    }
 
     /* convert to a Python list */
     if ((py_retval = PyList_New(c_retval)) == NULL)
