@@ -239,8 +239,8 @@
       <arg name='domain' type='virDomainPtr' info='pointer to domain object'/>
     </function>
     <function name='virDomainGetVcpus' file='python'>
-      <info>Extract information about virtual CPUs of domain, store it in info array and also in cpumaps if this pointer is&apos;nt NULL.</info>
-      <return type='int' info='the number of info filled in case of success, -1 in case of failure.'/>
+      <info>Extract information about virtual CPUs of domain, store it in info array and also in cpumaps.</info>
+      <return type='char *' info='None in case of error, returns a tuple of vcpu info and vcpu map.'/>
       <arg name='domain' type='virDomainPtr' info='pointer to domain object, or NULL for Domain0'/>
     </function>
     <function name='virDomainPinVcpu' file='python'>
