@@ -1961,7 +1961,6 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
     for (i = 0; i < ncred; i++) {
         PyObject *pycreditem;
         pycreditem = PyList_New(5);
-        Py_INCREF(Py_None);
         PyTuple_SetItem(pycred, i, pycreditem);
         PyList_SetItem(pycreditem, 0, libvirt_intWrap((long) cred[i].type));
         PyList_SetItem(pycreditem, 1, libvirt_constcharPtrWrap(cred[i].prompt));
@@ -1969,17 +1968,15 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
             PyList_SetItem(pycreditem, 2,
                            libvirt_constcharPtrWrap(cred[i].challenge));
         } else {
-            Py_INCREF(Py_None);
-            PyList_SetItem(pycreditem, 2, Py_None);
+            PyList_SetItem(pycreditem, 2, VIR_PY_NONE);
         }
         if (cred[i].defresult) {
             PyList_SetItem(pycreditem, 3,
                            libvirt_constcharPtrWrap(cred[i].defresult));
         } else {
-            Py_INCREF(Py_None);
-            PyList_SetItem(pycreditem, 3, Py_None);
+            PyList_SetItem(pycreditem, 3, VIR_PY_NONE);
         }
-        PyList_SetItem(pycreditem, 4, Py_None);
+        PyList_SetItem(pycreditem, 4, VIR_PY_NONE);
     }
 
     PyTuple_SetItem(list, 0, pycred);
