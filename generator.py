@@ -136,7 +136,7 @@ class docParser(xml.sax.handler.ContentHandler):
             elif attrs['file'] == "libvirt-qemu":
                 qemu_enum(attrs['type'],attrs['name'],attrs['value'])
         elif tag == "macro":
-            if "string" in attrs:
+            if "string" in attrs.keys():
                 params.append((attrs['name'], attrs['string']))
 
     def end(self, tag):
