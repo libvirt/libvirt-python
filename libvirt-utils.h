@@ -155,6 +155,88 @@ void virFree(void *ptrptr) ATTRIBUTE_NONNULL(1);
 
 
 /**
+ * VIR_PY_TUPLE_SET_GOTO:
+ * @TUPLE: a pointer to a tuple object
+ * @INDEX: a position in the tuple object
+ * @VALUE: a pointer to a python object to add into the tuple
+ * @GOTO: a label to jump to in case of error
+ *
+ * Add the new value to specific place into the python tuple object.  In case of
+ * error it will jump to provided label and DECREF the value to not leak memory.
+ */
+#define VIR_PY_TUPLE_SET_GOTO(TUPLE, INDEX, VALUE, GOTO)                    \
+    do {                                                                    \
+        PyObject *tmpVal = VALUE;                                           \
+        if (!tmpVal || PyTuple_SetItem(TUPLE, INDEX, tmpVal) < 0)           \
+            goto GOTO;                                                      \
+    } while (0)
+
+
+/**
+ * VIR_PY_LIST_SET_GOTO:
+ * @LIST: a pointer to a list object
+ * @INDEX: a position in the list object
+ * @VALUE: a pointer to a python object to add into the list
+ * @GOTO: a label to jump to in case of error
+ *
+ * Add the new value to specific place into the python list object.  In case of
+ * error it will jump to provided label and DECREF the value to not leak memory.
+ */
+#define VIR_PY_LIST_SET_GOTO(LIST, INDEX, VALUE, GOTO)                      \
+    do {                                                                    \
+        PyObject *tmpVal = VALUE;                                           \
+        if (!tmpVal || PyList_SetItem(LIST, INDEX, tmpVal) < 0)             \
+            goto GOTO;                                                      \
+    } while (0)
+
+
+/**
+ * VIR_PY_LIST_APPEND_GOTO:
+ * @LIST: a pointer to a python list object
+ * @VALUE: a pointer to a python object to add into the list
+ * @GOTO: a label to jump to in case of error
+ *
+ * Append the new value into the end of the python list object.  In case of
+ * error it will jump to provided label and DECREF the value to not leak memory.
+ */
+#define VIR_PY_LIST_APPEND_GOTO(LIST, VALUE, GOTO)                          \
+    do {                                                                    \
+        PyObject *tmpVal = VALUE;                                           \
+        if (!tmpVal || PyList_Append(LIST, tmpVal) < 0) {                   \
+            Py_XDECREF(tmpVal);                                             \
+            goto GOTO;                                                      \
+        }                                                                   \
+        Py_DECREF(tmpVal);                                                  \
+    } while (0)
+
+
+/**
+ * VIR_PY_DICT_SET_GOTO:
+ * @DICT: a pointer to a python dict object
+ * @KEY: a pointer to a python string object which will be used as a key
+ * @VALUE: a pointer to a python object to add into the dict under provided key
+ * @GOTO: a label to jump to in case of error
+ *
+ * Add a new pair of key:value into the python dict object.  In case of error it
+ * will jump to provided label.  It will DECREF both key and value in case of
+ * success or error.
+ */
+#define VIR_PY_DICT_SET_GOTO(DICT, KEY, VALUE, GOTO)                        \
+    do {                                                                    \
+        PyObject *tmpKey = KEY;                                             \
+        PyObject *tmpVal = VALUE;                                           \
+        if (!tmpKey || !tmpVal ||                                           \
+            PyDict_SetItem(DICT, tmpKey, tmpVal) < 0) {                     \
+            Py_XDECREF(tmpKey);                                             \
+            Py_XDECREF(tmpVal);                                             \
+            goto GOTO;                                                      \
+        }                                                                   \
+        Py_DECREF(tmpKey);                                                  \
+        Py_DECREF(tmpVal);                                                  \
+    } while (0)
+
+
+/**
  * VIR_ALLOC:
  * @ptr: pointer to hold address of allocated memory
  *
