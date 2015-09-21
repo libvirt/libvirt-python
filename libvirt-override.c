@@ -166,7 +166,7 @@ libvirt_virDomainBlockStatsFlags(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -302,7 +302,7 @@ libvirt_virDomainGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParamsFree(params, sumparams);
     return ret;
 
-error:
+ error:
     virTypedParamsFree(params, sumparams);
     Py_DECREF(ret);
     return error;
@@ -492,7 +492,7 @@ libvirt_virDomainGetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -540,7 +540,7 @@ libvirt_virDomainGetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -613,7 +613,7 @@ libvirt_virDomainSetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -689,7 +689,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, nparams);
     return ret;
@@ -763,7 +763,7 @@ libvirt_virDomainSetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -810,7 +810,7 @@ libvirt_virDomainGetBlkioParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -883,7 +883,7 @@ libvirt_virDomainSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -930,7 +930,7 @@ libvirt_virDomainGetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -1003,7 +1003,7 @@ libvirt_virDomainSetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -1050,7 +1050,7 @@ libvirt_virDomainGetNumaParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -1124,7 +1124,7 @@ libvirt_virDomainSetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -1172,7 +1172,7 @@ libvirt_virDomainGetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -1292,7 +1292,7 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
 
     return pyretval;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpuinfo);
     VIR_FREE(cpumap);
     Py_XDECREF(pyretval);
@@ -1361,7 +1361,7 @@ libvirt_virDomainPinVcpu(PyObject *self ATTRIBUTE_UNUSED,
     }
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpumap);
     return ret;
 }
@@ -1425,7 +1425,7 @@ libvirt_virDomainPinVcpuFlags(PyObject *self ATTRIBUTE_UNUSED,
     }
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpumap);
     return ret;
 }
@@ -1487,7 +1487,7 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
 
     return pycpumaps;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpumaps);
 
     Py_XDECREF(pycpumaps);
@@ -1696,7 +1696,7 @@ libvirt_virDomainGetIOThreadInfo(PyObject *self ATTRIBUTE_UNUSED,
     py_retval = py_iothrinfo;
     py_iothrinfo = NULL;
 
-cleanup:
+ cleanup:
     if (niothreads > 0) {
         for (i = 0; i < niothreads; i++)
             virDomainIOThreadInfoFree(iothrinfo[i]);
@@ -1765,7 +1765,7 @@ libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
     }
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpumap);
     return ret;
 }
@@ -2147,7 +2147,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
         PyList_SET_ITEM(rv, i, str);
     }
 
-done:
+ done:
     if (models) {
         for (i = 0; i < c_retval; i++)
             VIR_FREE(models[i]);
@@ -2156,7 +2156,7 @@ done:
 
     return rv;
 
-error:
+ error:
     Py_XDECREF(rv);
     rv = NULL;
     goto done;
@@ -2274,7 +2274,7 @@ libvirt_virConnectListAllDomains(PyObject *self ATTRIBUTE_UNUSED,
         doms[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (doms[i])
             virDomainFree(doms[i]);
@@ -2379,7 +2379,7 @@ libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
         VIR_FREE(names[i]);
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         VIR_FREE(names[i]);
     VIR_FREE(names);
@@ -2425,7 +2425,7 @@ libvirt_virDomainListAllSnapshots(PyObject *self ATTRIBUTE_UNUSED,
         snaps[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (snaps[i])
             virDomainSnapshotFree(snaps[i]);
@@ -2482,7 +2482,7 @@ libvirt_virDomainSnapshotListChildrenNames(PyObject *self ATTRIBUTE_UNUSED,
         VIR_FREE(names[i]);
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         VIR_FREE(names[i]);
     VIR_FREE(names);
@@ -2528,7 +2528,7 @@ libvirt_virDomainSnapshotListAllChildren(PyObject *self ATTRIBUTE_UNUSED,
         snaps[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (snaps[i])
             virDomainSnapshotFree(snaps[i]);
@@ -3031,7 +3031,7 @@ libvirt_virConnectListAllNetworks(PyObject *self ATTRIBUTE_UNUSED,
         nets[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (nets[i])
             virNetworkFree(nets[i]);
@@ -3267,7 +3267,7 @@ libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(stats);
     return ret;
 
-error:
+ error:
     VIR_FREE(stats);
     Py_XDECREF(key);
     Py_XDECREF(val);
@@ -3332,7 +3332,7 @@ libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(stats);
     return ret;
 
-error:
+ error:
     VIR_FREE(stats);
     Py_XDECREF(key);
     Py_XDECREF(val);
@@ -3488,7 +3488,7 @@ libvirt_virConnectListAllStoragePools(PyObject *self ATTRIBUTE_UNUSED,
         pools[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (pools[i])
             virStoragePoolFree(pools[i]);
@@ -3592,7 +3592,7 @@ libvirt_virStoragePoolListAllVolumes(PyObject *self ATTRIBUTE_UNUSED,
         vols[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (vols[i])
             virStorageVolFree(vols[i]);
@@ -3859,7 +3859,7 @@ libvirt_virConnectListAllNodeDevices(PyObject *self ATTRIBUTE_UNUSED,
         devices[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (devices[i])
             virNodeDeviceFree(devices[i]);
@@ -4079,7 +4079,7 @@ libvirt_virConnectListAllSecrets(PyObject *self ATTRIBUTE_UNUSED,
         secrets[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (secrets[i])
             virSecretFree(secrets[i]);
@@ -4309,7 +4309,7 @@ libvirt_virConnectListAllNWFilters(PyObject *self ATTRIBUTE_UNUSED,
         filters[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (filters[i])
             virNWFilterFree(filters[i]);
@@ -4469,7 +4469,7 @@ libvirt_virConnectListAllInterfaces(PyObject *self ATTRIBUTE_UNUSED,
         ifaces[i] = NULL;
     }
 
-cleanup:
+ cleanup:
     for (i = 0; i < c_retval; i++)
         if (ifaces[i])
             virInterfaceFree(ifaces[i]);
@@ -4605,7 +4605,7 @@ libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
     }
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     if (dict)
         return dict;
@@ -4668,7 +4668,7 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
 
     return dict;
 
-error:
+ error:
     Py_DECREF(dict);
     Py_XDECREF(type);
     Py_XDECREF(bandwidth);
@@ -4745,7 +4745,7 @@ libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, size);
     return ret;
@@ -4793,7 +4793,7 @@ libvirt_virDomainGetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -4842,7 +4842,7 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
                        libvirt_intWrap(disks[i].error));
     }
 
-cleanup:
+ cleanup:
     if (disks) {
         for (i = 0; i < count; i++)
             VIR_FREE(disks[i].disk);
@@ -4958,7 +4958,7 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
         }
     }
 
-cleanup:
+ cleanup:
     if (ifaces && ifaces_count > 0) {
         for (i = 0; i < ifaces_count; i++) {
             virDomainInterfaceFree(ifaces[i]);
@@ -4968,7 +4968,7 @@ cleanup:
 
     return py_retval;
 
-error:
+ error:
     Py_XDECREF(py_retval);
     py_retval = NULL;
     goto cleanup;
@@ -5229,7 +5229,7 @@ libvirt_virEventAddHandleFunc(int fd,
     Py_XDECREF(result);
     Py_DECREF(pyobj_args);
 
-cleanup:
+ cleanup:
     LIBVIRT_RELEASE_THREAD_STATE;
 
     return retval;
@@ -5355,7 +5355,7 @@ libvirt_virEventAddTimeoutFunc(int timeout,
     Py_XDECREF(result);
     Py_DECREF(pyobj_args);
 
-cleanup:
+ cleanup:
     LIBVIRT_RELEASE_THREAD_STATE;
     return retval;
 }
@@ -5580,7 +5580,7 @@ libvirt_virEventHandleCallback(int watch,
         Py_DECREF(pyobj_ret);
     }
 
-cleanup:
+ cleanup:
     LIBVIRT_RELEASE_THREAD_STATE;
 }
 
@@ -5647,7 +5647,7 @@ libvirt_virEventTimeoutCallback(int timer,
         Py_DECREF(pyobj_ret);
     }
 
-cleanup:
+ cleanup:
     LIBVIRT_RELEASE_THREAD_STATE;
 }
 
@@ -7450,7 +7450,7 @@ libvirt_virDomainBlockPeek(PyObject *self ATTRIBUTE_UNUSED,
 
     py_retval = libvirt_charPtrSizeWrap(buf, size);
 
-cleanup:
+ cleanup:
     VIR_FREE(buf);
     return py_retval;
 }
@@ -7488,7 +7488,7 @@ libvirt_virDomainMemoryPeek(PyObject *self ATTRIBUTE_UNUSED,
 
     py_retval = libvirt_charPtrSizeWrap(buf, size);
 
-cleanup:
+ cleanup:
     VIR_FREE(buf);
     return py_retval;
 }
@@ -7562,7 +7562,7 @@ libvirt_virNodeSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = VIR_PY_INT_SUCCESS;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     virTypedParamsFree(new_params, nparams);
     return ret;
@@ -7609,7 +7609,7 @@ libvirt_virNodeGetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
     ret = getPyVirTypedParameter(params, nparams);
 
-cleanup:
+ cleanup:
     virTypedParamsFree(params, nparams);
     return ret;
 }
@@ -7672,10 +7672,10 @@ libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
         PyTuple_SetItem(ret, 2, pyonline) < 0)
         goto error;
 
-cleanup:
+ cleanup:
     VIR_FREE(cpumap);
     return ret;
-error:
+ error:
     Py_XDECREF(ret);
     Py_XDECREF(pycpumap);
     Py_XDECREF(pyused);
@@ -7729,7 +7729,7 @@ libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
     py_retval = libvirt_intWrap((int) c_retval);
 
-cleanup:
+ cleanup:
     VIR_FREE(files);
     return py_retval;
 }
@@ -7777,7 +7777,7 @@ libvirt_virDomainCreateXMLWithFiles(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
     py_retval = libvirt_virDomainPtrWrap((virDomainPtr) c_retval);
 
-cleanup:
+ cleanup:
     VIR_FREE(files);
     return py_retval;
 }
@@ -7825,7 +7825,7 @@ libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED,
 
     py_retval = libvirt_intWrap(c_retval);
 
-cleanup:
+ cleanup:
     for (j = 0 ; j < i ; j++)
         VIR_FREE(mountpoints[j]);
     VIR_FREE(mountpoints);

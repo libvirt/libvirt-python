@@ -402,7 +402,7 @@ setPyVirTypedParameter(PyObject *info,
     }
     return ret;
 
-cleanup:
+ cleanup:
     virTypedParamsFree(ret, size);
     return NULL;
 }
@@ -589,7 +589,7 @@ virPyDictToTypedParams(PyObject *dict,
     params = NULL;
     ret = 0;
 
-cleanup:
+ cleanup:
     VIR_FREE(keystr);
     virTypedParamsFree(params, n);
     return ret;

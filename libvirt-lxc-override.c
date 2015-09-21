@@ -94,7 +94,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(fdlist);
     return py_retval;
 
-error:
+ error:
     for (i = 0; i < c_retval; i++) {
         VIR_FORCE_CLOSE(fdlist[i]);
     }

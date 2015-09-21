@@ -243,7 +243,7 @@ libvirt_qemu_virConnectDomainQemuMonitorEventCallback(virConnectPtr conn ATTRIBU
     Py_DECREF(pyobj_cbData);
     Py_DECREF(pyobj_dom);
 
-cleanup:
+ cleanup:
     if (!pyobj_ret) {
         DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
         PyErr_Print();
