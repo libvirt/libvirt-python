@@ -8243,7 +8243,6 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
-    PyObject *py_retval = NULL;
     PyObject *pyobj_domain;
     PyObject *pyobj_seconds;
     PyObject *pyobj_nseconds;
@@ -8263,38 +8262,31 @@ libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
     if (PyDict_Check(py_dict)) {
         py_dict_size = PyDict_Size(py_dict);
         if ((pyobj_seconds = PyDict_GetItemString(py_dict, "seconds"))) {
-            if (libvirt_longlongUnwrap(pyobj_seconds, &seconds) < 0) {
-                PyErr_Format(PyExc_LookupError, "malformed 'seconds'");
-                goto cleanup;
-            }
+            if (libvirt_longlongUnwrap(pyobj_seconds, &seconds) < 0)
+                return NULL;
         } else {
             PyErr_Format(PyExc_LookupError, "Dictionary must contains 'seconds'");
-            goto cleanup;
+            return NULL;
         }
 
         if ((pyobj_nseconds = PyDict_GetItemString(py_dict, "nseconds"))) {
-            if (libvirt_uintUnwrap(pyobj_nseconds, &nseconds) < 0) {
-                PyErr_Format(PyExc_LookupError, "malformed 'nseconds'");
-                goto cleanup;
-            }
+            if (libvirt_uintUnwrap(pyobj_nseconds, &nseconds) < 0)
+                return NULL;
         } else if (py_dict_size > 1) {
             PyErr_Format(PyExc_LookupError, "Dictionary contains unknown key");
-            goto cleanup;
+            return NULL;
         }
     } else if (py_dict != Py_None || !flags) {
         PyErr_Format(PyExc_TypeError, "time must be a dictionary "
                      "or None with flags set");
-        goto cleanup;
+        return NULL;
     }
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     c_retval = virDomainSetTime(domain, seconds, nseconds, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    py_retval = libvirt_intWrap(c_retval);
-
- cleanup:
-    return py_retval;
+    return libvirt_intWrap(c_retval);
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 5) */
 
