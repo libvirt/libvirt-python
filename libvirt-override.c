@@ -476,27 +476,23 @@ cleanup:
  */
 static int
 getPyNodeCPUCount(virConnectPtr conn) {
-    int i_retval = -1;
-    virNodeInfo nodeinfo;
+    int i_retval;
 
 #if LIBVIR_CHECK_VERSION(1, 0, 0)
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virNodeGetCPUMap(conn, NULL, NULL, 0);
     LIBVIRT_END_ALLOW_THREADS;
+#else /* fallback: use nodeinfo */
+    virNodeInfo nodeinfo;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virNodeGetInfo(conn, &nodeinfo);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval >= 0)
+        i_retval = VIR_NODEINFO_MAXCPUS(nodeinfo);
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
 
-    if (i_retval < 0) {
-        /* fallback: use nodeinfo */
-        LIBVIRT_BEGIN_ALLOW_THREADS;
-        i_retval = virNodeGetInfo(conn, &nodeinfo);
-        LIBVIRT_END_ALLOW_THREADS;
-        if (i_retval < 0)
-            goto cleanup;
-
-        i_retval = VIR_NODEINFO_MAXCPUS(nodeinfo);
-    }
-
-cleanup:
     return i_retval;
 }
 
