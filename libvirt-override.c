@@ -2303,12 +2303,9 @@ libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject * self,
           pyobj_f);
 
     virSetErrorFunc(NULL, libvirt_virErrorFuncHandler);
-    if (libvirt_virPythonErrorFuncHandler != NULL) {
-        Py_XDECREF(libvirt_virPythonErrorFuncHandler);
-    }
-    if (libvirt_virPythonErrorFuncCtxt != NULL) {
-        Py_XDECREF(libvirt_virPythonErrorFuncCtxt);
-    }
+
+    Py_XDECREF(libvirt_virPythonErrorFuncHandler);
+    Py_XDECREF(libvirt_virPythonErrorFuncCtxt);
 
     if ((pyobj_f == Py_None) && (pyobj_ctx == Py_None)) {
         libvirt_virPythonErrorFuncHandler = NULL;
