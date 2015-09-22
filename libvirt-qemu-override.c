@@ -271,10 +271,8 @@ libvirt_qemu_virConnectDomainQemuMonitorEventRegister(PyObject *self ATTRIBUTE_U
     unsigned int flags;
 
     if (!PyArg_ParseTuple(args, (char *) "OOzOI", &pyobj_conn, &pyobj_dom,
-                          &event, &pyobj_cbData, &flags)) {
-        DEBUG("%s failed parsing tuple\n", __FUNCTION__);
-        return VIR_PY_INT_FAIL;
-    }
+                          &event, &pyobj_cbData, &flags))
+        return NULL;
 
     DEBUG("libvirt_qemu_virConnectDomainQemuMonitorEventRegister(%p %p %s %p %x) called\n",
           pyobj_conn, pyobj_dom, NULLSTR(event), pyobj_cbData, flags);

@@ -99,7 +99,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
         VIR_FORCE_CLOSE(fdlist[i]);
     }
     VIR_FREE(fdlist);
-    return VIR_PY_NONE;
+    return NULL;
 }
 /************************************************************************
  *									*
