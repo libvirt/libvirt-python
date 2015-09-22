@@ -406,14 +406,11 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         val = libvirt_ulonglongWrap(stats[i].val);
 
         if (!key || !val || PyDict_SetItem(info, key, val) < 0) {
-            Py_DECREF(info);
-            info = NULL;
+            Py_CLEAR(info);
             goto cleanup;
         }
-        Py_DECREF(key);
-        Py_DECREF(val);
-        key = NULL;
-        val = NULL;
+        Py_CLEAR(key);
+        Py_CLEAR(val);
     }
 
  cleanup:
@@ -2175,8 +2172,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
     return rv;
 
  error:
-    Py_XDECREF(rv);
-    rv = NULL;
+    Py_CLEAR(rv);
     goto done;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 3) */
@@ -2284,8 +2280,7 @@ libvirt_virConnectListAllDomains(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virDomainPtrWrap(doms[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -2391,8 +2386,7 @@ libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
         if ((pyobj_snap = libvirt_constcharPtrWrap(names[i])) == NULL ||
             PyList_SetItem(py_retval, i, pyobj_snap) < 0) {
             Py_XDECREF(pyobj_snap);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         VIR_FREE(names[i]);
@@ -2437,8 +2431,7 @@ libvirt_virDomainListAllSnapshots(PyObject *self ATTRIBUTE_UNUSED,
         if ((pyobj_snap = libvirt_virDomainSnapshotPtrWrap(snaps[i])) == NULL ||
             PyList_SetItem(py_retval, i, pyobj_snap) < 0) {
             Py_XDECREF(pyobj_snap);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         snaps[i] = NULL;
@@ -2494,8 +2487,7 @@ libvirt_virDomainSnapshotListChildrenNames(PyObject *self ATTRIBUTE_UNUSED,
         if ((pyobj_snap = libvirt_constcharPtrWrap(names[i])) == NULL ||
             PyList_SetItem(py_retval, i, pyobj_snap) < 0) {
             Py_XDECREF(pyobj_snap);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         VIR_FREE(names[i]);
@@ -2540,8 +2532,7 @@ libvirt_virDomainSnapshotListAllChildren(PyObject *self ATTRIBUTE_UNUSED,
         if ((pyobj_snap = libvirt_virDomainSnapshotPtrWrap(snaps[i])) == NULL ||
             PyList_SetItem(py_retval, i, pyobj_snap) < 0) {
             Py_XDECREF(pyobj_snap);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         snaps[i] = NULL;
@@ -2835,8 +2826,7 @@ libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 
  error:
-    Py_XDECREF(py_retval);
-    py_retval = NULL;
+    Py_CLEAR(py_retval);
     goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
@@ -3050,8 +3040,7 @@ libvirt_virConnectListAllNetworks(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virNetworkPtrWrap(nets[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -3287,8 +3276,7 @@ libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
         val = libvirt_ulonglongWrap(stats[i].value);
 
         if (!key || !val || PyDict_SetItem(ret, key, val) < 0) {
-            Py_DECREF(ret);
-            ret = NULL;
+            Py_CLEAR(ret);
             goto error;
         }
 
@@ -3353,8 +3341,7 @@ libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         val = libvirt_ulonglongWrap(stats[i].value);
 
         if (!key || !val || PyDict_SetItem(ret, key, val) < 0) {
-            Py_DECREF(ret);
-            ret = NULL;
+            Py_CLEAR(ret);
             goto error;
         }
 
@@ -3513,8 +3500,7 @@ libvirt_virConnectListAllStoragePools(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virStoragePoolPtrWrap(pools[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -3618,8 +3604,7 @@ libvirt_virStoragePoolListAllVolumes(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virStorageVolPtrWrap(vols[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -3890,8 +3875,7 @@ libvirt_virConnectListAllNodeDevices(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virNodeDevicePtrWrap(devices[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -4111,8 +4095,7 @@ libvirt_virConnectListAllSecrets(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virSecretPtrWrap(secrets[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -4345,8 +4328,7 @@ libvirt_virConnectListAllNWFilters(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virNWFilterPtrWrap(filters[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -4508,8 +4490,7 @@ libvirt_virConnectListAllInterfaces(PyObject *self ATTRIBUTE_UNUSED,
         if (!(tmp = libvirt_virInterfacePtrWrap(ifaces[i])) ||
             PyList_SetItem(py_retval, i, tmp) < 0) {
             Py_XDECREF(tmp);
-            Py_DECREF(py_retval);
-            py_retval = NULL;
+            Py_CLEAR(py_retval);
             goto cleanup;
         }
         /* python steals the pointer */
@@ -4645,8 +4626,7 @@ libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED,
 
     if (PyDict_SetItem(dict, libvirt_constcharPtrWrap("type"),
                        libvirt_intWrap(type)) < 0) {
-        Py_DECREF(dict);
-        dict = NULL;
+        Py_CLEAR(dict);
         goto cleanup;
     }
 
@@ -5013,8 +4993,7 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 
  error:
-    Py_XDECREF(py_retval);
-    py_retval = NULL;
+    Py_CLEAR(py_retval);
     goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
@@ -7695,12 +7674,11 @@ libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(cpumap);
     return ret;
  error:
-    Py_XDECREF(ret);
+    Py_CLEAR(ret);
     Py_XDECREF(pycpumap);
     Py_XDECREF(pyused);
     Py_XDECREF(pycpunum);
     Py_XDECREF(pyonline);
-    ret = NULL;
     goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
@@ -8187,8 +8165,7 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 
  error:
-    Py_XDECREF(py_retval);
-    py_retval = NULL;
+    Py_CLEAR(py_retval);
     goto cleanup;
 }
 
