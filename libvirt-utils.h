@@ -22,6 +22,9 @@
 #ifndef __LIBVIRT_UTILS_H__
 # define __LIBVIRT_UTILS_H__
 
+# include <Python.h>
+# include <libvirt/libvirt.h>
+
 # define STREQ(a,b) (strcmp(a,b) == 0)
 
 # ifndef MIN
@@ -135,6 +138,22 @@ int virReallocN(void *ptrptr, size_t size, size_t count)
     ATTRIBUTE_RETURN_CHECK ATTRIBUTE_NONNULL(1);
 void virFree(void *ptrptr) ATTRIBUTE_NONNULL(1);
 
+
+# if PY_MAJOR_VERSION > 2
+#  define libvirt_PyString_Check PyUnicode_Check
+# else
+#  define libvirt_PyString_Check PyString_Check
+# endif
+
+
+/* The two-statement sequence "Py_INCREF(Py_None); return Py_None;"
+   is so common that we encapsulate it here.  Now, each use is simply
+   return VIR_PY_NONE;  */
+#define VIR_PY_NONE (Py_INCREF (Py_None), Py_None)
+#define VIR_PY_INT_FAIL (libvirt_intWrap(-1))
+#define VIR_PY_INT_SUCCESS (libvirt_intWrap(0))
+
+
 /**
  * VIR_ALLOC:
  * @ptr: pointer to hold address of allocated memory
@@ -215,5 +234,37 @@ void virTypedParamsClear(virTypedParameterPtr params, int nparams);
 
 void virTypedParamsFree(virTypedParameterPtr params, int nparams);
 # endif /* ! LIBVIR_CHECK_VERSION(1, 0, 2) */
+
+char * py_str(PyObject *obj);
+PyObject * getPyVirTypedParameter(const virTypedParameter *params,
+                                  int nparams);
+virTypedParameterPtr setPyVirTypedParameter(PyObject *info,
+                                            const virTypedParameter *params,
+                                            int nparams)
+ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2);
+
+
+# if LIBVIR_CHECK_VERSION(1, 1, 0)
+typedef struct {
+    const char *name;
+    int type;
+} virPyTypedParamsHint;
+typedef virPyTypedParamsHint *virPyTypedParamsHintPtr;
+
+
+int virPyDictToTypedPramaOne(virTypedParameterPtr *params,
+                             int *n,
+                             int *max,
+                             virPyTypedParamsHintPtr hints,
+                             int nhints,
+                             const char *keystr,
+                             PyObject *value);
+int virPyDictToTypedParams(PyObject *dict,
+                           virTypedParameterPtr *ret_params,
+                           int *ret_nparams,
+                           virPyTypedParamsHintPtr hints,
+                           int nhints)
+ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2) ATTRIBUTE_NONNULL(3);
+# endif /* LIBVIR_CHECK_VERSION(1, 1, 0) */
 
 #endif /* __LIBVIRT_UTILS_H__ */

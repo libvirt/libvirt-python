@@ -47,13 +47,6 @@ extern void initcygvirtmod_qemu(void);
    do {} while (0)
 #endif
 
-/* The two-statement sequence "Py_INCREF(Py_None); return Py_None;"
-   is so common that we encapsulate it here.  Now, each use is simply
-   return VIR_PY_NONE;  */
-#define VIR_PY_NONE (Py_INCREF (Py_None), Py_None)
-#define VIR_PY_INT_FAIL (libvirt_intWrap(-1))
-#define VIR_PY_INT_SUCCESS (libvirt_intWrap(0))
-
 /*******************************************
  * Helper functions to avoid importing modules
  * for every callback
