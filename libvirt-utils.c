@@ -267,22 +267,13 @@ getPyVirTypedParameter(const virTypedParameter *params,
         }
 
         key = libvirt_constcharPtrWrap(params[i].field);
-        if (!key || !val)
-            goto cleanup;
 
-        if (PyDict_SetItem(info, key, val) < 0) {
-            Py_DECREF(info);
-            goto cleanup;
-        }
-
-        Py_DECREF(key);
-        Py_DECREF(val);
+        VIR_PY_DICT_SET_GOTO(info, key, val, cleanup);
     }
     return info;
 
  cleanup:
-    Py_XDECREF(key);
-    Py_XDECREF(val);
+    Py_DECREF(info);
     return NULL;
 }
 

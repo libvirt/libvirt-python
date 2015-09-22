@@ -403,18 +403,14 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         }
         val = libvirt_ulonglongWrap(stats[i].val);
 
-        if (!key || !val || PyDict_SetItem(info, key, val) < 0) {
-            Py_CLEAR(info);
-            goto cleanup;
-        }
-        Py_CLEAR(key);
-        Py_CLEAR(val);
+        VIR_PY_DICT_SET_GOTO(info, key, val, error);
     }
 
- cleanup:
-    Py_XDECREF(key);
-    Py_XDECREF(val);
     return info;
+
+ error:
+    Py_DECREF(info);
+    return NULL;
 }
 
 static PyObject *
@@ -3358,23 +3354,16 @@ libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
         key = libvirt_constcharPtrWrap(stats[i].field);
         val = libvirt_ulonglongWrap(stats[i].value);
 
-        if (!key || !val || PyDict_SetItem(ret, key, val) < 0) {
-            Py_CLEAR(ret);
-            goto error;
-        }
-
-        Py_DECREF(key);
-        Py_DECREF(val);
+        VIR_PY_DICT_SET_GOTO(ret, key, val, error);
     }
 
+ cleanup:
     VIR_FREE(stats);
     return ret;
 
  error:
-    VIR_FREE(stats);
-    Py_XDECREF(key);
-    Py_XDECREF(val);
-    return ret;
+    Py_CLEAR(ret);
+    goto cleanup;
 }
 
 static PyObject *
@@ -3423,23 +3412,16 @@ libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         key = libvirt_constcharPtrWrap(stats[i].field);
         val = libvirt_ulonglongWrap(stats[i].value);
 
-        if (!key || !val || PyDict_SetItem(ret, key, val) < 0) {
-            Py_CLEAR(ret);
-            goto error;
-        }
-
-        Py_DECREF(key);
-        Py_DECREF(val);
+        VIR_PY_DICT_SET_GOTO(ret, key, val, error);
     }
 
+ cleanup:
     VIR_FREE(stats);
     return ret;
 
  error:
-    VIR_FREE(stats);
-    Py_XDECREF(key);
-    Py_XDECREF(val);
-    return ret;
+    Py_CLEAR(ret);
+    goto cleanup;
 }
 
 static PyObject *
@@ -4747,15 +4729,16 @@ libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED,
     if (!(dict = getPyVirTypedParameter(params, nparams)))
         goto cleanup;
 
-    if (PyDict_SetItem(dict, libvirt_constcharPtrWrap("type"),
-                       libvirt_intWrap(type)) < 0) {
-        Py_CLEAR(dict);
-        goto cleanup;
-    }
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("type"),
+                         libvirt_intWrap(type), error);
 
  cleanup:
     virTypedParamsFree(params, nparams);
     return dict;
+
+ error:
+    Py_CLEAR(dict);
+    goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
 
@@ -4769,7 +4752,6 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     virDomainBlockJobInfo info;
     int c_ret;
-    PyObject *type = NULL, *bandwidth = NULL, *cur = NULL, *end = NULL;
     PyObject *dict;
 
     if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetBlockJobInfo",
@@ -4790,34 +4772,19 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
     if (c_ret == 0)
         return dict;
 
-    if ((type = libvirt_intWrap(info.type)) == NULL ||
-        PyDict_SetItemString(dict, "type", type) < 0)
-        goto error;
-    Py_DECREF(type);
-
-    if ((bandwidth = libvirt_ulongWrap(info.bandwidth)) == NULL ||
-        PyDict_SetItemString(dict, "bandwidth", bandwidth) < 0)
-        goto error;
-    Py_DECREF(bandwidth);
-
-    if ((cur = libvirt_ulonglongWrap(info.cur)) == NULL ||
-        PyDict_SetItemString(dict, "cur", cur) < 0)
-        goto error;
-    Py_DECREF(cur);
-
-    if ((end = libvirt_ulonglongWrap(info.end)) == NULL ||
-        PyDict_SetItemString(dict, "end", end) < 0)
-        goto error;
-    Py_DECREF(end);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("type"),
+                         libvirt_intWrap(info.type), error);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("bandwidth"),
+                         libvirt_ulongWrap(info.bandwidth), error);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("cur"),
+                         libvirt_ulonglongWrap(info.cur), error);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("end"),
+                         libvirt_ulonglongWrap(info.end), error);
 
     return dict;
 
  error:
     Py_DECREF(dict);
-    Py_XDECREF(type);
-    Py_XDECREF(bandwidth);
-    Py_XDECREF(cur);
-    Py_XDECREF(end);
     return NULL;
 }
 
@@ -4983,9 +4950,10 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
 
     for (i = 0; i < count; i++) {
-        PyDict_SetItem(py_retval,
-                       libvirt_constcharPtrWrap(disks[i].disk),
-                       libvirt_intWrap(disks[i].error));
+        VIR_PY_DICT_SET_GOTO(py_retval,
+                             libvirt_constcharPtrWrap(disks[i].disk),
+                             libvirt_intWrap(disks[i].error),
+                             error);
     }
 
  cleanup:
@@ -4994,6 +4962,10 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
             VIR_FREE(disks[i].disk);
     VIR_FREE(disks);
     return py_retval;
+
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
 }
 
 
@@ -5031,18 +5003,12 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
         virDomainInterfacePtr iface = ifaces[i];
         PyObject *py_addrs = NULL;
         PyObject *py_iface = NULL;
-        PyObject *py_iname = NULL;
-        PyObject *py_ivalue = NULL;
 
         if (!(py_iface = PyDict_New()))
             goto error;
 
-        if ((py_iname = libvirt_charPtrWrap(iface->name)) == NULL ||
-            PyDict_SetItem(py_retval, py_iname, py_iface) < 0) {
-            Py_XDECREF(py_iname);
-            Py_DECREF(py_iface);
-            goto error;
-        }
+        VIR_PY_DICT_SET_GOTO(py_retval, libvirt_charPtrWrap(iface->name),
+                             py_iface, error);
 
         if (iface->naddrs) {
             if (!(py_addrs = PyList_New(iface->naddrs))) {
@@ -5052,20 +5018,11 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
             py_addrs = VIR_PY_NONE;
         }
 
-        if ((py_iname = libvirt_constcharPtrWrap("addrs")) == NULL ||
-            PyDict_SetItem(py_iface, py_iname, py_addrs) < 0) {
-            Py_XDECREF(py_iname);
-            Py_DECREF(py_addrs);
-            goto error;
-        }
+        VIR_PY_DICT_SET_GOTO(py_iface, libvirt_constcharPtrWrap("addrs"),
+                             py_addrs, error);
 
-        if ((py_iname = libvirt_constcharPtrWrap("hwaddr")) == NULL ||
-            (py_ivalue = libvirt_constcharPtrWrap(iface->hwaddr)) == NULL ||
-            PyDict_SetItem(py_iface, py_iname, py_ivalue) < 0) {
-            Py_XDECREF(py_iname);
-            Py_XDECREF(py_ivalue);
-            goto error;
-        }
+        VIR_PY_DICT_SET_GOTO(py_iface, libvirt_constcharPtrWrap("hwaddr"),
+                             libvirt_constcharPtrWrap(iface->hwaddr), error);
 
         for (j = 0; j < iface->naddrs; j++) {
             virDomainIPAddressPtr addr = &(iface->addrs[j]);
@@ -5076,27 +5033,12 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
 
             VIR_PY_LIST_SET_GOTO(py_addrs, j, py_addr, error);
 
-            if ((py_iname = libvirt_constcharPtrWrap("addr")) == NULL ||
-                (py_ivalue = libvirt_constcharPtrWrap(addr->addr)) == NULL ||
-                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
-                Py_XDECREF(py_iname);
-                Py_XDECREF(py_ivalue);
-                goto error;
-            }
-            if ((py_iname = libvirt_constcharPtrWrap("prefix")) == NULL ||
-                (py_ivalue = libvirt_intWrap(addr->prefix)) == NULL ||
-                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
-                Py_XDECREF(py_iname);
-                Py_XDECREF(py_ivalue);
-                goto error;
-            }
-            if ((py_iname = libvirt_constcharPtrWrap("type")) == NULL ||
-                (py_ivalue = libvirt_intWrap(addr->type)) == NULL ||
-                PyDict_SetItem(py_addr, py_iname, py_ivalue) < 0) {
-                Py_XDECREF(py_iname);
-                Py_XDECREF(py_ivalue);
-                goto error;
-            }
+            VIR_PY_DICT_SET_GOTO(py_addr, libvirt_constcharPtrWrap("addr"),
+                                 libvirt_constcharPtrWrap(addr->addr), error);
+            VIR_PY_DICT_SET_GOTO(py_addr, libvirt_constcharPtrWrap("prefix"),
+                                 libvirt_uintWrap(addr->prefix), error);
+            VIR_PY_DICT_SET_GOTO(py_addr, libvirt_constcharPtrWrap("type"),
+                                 libvirt_intWrap(addr->type), error);
         }
     }
 
@@ -6170,28 +6112,34 @@ libvirt_virConnectDomainEventGraphicsCallback(virConnectPtr conn ATTRIBUTE_UNUSE
     if ((pyobj_local = PyDict_New()) == NULL)
         goto cleanup;
 
-    PyDict_SetItem(pyobj_local,
-                   libvirt_constcharPtrWrap("family"),
-                   libvirt_intWrap(local->family));
-    PyDict_SetItem(pyobj_local,
-                   libvirt_constcharPtrWrap("node"),
-                   libvirt_constcharPtrWrap(local->node));
-    PyDict_SetItem(pyobj_local,
-                   libvirt_constcharPtrWrap("service"),
-                   libvirt_constcharPtrWrap(local->service));
+    VIR_PY_DICT_SET_GOTO(pyobj_local,
+                         libvirt_constcharPtrWrap("family"),
+                         libvirt_intWrap(local->family),
+                         cleanup);
+    VIR_PY_DICT_SET_GOTO(pyobj_local,
+                         libvirt_constcharPtrWrap("node"),
+                         libvirt_constcharPtrWrap(local->node),
+                         cleanup);
+    VIR_PY_DICT_SET_GOTO(pyobj_local,
+                         libvirt_constcharPtrWrap("service"),
+                         libvirt_constcharPtrWrap(local->service),
+                         cleanup);
 
     if ((pyobj_remote = PyDict_New()) == NULL)
         goto cleanup;
 
-    PyDict_SetItem(pyobj_remote,
-                   libvirt_constcharPtrWrap("family"),
-                   libvirt_intWrap(remote->family));
-    PyDict_SetItem(pyobj_remote,
-                   libvirt_constcharPtrWrap("node"),
-                   libvirt_constcharPtrWrap(remote->node));
-    PyDict_SetItem(pyobj_remote,
-                   libvirt_constcharPtrWrap("service"),
-                   libvirt_constcharPtrWrap(remote->service));
+    VIR_PY_DICT_SET_GOTO(pyobj_remote,
+                         libvirt_constcharPtrWrap("family"),
+                         libvirt_intWrap(remote->family),
+                         cleanup);
+    VIR_PY_DICT_SET_GOTO(pyobj_remote,
+                         libvirt_constcharPtrWrap("node"),
+                         libvirt_constcharPtrWrap(remote->node),
+                         cleanup);
+    VIR_PY_DICT_SET_GOTO(pyobj_remote,
+                         libvirt_constcharPtrWrap("service"),
+                         libvirt_constcharPtrWrap(remote->service),
+                         cleanup);
 
     if ((pyobj_subject = PyList_New(subject->nidentity)) == NULL)
         goto cleanup;
@@ -7983,7 +7931,7 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED,
 {
     PyObject *py_retval = NULL;
     PyObject *dict = NULL;
-    PyObject *pyobj_domain, *pyobj_seconds, *pyobj_nseconds;
+    PyObject *pyobj_domain;
     virDomainPtr domain;
     long long seconds;
     unsigned int nseconds;
@@ -8007,15 +7955,10 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
     }
 
-    if (!(pyobj_seconds = libvirt_longlongWrap(seconds)) ||
-        PyDict_SetItemString(dict, "seconds", pyobj_seconds) < 0)
-        goto cleanup;
-    Py_DECREF(pyobj_seconds);
-
-    if (!(pyobj_nseconds = libvirt_uintWrap(nseconds)) ||
-        PyDict_SetItemString(dict, "nseconds", pyobj_nseconds) < 0)
-        goto cleanup;
-    Py_DECREF(pyobj_nseconds);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("seconds"),
+                         libvirt_longlongWrap(seconds), cleanup);
+    VIR_PY_DICT_SET_GOTO(dict, libvirt_constcharPtrWrap("nseconds"),
+                         libvirt_longlongWrap(nseconds), cleanup);
 
     py_retval = dict;
     dict = NULL;
@@ -8143,35 +8086,18 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
 
     for (i = 0; i < c_retval;) {
         PyObject *per_node = NULL;
-        PyObject *node = NULL;
 
-        if (!(per_node = PyDict_New()) ||
-            !(node = libvirt_intWrap(startCell + i/pyobj_pagesize_size))) {
-            Py_XDECREF(per_node);
-            Py_XDECREF(node);
+        if (!(per_node = PyDict_New()))
             goto cleanup;
-        }
 
-        if (PyDict_SetItem(pyobj_counts, node, per_node) < 0) {
-            Py_XDECREF(per_node);
-            Py_XDECREF(node);
-            goto cleanup;
-        }
+        VIR_PY_DICT_SET_GOTO(pyobj_counts,
+                             libvirt_intWrap(startCell + i/pyobj_pagesize_size),
+                             per_node, cleanup);
 
-        for (j = 0; j < pyobj_pagesize_size; j ++) {
-            PyObject *page = NULL;
-            PyObject *count = NULL;
+        for (j = 0; j < pyobj_pagesize_size; j ++)
+            VIR_PY_DICT_SET_GOTO(per_node, libvirt_intWrap(pages[j]),
+                                 libvirt_intWrap(counts[i + j]), cleanup);
 
-            if (!(page = libvirt_intWrap(pages[j])) ||
-                !(count = libvirt_intWrap(counts[i + j])) ||
-                PyDict_SetItem(per_node, page, count) < 0) {
-                Py_XDECREF(page);
-                Py_XDECREF(count);
-                Py_XDECREF(per_node);
-                Py_XDECREF(node);
-                goto cleanup;
-            }
-        }
         i += pyobj_pagesize_size;
     }
 
@@ -8225,30 +8151,24 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
 
         VIR_PY_LIST_SET_GOTO(py_retval, i, py_lease, error);
 
-#define VIR_SET_LEASE_ITEM(NAME, VALUE_OBJ_FUNC)                            \
-        do {                                                                \
-            PyObject *tmp_val;                                              \
-                                                                            \
-            if (!(tmp_val = VALUE_OBJ_FUNC))                                \
-                goto error;                                                 \
-                                                                            \
-            if (PyDict_SetItemString(py_lease, NAME, tmp_val) < 0) {        \
-                Py_DECREF(tmp_val);                                         \
-                goto error;                                                 \
-            }                                                               \
-        } while (0)
-
-        VIR_SET_LEASE_ITEM("iface", libvirt_charPtrWrap(lease->iface));
-        VIR_SET_LEASE_ITEM("expirytime", libvirt_longlongWrap(lease->expirytime));
-        VIR_SET_LEASE_ITEM("type", libvirt_intWrap(lease->type));
-        VIR_SET_LEASE_ITEM("mac", libvirt_charPtrWrap(lease->mac));
-        VIR_SET_LEASE_ITEM("ipaddr", libvirt_charPtrWrap(lease->ipaddr));
-        VIR_SET_LEASE_ITEM("prefix", libvirt_uintWrap(lease->prefix));
-        VIR_SET_LEASE_ITEM("hostname", libvirt_charPtrWrap(lease->hostname));
-        VIR_SET_LEASE_ITEM("clientid", libvirt_charPtrWrap(lease->clientid));
-        VIR_SET_LEASE_ITEM("iaid", libvirt_charPtrWrap(lease->iaid));
-
-#undef VIR_SET_LEASE_ITEM
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("iface"),
+                             libvirt_charPtrWrap(lease->iface), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("expirytime"),
+                             libvirt_longlongWrap(lease->expirytime), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("type"),
+                             libvirt_intWrap(lease->type), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("mac"),
+                             libvirt_charPtrWrap(lease->mac), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("ipaddr"),
+                             libvirt_charPtrWrap(lease->ipaddr), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("prefix"),
+                             libvirt_uintWrap(lease->prefix), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("hostname"),
+                             libvirt_charPtrWrap(lease->hostname), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("clientid"),
+                             libvirt_charPtrWrap(lease->clientid), error);
+        VIR_PY_DICT_SET_GOTO(py_lease, libvirt_constcharPtrWrap("iaid"),
+                             libvirt_charPtrWrap(lease->iaid), error);
     }
 
  cleanup:
