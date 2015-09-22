@@ -41,10 +41,10 @@ extern void initcygvirtmod_qemu(void);
 
 #if DEBUG_ERROR
 # define DEBUG(fmt, ...)            \
-   printf(fmt, __VA_ARGS__)
+    printf(fmt, __VA_ARGS__)
 #else
 # define DEBUG(fmt, ...)            \
-   do {} while (0)
+    do {} while (0)
 #endif
 
 /*******************************************
@@ -270,9 +270,8 @@ libvirt_qemu_virConnectDomainQemuMonitorEventRegister(PyObject *self ATTRIBUTE_U
     virDomainPtr dom;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OOzOI",
-         &pyobj_conn, &pyobj_dom, &event, &pyobj_cbData, &flags)) {
+    if (!PyArg_ParseTuple(args, (char *) "OOzOI", &pyobj_conn, &pyobj_dom,
+                          &event, &pyobj_cbData, &flags)) {
         DEBUG("%s failed parsing tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
@@ -315,9 +314,9 @@ libvirt_qemu_virConnectDomainQemuMonitorEventDeregister(PyObject *self ATTRIBUTE
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "Oi:virConnectDomainQemuMonitorEventDeregister",
-         &pyobj_conn, &callbackID))
+    if (!PyArg_ParseTuple(args,
+                          (char *) "Oi:virConnectDomainQemuMonitorEventDeregister",
+                          &pyobj_conn, &callbackID))
         return NULL;
 
     DEBUG("libvirt_qemu_virConnectDomainQemuMonitorEventDeregister(%p) called\n",
@@ -355,19 +354,19 @@ static PyMethodDef libvirtQemuMethods[] = {
 
 #if PY_MAJOR_VERSION > 2
 static struct PyModuleDef moduledef = {
-        PyModuleDef_HEAD_INIT,
+    PyModuleDef_HEAD_INIT,
 # ifndef __CYGWIN__
-        "libvirtmod_qemu",
+    "libvirtmod_qemu",
 # else
-        "cygvirtmod_qemu",
+    "cygvirtmod_qemu",
 # endif
-        NULL,
-        -1,
-        libvirtQemuMethods,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    NULL,
+    -1,
+    libvirtQemuMethods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 PyObject *
@@ -376,7 +375,7 @@ PyInit_libvirtmod_qemu
 # else
 PyInit_cygvirtmod_qemu
 # endif
-  (void)
+(void)
 {
     PyObject *module;
 
@@ -394,7 +393,7 @@ initlibvirtmod_qemu
 # else
 initcygvirtmod_qemu
 # endif
-  (void)
+(void)
 {
     if (virInitialize() < 0)
         return;
@@ -406,6 +405,6 @@ initcygvirtmod_qemu
 # else
                   "cygvirtmod_qemu",
 # endif
-		  libvirtQemuMethods);
+                  libvirtQemuMethods);
 }
 #endif /* ! PY_MAJOR_VERSION > 2 */

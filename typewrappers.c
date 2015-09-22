@@ -145,10 +145,10 @@ libvirt_constcharPtrWrap(const char *str)
 PyObject *
 libvirt_boolWrap(int val)
 {
-  if (val)
-      Py_RETURN_TRUE;
-  else
-      Py_RETURN_FALSE;
+    if (val)
+        Py_RETURN_TRUE;
+    else
+        Py_RETURN_FALSE;
 }
 
 int

@@ -45,10 +45,10 @@ extern void initcygvirtmod(void);
 
 #if DEBUG_ERROR
 # define DEBUG(fmt, ...)            \
-   printf(fmt, __VA_ARGS__)
+    printf(fmt, __VA_ARGS__)
 #else
 # define DEBUG(fmt, ...)            \
-   do {} while (0)
+    do {} while (0)
 #endif
 
 
@@ -102,7 +102,7 @@ libvirt_virDomainBlockStats(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *info;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz:virDomainBlockStats",
-        &pyobj_domain, &path))
+                          &pyobj_domain, &path))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
@@ -320,7 +320,7 @@ libvirt_virDomainInterfaceStats(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *info;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz:virDomainInterfaceStats",
-        &pyobj_domain, &path))
+                          &pyobj_domain, &path))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
@@ -499,7 +499,7 @@ libvirt_virDomainGetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virDomainGetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
-                                        PyObject *args)
+                                             PyObject *args)
 {
     virDomainPtr domain;
     PyObject *pyobj_domain;
@@ -1259,10 +1259,10 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
             goto itemError;
 
         continue;
-        itemError:
-            Py_DECREF(info);
-            Py_XDECREF(item);
-            goto cleanup;
+     itemError:
+        Py_DECREF(info);
+        Py_XDECREF(item);
+        goto cleanup;
     }
     for (i = 0; i < dominfo.nrVirtCpu; i++) {
         PyObject *info = PyTuple_New(cpunum);
@@ -1327,8 +1327,8 @@ libvirt_virDomainPinVcpu(PyObject *self ATTRIBUTE_UNUSED,
         if (tuple_size == -1)
             return ret;
     } else {
-       PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-       return ret;
+        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+        return ret;
     }
 
     cpumaplen = VIR_CPU_MAPLEN(cpunum);
@@ -1392,8 +1392,8 @@ libvirt_virDomainPinVcpuFlags(PyObject *self ATTRIBUTE_UNUSED,
         if (tuple_size == -1)
             return ret;
     } else {
-       PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-       return ret;
+        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+        return ret;
     }
 
     cpumaplen = VIR_CPU_MAPLEN(cpunum);
@@ -1521,8 +1521,8 @@ libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
     cpumaplen = VIR_CPU_MAPLEN(cpunum);
 
     if (!PyTuple_Check(pycpumap)) {
-       PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-       return NULL;
+        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+        return NULL;
     }
 
     if ((tuple_size = PyTuple_Size(pycpumap)) == -1)
@@ -1890,9 +1890,8 @@ libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject *self,
     PyObject *pyobj_f;
     PyObject *pyobj_ctx;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OO:xmlRegisterErrorHandler", &pyobj_f,
-         &pyobj_ctx))
+    if (!PyArg_ParseTuple(args, (char *) "OO:xmlRegisterErrorHandler",
+                          &pyobj_f, &pyobj_ctx))
         return NULL;
 
     DEBUG("libvirt_virRegisterErrorHandler(%p, %p) called\n", pyobj_ctx,
@@ -3203,7 +3202,7 @@ libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED,
     py_retval = PyList_New(c_retval);
     for (i = 0; i < c_retval; i++) {
         PyList_SetItem(py_retval, i,
-                libvirt_ulonglongWrap(freeMems[i]));
+                       libvirt_ulonglongWrap(freeMems[i]));
     }
     VIR_FREE(freeMems);
     return py_retval;
@@ -5103,9 +5102,8 @@ libvirt_virConnectDomainEventRegister(ATTRIBUTE_UNUSED PyObject *self,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OO:virConnectDomainEventRegister",
-                        &pyobj_conn, &pyobj_conn_inst)) {
+    if (!PyArg_ParseTuple(args, (char *) "OO:virConnectDomainEventRegister",
+                          &pyobj_conn, &pyobj_conn_inst)) {
         DEBUG("%s failed parsing tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
@@ -5139,9 +5137,8 @@ libvirt_virConnectDomainEventDeregister(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OO:virConnectDomainEventDeregister",
-         &pyobj_conn, &pyobj_conn_inst))
+    if (!PyArg_ParseTuple(args, (char *) "OO:virConnectDomainEventDeregister",
+                          &pyobj_conn, &pyobj_conn_inst))
         return NULL;
 
     DEBUG("libvirt_virConnectDomainEventDeregister(%p) called\n", pyobj_conn);
@@ -5501,10 +5498,8 @@ libvirt_virEventInvokeHandleCallback(PyObject *self ATTRIBUTE_UNUSED,
     virEventHandleCallback cb;
     void *opaque;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "iiiOO:virEventInvokeHandleCallback",
-         &watch, &fd, &event, &py_f, &py_opaque
-        ))
+    if (!PyArg_ParseTuple(args, (char *) "iiiOO:virEventInvokeHandleCallback",
+                          &watch, &fd, &event, &py_f, &py_opaque))
         return VIR_PY_INT_FAIL;
 
     cb     = (virEventHandleCallback) PyvirEventHandleCallback_Get(py_f);
@@ -5529,10 +5524,8 @@ libvirt_virEventInvokeTimeoutCallback(PyObject *self ATTRIBUTE_UNUSED,
     virEventTimeoutCallback cb;
     void *opaque;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "iOO:virEventInvokeTimeoutCallback",
-                        &timer, &py_f, &py_opaque
-        ))
+    if (!PyArg_ParseTuple(args, (char *) "iOO:virEventInvokeTimeoutCallback",
+                          &timer, &py_f, &py_opaque))
         return VIR_PY_INT_FAIL;
 
     cb     = (virEventTimeoutCallback) PyvirEventTimeoutCallback_Get(py_f);
@@ -6703,15 +6696,15 @@ libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     virConnectDomainEventGenericCallback cb = NULL;
     virDomainPtr dom;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OOiO:virConnectDomainEventRegisterAny",
-         &pyobj_conn, &pyobj_dom, &eventID, &pyobj_cbData)) {
+    if (!PyArg_ParseTuple(args,
+                          (char *) "OOiO:virConnectDomainEventRegisterAny",
+                          &pyobj_conn, &pyobj_dom, &eventID, &pyobj_cbData)) {
         DEBUG("%s failed parsing tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
 
     DEBUG("libvirt_virConnectDomainEventRegister(%p %p %d %p) called\n",
-           pyobj_conn, pyobj_dom, eventID, pyobj_cbData);
+          pyobj_conn, pyobj_dom, eventID, pyobj_cbData);
     conn = PyvirConnect_Get(pyobj_conn);
     if (pyobj_dom == Py_None)
         dom = NULL;
@@ -6825,9 +6818,8 @@ libvirt_virConnectDomainEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "Oi:virConnectDomainEventDeregister",
-         &pyobj_conn, &callbackID))
+    if (!PyArg_ParseTuple(args, (char *) "Oi:virConnectDomainEventDeregister",
+                          &pyobj_conn, &callbackID))
         return NULL;
 
     DEBUG("libvirt_virConnectDomainEventDeregister(%p) called\n", pyobj_conn);
@@ -6921,15 +6913,15 @@ libvirt_virConnectNetworkEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     virConnectNetworkEventGenericCallback cb = NULL;
     virNetworkPtr net;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OOiO:virConnectNetworkEventRegisterAny",
-         &pyobj_conn, &pyobj_net, &eventID, &pyobj_cbData)) {
+    if (!PyArg_ParseTuple(args,
+                          (char *) "OOiO:virConnectNetworkEventRegisterAny",
+                          &pyobj_conn, &pyobj_net, &eventID, &pyobj_cbData)) {
         DEBUG("%s failed parsing tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
 
     DEBUG("libvirt_virConnectNetworkEventRegister(%p %p %d %p) called\n",
-           pyobj_conn, pyobj_net, eventID, pyobj_cbData);
+          pyobj_conn, pyobj_net, eventID, pyobj_cbData);
     conn = PyvirConnect_Get(pyobj_conn);
     if (pyobj_net == Py_None)
         net = NULL;
@@ -6975,9 +6967,8 @@ libvirt_virConnectNetworkEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "Oi:virConnectNetworkEventDeregister",
-         &pyobj_conn, &callbackID))
+    if (!PyArg_ParseTuple(args, (char *) "Oi:virConnectNetworkEventDeregister",
+                          &pyobj_conn, &callbackID))
         return NULL;
 
     DEBUG("libvirt_virConnectNetworkEventDeregister(%p) called\n", pyobj_conn);
@@ -7042,15 +7033,14 @@ libvirt_virConnectRegisterCloseCallback(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "OO:virConnectRegisterCloseCallback",
-         &pyobj_conn, &pyobj_cbData)) {
+    if (!PyArg_ParseTuple(args, (char *) "OO:virConnectRegisterCloseCallback",
+                          &pyobj_conn, &pyobj_cbData)) {
         DEBUG("%s failed parsing tuple\n", __FUNCTION__);
         return VIR_PY_INT_FAIL;
     }
 
     DEBUG("libvirt_virConnectRegisterCloseCallback(%p %p) called\n",
-           pyobj_conn, pyobj_cbData);
+          pyobj_conn, pyobj_cbData);
     conn = PyvirConnect_Get(pyobj_conn);
 
     Py_INCREF(pyobj_cbData);
@@ -7079,9 +7069,8 @@ libvirt_virConnectUnregisterCloseCallback(PyObject * self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple
-        (args, (char *) "O:virConnectDomainEventUnregister",
-         &pyobj_conn))
+    if (!PyArg_ParseTuple(args, (char *) "O:virConnectDomainEventUnregister",
+                          &pyobj_conn))
         return NULL;
 
     DEBUG("libvirt_virConnectDomainEventUnregister(%p) called\n",
@@ -8424,7 +8413,7 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *py_retval = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainFSInfo",
-        &pyobj_domain, &flags))
+                          &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
@@ -8687,19 +8676,19 @@ static PyMethodDef libvirtMethods[] = {
 
 #if PY_MAJOR_VERSION > 2
 static struct PyModuleDef moduledef = {
-        PyModuleDef_HEAD_INIT,
+    PyModuleDef_HEAD_INIT,
 # ifndef __CYGWIN__
-        "libvirtmod",
+    "libvirtmod",
 # else
-        "cygvirtmod",
+    "cygvirtmod",
 # endif
-        NULL,
-        -1,
-        libvirtMethods,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    NULL,
+    -1,
+    libvirtMethods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 PyObject *
@@ -8708,7 +8697,7 @@ PyInit_libvirtmod
 # else
 PyInit_cygvirtmod
 # endif
-  (void)
+(void)
 {
     PyObject *module;
 
@@ -8726,7 +8715,7 @@ initlibvirtmod
 # else
 initcygvirtmod
 # endif
-  (void)
+(void)
 {
     if (virInitialize() < 0)
         return;
@@ -8738,6 +8727,6 @@ initcygvirtmod
 # else
                   "cygvirtmod",
 # endif
-		  libvirtMethods);
+                  libvirtMethods);
 }
 #endif /* ! PY_MAJOR_VERSION > 2 */

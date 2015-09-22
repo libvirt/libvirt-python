@@ -41,10 +41,10 @@ extern void initcygvirtmod_lxc(void);
 
 #if DEBUG_ERROR
 # define DEBUG(fmt, ...)            \
-   printf(fmt, __VA_ARGS__)
+    printf(fmt, __VA_ARGS__)
 #else
 # define DEBUG(fmt, ...)            \
-   do {} while (0)
+    do {} while (0)
 #endif
 
 /************************************************************************
@@ -114,19 +114,19 @@ static PyMethodDef libvirtLxcMethods[] = {
 
 #if PY_MAJOR_VERSION > 2
 static struct PyModuleDef moduledef = {
-        PyModuleDef_HEAD_INIT,
+    PyModuleDef_HEAD_INIT,
 # ifndef __CYGWIN__
-        "libvirtmod_lxc",
+    "libvirtmod_lxc",
 # else
-        "cygvirtmod_lxc",
+    "cygvirtmod_lxc",
 # endif
-        NULL,
-        -1,
-        libvirtLxcMethods,
-        NULL,
-        NULL,
-        NULL,
-        NULL
+    NULL,
+    -1,
+    libvirtLxcMethods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 PyObject *
@@ -135,7 +135,7 @@ PyInit_libvirtmod_lxc
 # else
 PyInit_cygvirtmod_lxc
 # endif
-  (void)
+(void)
 {
     PyObject *module;
 
@@ -153,7 +153,7 @@ initlibvirtmod_lxc
 # else
 initcygvirtmod_lxc
 # endif
-  (void)
+(void)
 {
     if (virInitialize() < 0)
         return;
@@ -165,6 +165,6 @@ initcygvirtmod_lxc
 # else
                   "cygvirtmod_lxc",
 # endif
-		  libvirtLxcMethods);
+                  libvirtLxcMethods);
 }
 #endif /* ! PY_MAJOR_VERSION > 2 */
