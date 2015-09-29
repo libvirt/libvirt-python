@@ -79,7 +79,9 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     if (c_retval < 0)
         return VIR_PY_NONE;
 
-    py_retval = PyList_New(0);
+    if ((py_retval = PyList_New(0)) == NULL)
+        goto error;
+
     for (i = 0; i < c_retval; i++) {
         PyObject *item = NULL;
 
@@ -91,6 +93,8 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
             goto error;
         }
     }
+
+ cleanup:
     VIR_FREE(fdlist);
     return py_retval;
 
@@ -98,8 +102,8 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     for (i = 0; i < c_retval; i++) {
         VIR_FORCE_CLOSE(fdlist[i]);
     }
-    VIR_FREE(fdlist);
-    return NULL;
+    Py_CLEAR(py_retval);
+    goto cleanup;
 }
 /************************************************************************
  *									*
