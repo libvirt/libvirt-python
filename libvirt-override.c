@@ -62,7 +62,8 @@ extern void initcygvirtmod(void);
  * number if some host CPUs are offline.
  */
 static int
-getPyNodeCPUCount(virConnectPtr conn) {
+getPyNodeCPUCount(virConnectPtr conn)
+{
     int i_retval;
 
 #if LIBVIR_CHECK_VERSION(1, 0, 0)
@@ -90,7 +91,9 @@ getPyNodeCPUCount(virConnectPtr conn) {
  ************************************************************************/
 
 static PyObject *
-libvirt_virDomainBlockStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainBlockStats(PyObject *self ATTRIBUTE_UNUSED,
+                            PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain;
     char * path;
@@ -169,7 +172,8 @@ cleanup:
 }
 
 static PyObject *
-libvirt_virDomainGetCPUStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virDomainGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
 {
     virDomainPtr domain;
     PyObject *pyobj_domain, *totalbool;
@@ -305,7 +309,9 @@ error:
 }
 
 static PyObject *
-libvirt_virDomainInterfaceStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainInterfaceStats(PyObject *self ATTRIBUTE_UNUSED,
+                                PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain;
     char * path;
@@ -340,7 +346,9 @@ libvirt_virDomainInterfaceStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 }
 
 static PyObject *
-libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain;
     unsigned int nr_stats;
@@ -412,7 +420,8 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virDomainGetSchedulerType(PyObject *self ATTRIBUTE_UNUSED,
-                                  PyObject *args) {
+                                  PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain, *info;
     char *c_retval;
@@ -1423,7 +1432,8 @@ cleanup:
 
 static PyObject *
 libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
-                                PyObject *args) {
+                                PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain, *pycpumaps = NULL;
     virDomainInfo dominfo;
@@ -1772,7 +1782,8 @@ static PyObject *libvirt_virPythonErrorFuncHandler = NULL;
 static PyObject *libvirt_virPythonErrorFuncCtxt = NULL;
 
 static PyObject *
-libvirt_virGetLastError(PyObject *self ATTRIBUTE_UNUSED, PyObject *args ATTRIBUTE_UNUSED)
+libvirt_virGetLastError(PyObject *self ATTRIBUTE_UNUSED,
+                        PyObject *args ATTRIBUTE_UNUSED)
 {
     virError *err;
     PyObject *info;
@@ -1796,7 +1807,8 @@ libvirt_virGetLastError(PyObject *self ATTRIBUTE_UNUSED, PyObject *args ATTRIBUT
 }
 
 static PyObject *
-libvirt_virConnGetLastError(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virConnGetLastError(PyObject *self ATTRIBUTE_UNUSED,
+                            PyObject *args)
 {
     virError *err;
     PyObject *info;
@@ -1829,7 +1841,8 @@ libvirt_virConnGetLastError(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 }
 
 static void
-libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx, virErrorPtr err)
+libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx,
+                            virErrorPtr err)
 {
     PyObject *list, *info;
     PyObject *result;
@@ -1870,8 +1883,8 @@ libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx, virErrorPtr err)
 }
 
 static PyObject *
-libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject * self,
-                               PyObject * args)
+libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject *self,
+                                PyObject *args)
 {
     PyObject *py_retval;
     PyObject *pyobj_f;
@@ -1906,9 +1919,11 @@ libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject * self,
     return py_retval;
 }
 
-static int virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
-                                         unsigned int ncred,
-                                         void *cbdata) {
+static int
+virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
+                              unsigned int ncred,
+                              void *cbdata)
+{
     PyObject *list;
     PyObject *pycred;
     PyObject *pyauth = (PyObject *)cbdata;
@@ -1989,7 +2004,9 @@ static int virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
 
 
 static PyObject *
-libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
+{
     PyObject *py_retval;
     virConnectPtr c_retval;
     char * name;
@@ -2038,7 +2055,8 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
  ************************************************************************/
 
 static PyObject *
-libvirt_virGetVersion(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virGetVersion(PyObject *self ATTRIBUTE_UNUSED,
+                      PyObject *args)
 {
     char *type = NULL;
     unsigned long libVer, typeVer = 0;
@@ -2173,7 +2191,8 @@ libvirt_virConnectGetLibVersion(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virConnectListDomainsID(PyObject *self ATTRIBUTE_UNUSED,
-                                PyObject *args) {
+                                PyObject *args)
+{
     PyObject *py_retval;
     int *ids = NULL, c_retval;
     size_t i;
@@ -2266,7 +2285,8 @@ cleanup:
 
 static PyObject *
 libvirt_virConnectListDefinedDomains(PyObject *self ATTRIBUTE_UNUSED,
-                                     PyObject *args) {
+                                     PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -2519,7 +2539,8 @@ cleanup:
 
 static PyObject *
 libvirt_virDomainRevertToSnapshot(PyObject *self ATTRIBUTE_UNUSED,
-                                  PyObject *args) {
+                                  PyObject *args)
+{
     int c_retval;
     virDomainSnapshotPtr snap;
     PyObject *pyobj_snap;
@@ -2540,7 +2561,9 @@ libvirt_virDomainRevertToSnapshot(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virDomainGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetInfo(PyObject *self ATTRIBUTE_UNUSED,
+                         PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr domain;
@@ -2567,7 +2590,8 @@ libvirt_virDomainGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
-libvirt_virDomainGetState(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virDomainGetState(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
 {
     PyObject *py_retval;
     int c_retval;
@@ -2596,7 +2620,9 @@ libvirt_virDomainGetState(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 }
 
 static PyObject *
-libvirt_virDomainGetControlInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetControlInfo(PyObject *self ATTRIBUTE_UNUSED,
+                                PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr domain;
@@ -2622,7 +2648,9 @@ libvirt_virDomainGetControlInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 }
 
 static PyObject *
-libvirt_virDomainGetBlockInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetBlockInfo(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr domain;
@@ -2648,7 +2676,9 @@ libvirt_virDomainGetBlockInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
-libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED,
+                       PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virConnectPtr conn;
@@ -2677,7 +2707,9 @@ libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
-libvirt_virNodeGetSecurityModel(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNodeGetSecurityModel(PyObject *self ATTRIBUTE_UNUSED,
+                                PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virConnectPtr conn;
@@ -2700,7 +2732,9 @@ libvirt_virNodeGetSecurityModel(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 }
 
 static PyObject *
-libvirt_virDomainGetSecurityLabel(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetSecurityLabel(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr dom;
@@ -2784,7 +2818,9 @@ libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 0) */
 
 static PyObject *
-libvirt_virDomainGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                         PyObject *args)
+{
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
     virDomainPtr domain;
@@ -2810,7 +2846,8 @@ libvirt_virDomainGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virDomainGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
-                               PyObject *args) {
+                               PyObject *args)
+{
     PyObject *py_retval;
     char uuidstr[VIR_UUID_STRING_BUFLEN];
     virDomainPtr dom;
@@ -2836,7 +2873,9 @@ libvirt_virDomainGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virDomainLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     virDomainPtr c_retval;
     virConnectPtr conn;
@@ -2861,7 +2900,8 @@ libvirt_virDomainLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virConnectListNetworks(PyObject *self ATTRIBUTE_UNUSED,
-                               PyObject *args) {
+                               PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -2907,7 +2947,8 @@ libvirt_virConnectListNetworks(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virConnectListDefinedNetworks(PyObject *self ATTRIBUTE_UNUSED,
-                                      PyObject *args) {
+                                      PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3001,7 +3042,9 @@ cleanup:
 
 
 static PyObject *
-libvirt_virNetworkGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNetworkGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
+{
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
     virNetworkPtr domain;
@@ -3027,7 +3070,8 @@ libvirt_virNetworkGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virNetworkGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
-                                PyObject *args) {
+                                PyObject *args)
+{
     PyObject *py_retval;
     char uuidstr[VIR_UUID_STRING_BUFLEN];
     virNetworkPtr net;
@@ -3053,7 +3097,9 @@ libvirt_virNetworkGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virNetworkLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNetworkLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
     PyObject *py_retval;
     virNetworkPtr c_retval;
     virConnectPtr conn;
@@ -3077,7 +3123,9 @@ libvirt_virNetworkLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) 
 
 
 static PyObject *
-libvirt_virDomainGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     int c_retval, autostart;
     virDomainPtr domain;
@@ -3100,7 +3148,9 @@ libvirt_virDomainGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 
 static PyObject *
-libvirt_virNetworkGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNetworkGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
     PyObject *py_retval;
     int c_retval, autostart;
     virNetworkPtr network;
@@ -3122,7 +3172,8 @@ libvirt_virNetworkGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) 
 }
 
 static PyObject *
-libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
 {
     PyObject *py_retval;
     PyObject *pyobj_conn;
@@ -3159,7 +3210,8 @@ libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED, PyObject *arg
 }
 
 static PyObject *
-libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virNodeGetCPUStats(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
 {
     PyObject *ret = NULL;
     PyObject *key = NULL;
@@ -3223,7 +3275,8 @@ error:
 }
 
 static PyObject *
-libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virNodeGetMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
 {
     PyObject *ret = NULL;
     PyObject *key = NULL;
@@ -3288,7 +3341,8 @@ error:
 
 static PyObject *
 libvirt_virConnectListStoragePools(PyObject *self ATTRIBUTE_UNUSED,
-                                   PyObject *args) {
+                                   PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3342,7 +3396,8 @@ libvirt_virConnectListStoragePools(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virConnectListDefinedStoragePools(PyObject *self ATTRIBUTE_UNUSED,
-                                          PyObject *args) {
+                                          PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3444,7 +3499,8 @@ cleanup:
 
 static PyObject *
 libvirt_virStoragePoolListVolumes(PyObject *self ATTRIBUTE_UNUSED,
-                                  PyObject *args) {
+                                  PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3547,7 +3603,9 @@ cleanup:
 
 
 static PyObject *
-libvirt_virStoragePoolGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virStoragePoolGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
+                                   PyObject *args)
+{
     PyObject *py_retval;
     int c_retval, autostart;
     virStoragePoolPtr pool;
@@ -3570,7 +3628,9 @@ libvirt_virStoragePoolGetAutostart(PyObject *self ATTRIBUTE_UNUSED, PyObject *ar
 }
 
 static PyObject *
-libvirt_virStoragePoolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virStoragePoolGetInfo(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virStoragePoolPtr pool;
@@ -3602,7 +3662,9 @@ libvirt_virStoragePoolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 
 static PyObject *
-libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virStorageVolPtr pool;
@@ -3630,7 +3692,9 @@ libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
-libvirt_virStoragePoolGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virStoragePoolGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
     virStoragePoolPtr pool;
@@ -3657,7 +3721,8 @@ libvirt_virStoragePoolGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virStoragePoolGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
-                                    PyObject *args) {
+                                    PyObject *args)
+{
     PyObject *py_retval;
     char uuidstr[VIR_UUID_STRING_BUFLEN];
     virStoragePoolPtr pool;
@@ -3682,7 +3747,9 @@ libvirt_virStoragePoolGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virStoragePoolLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virStoragePoolLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                                   PyObject *args)
+{
     PyObject *py_retval;
     virStoragePoolPtr c_retval;
     virConnectPtr conn;
@@ -3706,7 +3773,8 @@ libvirt_virStoragePoolLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *ar
 
 static PyObject *
 libvirt_virNodeListDevices(PyObject *self ATTRIBUTE_UNUSED,
-                           PyObject *args) {
+                           PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3802,7 +3870,8 @@ cleanup:
 
 static PyObject *
 libvirt_virNodeDeviceListCaps(PyObject *self ATTRIBUTE_UNUSED,
-                              PyObject *args) {
+                              PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -3845,7 +3914,9 @@ libvirt_virNodeDeviceListCaps(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virSecretGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virSecretGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                         PyObject *args)
+{
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
     virSecretPtr secret;
@@ -3871,7 +3942,8 @@ libvirt_virSecretGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virSecretGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
-                               PyObject *args) {
+                               PyObject *args)
+{
     PyObject *py_retval;
     char uuidstr[VIR_UUID_STRING_BUFLEN];
     virSecretPtr dom;
@@ -3897,7 +3969,9 @@ libvirt_virSecretGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virSecretLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virSecretLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
     PyObject *py_retval;
     virSecretPtr c_retval;
     virConnectPtr conn;
@@ -3922,7 +3996,8 @@ libvirt_virSecretLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virConnectListSecrets(PyObject *self ATTRIBUTE_UNUSED,
-                              PyObject *args) {
+                              PyObject *args)
+{
     PyObject *py_retval;
     char **uuids = NULL;
     virConnectPtr conn;
@@ -4015,7 +4090,8 @@ cleanup:
 
 static PyObject *
 libvirt_virSecretGetValue(PyObject *self ATTRIBUTE_UNUSED,
-                          PyObject *args) {
+                          PyObject *args)
+{
     PyObject *py_retval;
     unsigned char *c_retval;
     size_t size;
@@ -4043,7 +4119,8 @@ libvirt_virSecretGetValue(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virSecretSetValue(PyObject *self ATTRIBUTE_UNUSED,
-                          PyObject *args) {
+                          PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virSecretPtr secret;
@@ -4067,7 +4144,9 @@ libvirt_virSecretSetValue(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virNWFilterGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNWFilterGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
+{
     PyObject *py_retval;
     unsigned char uuid[VIR_UUID_BUFLEN];
     virNWFilterPtr nwfilter;
@@ -4093,7 +4172,8 @@ libvirt_virNWFilterGetUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 static PyObject *
 libvirt_virNWFilterGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
-                                 PyObject *args) {
+                                 PyObject *args)
+{
     PyObject *py_retval;
     char uuidstr[VIR_UUID_STRING_BUFLEN];
     virNWFilterPtr nwfilter;
@@ -4119,7 +4199,9 @@ libvirt_virNWFilterGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virNWFilterLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virNWFilterLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                                PyObject *args)
+{
     PyObject *py_retval;
     virNWFilterPtr c_retval;
     virConnectPtr conn;
@@ -4144,7 +4226,8 @@ libvirt_virNWFilterLookupByUUID(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 
 static PyObject *
 libvirt_virConnectListNWFilters(PyObject *self ATTRIBUTE_UNUSED,
-                                PyObject *args) {
+                                PyObject *args)
+{
     PyObject *py_retval;
     char **uuids = NULL;
     virConnectPtr conn;
@@ -4237,7 +4320,8 @@ cleanup:
 
 static PyObject *
 libvirt_virConnectListInterfaces(PyObject *self ATTRIBUTE_UNUSED,
-                                 PyObject *args) {
+                                 PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -4291,7 +4375,8 @@ libvirt_virConnectListInterfaces(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virConnectListDefinedInterfaces(PyObject *self ATTRIBUTE_UNUSED,
-                                        PyObject *args) {
+                                        PyObject *args)
+{
     PyObject *py_retval;
     char **names = NULL;
     int c_retval;
@@ -4395,7 +4480,8 @@ cleanup:
 
 static PyObject *
 libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
-                              PyObject *args) {
+                              PyObject *args)
+{
     PyObject *pyobj_conn;
     PyObject *list;
     virConnectPtr conn;
@@ -4449,7 +4535,9 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
 
 
 static PyObject *
-libvirt_virDomainGetJobInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetJobInfo(PyObject *self ATTRIBUTE_UNUSED,
+                            PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     virDomainPtr domain;
@@ -4484,7 +4572,8 @@ libvirt_virDomainGetJobInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 #if LIBVIR_CHECK_VERSION(1, 0, 3)
 static PyObject *
-libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virDomainGetJobStats(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
 {
     PyObject *pyobj_domain;
     virDomainPtr domain;
@@ -4895,7 +4984,8 @@ static PyObject *libvirt_module    = NULL;
 static PyObject *libvirt_dict      = NULL;
 
 static PyObject *
-getLibvirtModuleObject(void) {
+getLibvirtModuleObject(void)
+{
     if (libvirt_module)
         return libvirt_module;
 
@@ -4912,7 +5002,8 @@ getLibvirtModuleObject(void) {
 }
 
 static PyObject *
-getLibvirtDictObject(void) {
+getLibvirtDictObject(void)
+{
     if (libvirt_dict)
         return libvirt_dict;
 
@@ -5038,7 +5129,7 @@ libvirt_virConnectDomainEventRegister(ATTRIBUTE_UNUSED PyObject *self,
 }
 
 static PyObject *
-libvirt_virConnectDomainEventDeregister(ATTRIBUTE_UNUSED PyObject *self,
+libvirt_virConnectDomainEventDeregister(PyObject *self ATTRIBUTE_UNUSED,
                                         PyObject *args)
 {
     PyObject *py_retval;
@@ -5087,11 +5178,11 @@ static char *removeTimeoutName;
 #define NAME(fn) ( fn ## Name ? fn ## Name : # fn )
 
 static int
-libvirt_virEventAddHandleFunc  (int fd,
-                                int event,
-                                virEventHandleCallback cb,
-                                void *opaque,
-                                virFreeCallback ff)
+libvirt_virEventAddHandleFunc(int fd,
+                              int event,
+                              virEventHandleCallback cb,
+                              void *opaque,
+                              virFreeCallback ff)
 {
     PyObject *result;
     PyObject *python_cb;
@@ -5145,7 +5236,8 @@ cleanup:
 }
 
 static void
-libvirt_virEventUpdateHandleFunc(int watch, int event)
+libvirt_virEventUpdateHandleFunc(int watch,
+                                 int event)
 {
     PyObject *result;
     PyObject *pyobj_args;
@@ -5269,7 +5361,8 @@ cleanup:
 }
 
 static void
-libvirt_virEventUpdateTimeoutFunc(int timer, int timeout)
+libvirt_virEventUpdateTimeoutFunc(int timer,
+                                  int timeout)
 {
     PyObject *result = NULL;
     PyObject *pyobj_args;
@@ -5333,8 +5426,8 @@ libvirt_virEventRemoveTimeoutFunc(int timer)
 }
 
 static PyObject *
-libvirt_virEventRegisterImpl(ATTRIBUTE_UNUSED PyObject * self,
-                             PyObject * args)
+libvirt_virEventRegisterImpl(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
 {
     /* Unref the previously-registered impl (if any) */
     Py_XDECREF(addHandleObj);
@@ -6597,7 +6690,7 @@ libvirt_virConnectDomainEventDeviceAddedCallback(virConnectPtr conn ATTRIBUTE_UN
 #endif /* VIR_DOMAIN_EVENT_ID_DEVICE_ADDED */
 
 static PyObject *
-libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
+libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                          PyObject *args)
 {
     PyObject *py_retval;        /* return value */
@@ -6723,7 +6816,7 @@ libvirt_virConnectDomainEventRegisterAny(ATTRIBUTE_UNUSED PyObject *self,
 }
 
 static PyObject *
-libvirt_virConnectDomainEventDeregisterAny(ATTRIBUTE_UNUSED PyObject *self,
+libvirt_virConnectDomainEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                            PyObject *args)
 {
     PyObject *py_retval;
@@ -6872,9 +6965,9 @@ libvirt_virConnectNetworkEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     return py_retval;
 }
 
-static PyObject
-*libvirt_virConnectNetworkEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
-                                             PyObject *args)
+static PyObject *
+libvirt_virConnectNetworkEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
+                                            PyObject *args)
 {
     PyObject *py_retval;
     PyObject *pyobj_conn;
@@ -6940,8 +7033,8 @@ libvirt_virConnectCloseCallbackDispatch(virConnectPtr conn ATTRIBUTE_UNUSED,
 }
 
 static PyObject *
-libvirt_virConnectRegisterCloseCallback(ATTRIBUTE_UNUSED PyObject * self,
-                                        PyObject * args)
+libvirt_virConnectRegisterCloseCallback(PyObject *self ATTRIBUTE_UNUSED,
+                                        PyObject *args)
 {
     PyObject *py_retval;        /* return value */
     PyObject *pyobj_conn;       /* virConnectPtr */
@@ -6978,7 +7071,7 @@ libvirt_virConnectRegisterCloseCallback(ATTRIBUTE_UNUSED PyObject * self,
 }
 
 static PyObject *
-libvirt_virConnectUnregisterCloseCallback(ATTRIBUTE_UNUSED PyObject * self,
+libvirt_virConnectUnregisterCloseCallback(PyObject * self ATTRIBUTE_UNUSED,
                                           PyObject * args)
 {
     PyObject *py_retval;
@@ -7233,7 +7326,9 @@ libvirt_virDomainMigrateGetCompressionCache(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
 
 static PyObject *
-libvirt_virDomainMigrateGetMaxSpeed(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainMigrateGetMaxSpeed(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
     PyObject *py_retval;
     int c_retval;
     unsigned long bandwidth;
@@ -7323,7 +7418,8 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
 
 static PyObject *
 libvirt_virDomainBlockPeek(PyObject *self ATTRIBUTE_UNUSED,
-                           PyObject *args) {
+                           PyObject *args)
+{
     PyObject *py_retval = NULL;
     int c_retval;
     virDomainPtr domain;
@@ -7361,7 +7457,8 @@ cleanup:
 
 static PyObject *
 libvirt_virDomainMemoryPeek(PyObject *self ATTRIBUTE_UNUSED,
-                            PyObject *args) {
+                            PyObject *args)
+{
     PyObject *py_retval = NULL;
     int c_retval;
     virDomainPtr domain;
@@ -7592,7 +7689,9 @@ error:
 
 #if LIBVIR_CHECK_VERSION(1, 1, 1)
 static PyObject *
-libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED,
+                                 PyObject *args)
+{
     PyObject *py_retval = NULL;
     int c_retval;
     virDomainPtr domain;
@@ -7637,7 +7736,9 @@ cleanup:
 
 
 static PyObject *
-libvirt_virDomainCreateXMLWithFiles(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainCreateXMLWithFiles(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
     PyObject *py_retval = NULL;
     virDomainPtr c_retval;
     virConnectPtr conn;
@@ -7685,7 +7786,9 @@ cleanup:
 
 #if LIBVIR_CHECK_VERSION(1, 2, 5)
 static PyObject *
-libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
+{
     PyObject *py_retval = NULL;
     int c_retval;
     virDomainPtr domain;
@@ -7731,7 +7834,9 @@ cleanup:
 
 
 static PyObject *
-libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED,
+                        PyObject *args)
+{
     PyObject *py_retval = NULL;
     int c_retval;
     virDomainPtr domain;
@@ -7776,7 +7881,9 @@ libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 }
 
 static PyObject *
-libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED,
+                         PyObject *args)
+{
     PyObject *py_retval = NULL;
     PyObject *dict = NULL;
     PyObject *pyobj_domain, *pyobj_seconds, *pyobj_nseconds;
@@ -7822,7 +7929,9 @@ libvirt_virDomainGetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 
 
 static PyObject *
-libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED,
+                         PyObject *args)
+{
     PyObject *pyobj_domain;
     PyObject *pyobj_seconds;
     PyObject *pyobj_nseconds;
@@ -7874,7 +7983,8 @@ libvirt_virDomainSetTime(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
 #if LIBVIR_CHECK_VERSION(1, 2, 6)
 static PyObject *
 libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
-                            PyObject *args) {
+                            PyObject *args)
+{
     PyObject *py_retval = NULL;
     PyObject *pyobj_conn;
     PyObject *pyobj_pagesize;
@@ -8201,7 +8311,8 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
 
 
 static PyObject *
-libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
 {
     PyObject *pyobj_dom = NULL;
     PyObject *pyobj_dict = NULL;
@@ -8237,7 +8348,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
 #if LIBVIR_CHECK_VERSION(1, 2, 9)
 static PyObject *
 libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
-                                    PyObject *args)
+                          PyObject *args)
 {
     PyObject *pyobj_conn;
     PyObject *pyobj_pages;
@@ -8301,7 +8412,9 @@ libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
 #if LIBVIR_CHECK_VERSION(1, 2, 11)
 
 static PyObject *
-libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED, PyObject *args) {
+libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
+{
     virDomainPtr domain;
     PyObject *pyobj_domain;
     unsigned int flags;

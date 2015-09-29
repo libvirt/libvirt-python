@@ -125,7 +125,8 @@ libvirt_qemu_lookupPythonFunc(const char *funcname)
 
 static PyObject *
 libvirt_qemu_virDomainQemuMonitorCommand(PyObject *self ATTRIBUTE_UNUSED,
-                                    PyObject *args) {
+                                         PyObject *args)
+{
     PyObject *py_retval;
     char *result = NULL;
     virDomainPtr domain;
@@ -155,7 +156,8 @@ libvirt_qemu_virDomainQemuMonitorCommand(PyObject *self ATTRIBUTE_UNUSED,
 
 #if LIBVIR_CHECK_VERSION(0, 10, 0)
 static PyObject *
-libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)
+libvirt_qemu_virDomainQemuAgentCommand(PyObject *self ATTRIBUTE_UNUSED,
+                                       PyObject *args)
 {
     PyObject *py_retval;
     char *result = NULL;

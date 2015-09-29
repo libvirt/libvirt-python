@@ -152,7 +152,8 @@ libvirt_boolWrap(int val)
 }
 
 int
-libvirt_intUnwrap(PyObject *obj, int *val)
+libvirt_intUnwrap(PyObject *obj,
+                  int *val)
 {
     long long_val;
 
@@ -188,7 +189,8 @@ libvirt_intUnwrap(PyObject *obj, int *val)
 }
 
 int
-libvirt_uintUnwrap(PyObject *obj, unsigned int *val)
+libvirt_uintUnwrap(PyObject *obj,
+                   unsigned int *val)
 {
     long long_val;
 
@@ -216,7 +218,8 @@ libvirt_uintUnwrap(PyObject *obj, unsigned int *val)
 }
 
 int
-libvirt_longUnwrap(PyObject *obj, long *val)
+libvirt_longUnwrap(PyObject *obj,
+                   long *val)
 {
     long long_val;
 
@@ -234,7 +237,8 @@ libvirt_longUnwrap(PyObject *obj, long *val)
 }
 
 int
-libvirt_ulongUnwrap(PyObject *obj, unsigned long *val)
+libvirt_ulongUnwrap(PyObject *obj,
+                    unsigned long *val)
 {
     long long_val;
 
@@ -258,7 +262,8 @@ libvirt_ulongUnwrap(PyObject *obj, unsigned long *val)
 }
 
 int
-libvirt_longlongUnwrap(PyObject *obj, long long *val)
+libvirt_longlongUnwrap(PyObject *obj,
+                       long long *val)
 {
     long long llong_val = -1;
 
@@ -287,7 +292,8 @@ libvirt_longlongUnwrap(PyObject *obj, long long *val)
 }
 
 int
-libvirt_ulonglongUnwrap(PyObject *obj, unsigned long long *val)
+libvirt_ulonglongUnwrap(PyObject *obj,
+                        unsigned long long *val)
 {
     unsigned long long ullong_val = -1;
 
@@ -324,7 +330,8 @@ libvirt_ulonglongUnwrap(PyObject *obj, unsigned long long *val)
 }
 
 int
-libvirt_doubleUnwrap(PyObject *obj, double *val)
+libvirt_doubleUnwrap(PyObject *obj,
+                     double *val)
 {
     double double_val;
 
@@ -342,7 +349,8 @@ libvirt_doubleUnwrap(PyObject *obj, double *val)
 }
 
 int
-libvirt_boolUnwrap(PyObject *obj, bool *val)
+libvirt_boolUnwrap(PyObject *obj,
+                   bool *val)
 {
     int ret;
 
@@ -359,7 +367,8 @@ libvirt_boolUnwrap(PyObject *obj, bool *val)
 }
 
 int
-libvirt_charPtrUnwrap(PyObject *obj, char **str)
+libvirt_charPtrUnwrap(PyObject *obj,
+                      char **str)
 {
 #if PY_MAJOR_VERSION > 2
     PyObject *bytes;
@@ -386,7 +395,10 @@ libvirt_charPtrUnwrap(PyObject *obj, char **str)
     return ret && *str ? 0 : -1;
 }
 
-int libvirt_charPtrSizeUnwrap(PyObject *obj, char **str, Py_ssize_t *size)
+int
+libvirt_charPtrSizeUnwrap(PyObject *obj,
+                          char **str,
+                          Py_ssize_t *size)
 {
     int ret;
 #if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION <= 4

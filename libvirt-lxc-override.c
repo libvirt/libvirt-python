@@ -55,7 +55,8 @@ extern void initcygvirtmod_lxc(void);
 
 static PyObject *
 libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
-                                      PyObject *args) {
+                                      PyObject *args)
+{
     PyObject *py_retval;
     virDomainPtr domain;
     PyObject *pyobj_domain;

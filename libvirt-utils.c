@@ -46,8 +46,9 @@
  *
  * Returns -1 on failure to allocate, zero on success
  */
-int virAlloc(void *ptrptr,
-             size_t size)
+int
+virAlloc(void *ptrptr,
+         size_t size)
 {
     *(void **)ptrptr = calloc(1, size);
     if (*(void **)ptrptr == NULL) {
@@ -69,9 +70,10 @@ int virAlloc(void *ptrptr,
  *
  * Returns -1 on failure to allocate, zero on success
  */
-int virAllocN(void *ptrptr,
-              size_t size,
-              size_t count)
+int
+virAllocN(void *ptrptr,
+          size_t size,
+          size_t count)
 {
     *(void**)ptrptr = calloc(count, size);
     if (*(void**)ptrptr == NULL) {
@@ -94,9 +96,10 @@ int virAllocN(void *ptrptr,
  *
  * Returns -1 on failure to allocate, zero on success
  */
-int virReallocN(void *ptrptr,
-                size_t size,
-                size_t count)
+int
+virReallocN(void *ptrptr,
+            size_t size,
+            size_t count)
 {
     void *tmp;
 
@@ -121,7 +124,8 @@ int virReallocN(void *ptrptr,
  * the 'ptrptr' variable. After release, 'ptrptr' will be
  * updated to point to NULL.
  */
-void virFree(void *ptrptr)
+void
+virFree(void *ptrptr)
 {
     int save_errno = errno;
 
@@ -131,7 +135,8 @@ void virFree(void *ptrptr)
 }
 
 
-int virFileClose(int *fdptr)
+int
+virFileClose(int *fdptr)
 {
     int saved_errno = 0;
     int rc = 0;
