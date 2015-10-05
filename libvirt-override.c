@@ -440,13 +440,13 @@ libvirt_virDomainGetSchedulerType(PyObject *self ATTRIBUTE_UNUSED,
         return VIR_PY_NONE;
 
     /* convert to a Python tuple of long objects */
-    if ((info = PyTuple_New(2)) == NULL) {
-        VIR_FREE(c_retval);
-        return NULL;
-    }
+    if ((info = PyTuple_New(2)) == NULL)
+        goto cleanup;
 
     PyTuple_SetItem(info, 0, libvirt_constcharPtrWrap(c_retval));
     PyTuple_SetItem(info, 1, libvirt_intWrap((long)nparams));
+
+ cleanup:
     VIR_FREE(c_retval);
     return info;
 }
@@ -2240,8 +2240,8 @@ libvirt_virConnectListDomainsID(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListDomains(conn, ids, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(ids);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -2335,8 +2335,8 @@ libvirt_virConnectListDefinedDomains(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListDefinedDomains(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -2349,8 +2349,9 @@ libvirt_virConnectListDefinedDomains(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -2386,8 +2387,8 @@ libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virDomainSnapshotListNames(dom, names, c_retval, flags);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
     py_retval = PyList_New(c_retval);
@@ -2401,12 +2402,12 @@ libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
             Py_CLEAR(py_retval);
             goto cleanup;
         }
-        VIR_FREE(names[i]);
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -2489,8 +2490,8 @@ libvirt_virDomainSnapshotListChildrenNames(PyObject *self ATTRIBUTE_UNUSED,
                                                       flags);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -2508,8 +2509,9 @@ libvirt_virDomainSnapshotListChildrenNames(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -2972,8 +2974,8 @@ libvirt_virConnectListNetworks(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListNetworks(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -2986,8 +2988,9 @@ libvirt_virConnectListNetworks(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -3023,8 +3026,8 @@ libvirt_virConnectListDefinedNetworks(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListDefinedNetworks(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -3037,8 +3040,9 @@ libvirt_virConnectListDefinedNetworks(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -3245,8 +3249,8 @@ libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     if (c_retval < 0) {
-        VIR_FREE(freeMems);
-        return VIR_PY_NONE;
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
     }
 
     if ((py_retval = PyList_New(c_retval)) == NULL)
@@ -3421,28 +3425,24 @@ libvirt_virConnectListStoragePools(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListStoragePools(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
-    py_retval = PyList_New(c_retval);
-    if (py_retval == NULL) {
-        if (names) {
-            for (i = 0; i < c_retval; i++)
-                VIR_FREE(names[i]);
-            VIR_FREE(names);
-        }
-        return NULL;
-    }
+
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
 
     if (names) {
-        for (i = 0; i < c_retval; i++) {
+        for (i = 0; i < c_retval; i++)
             PyList_SetItem(py_retval, i, libvirt_constcharPtrWrap(names[i]));
-            VIR_FREE(names[i]);
-        }
-        VIR_FREE(names);
     }
 
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
+    VIR_FREE(names);
     return py_retval;
 }
 
@@ -3476,28 +3476,24 @@ libvirt_virConnectListDefinedStoragePools(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListDefinedStoragePools(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
-    py_retval = PyList_New(c_retval);
-    if (py_retval == NULL) {
-        if (names) {
-            for (i = 0; i < c_retval; i++)
-                VIR_FREE(names[i]);
-            VIR_FREE(names);
-        }
-        return NULL;
-    }
+
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
 
     if (names) {
-        for (i = 0; i < c_retval; i++) {
+        for (i = 0; i < c_retval; i++)
             PyList_SetItem(py_retval, i, libvirt_constcharPtrWrap(names[i]));
-            VIR_FREE(names[i]);
-        }
-        VIR_FREE(names);
     }
 
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
+    VIR_FREE(names);
     return py_retval;
 }
 
@@ -3579,28 +3575,24 @@ libvirt_virStoragePoolListVolumes(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virStoragePoolListVolumes(pool, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
-    py_retval = PyList_New(c_retval);
-    if (py_retval == NULL) {
-        if (names) {
-            for (i = 0; i < c_retval; i++)
-                VIR_FREE(names[i]);
-            VIR_FREE(names);
-        }
-        return NULL;
-    }
+
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
 
     if (names) {
-        for (i = 0; i < c_retval; i++) {
+        for (i = 0; i < c_retval; i++)
             PyList_SetItem(py_retval, i, libvirt_constcharPtrWrap(names[i]));
-            VIR_FREE(names[i]);
-        }
-        VIR_FREE(names);
     }
 
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
+    VIR_FREE(names);
     return py_retval;
 }
 
@@ -3850,9 +3842,10 @@ libvirt_virNodeListDevices(PyObject *self ATTRIBUTE_UNUSED,
         LIBVIRT_BEGIN_ALLOW_THREADS;
         c_retval = virNodeListDevices(conn, cap, names, c_retval, flags);
         LIBVIRT_END_ALLOW_THREADS;
+
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -3865,8 +3858,9 @@ libvirt_virNodeListDevices(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -3947,8 +3941,8 @@ libvirt_virNodeDeviceListCaps(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virNodeDeviceListCaps(dev, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -3961,8 +3955,9 @@ libvirt_virNodeDeviceListCaps(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(names[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
     VIR_FREE(names);
     return py_retval;
 }
@@ -4072,8 +4067,8 @@ libvirt_virConnectListSecrets(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListSecrets(conn, uuids, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(uuids);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -4086,8 +4081,9 @@ libvirt_virConnectListSecrets(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(uuids[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(uuids[i]);
     VIR_FREE(uuids);
     return py_retval;
 }
@@ -4301,8 +4297,8 @@ libvirt_virConnectListNWFilters(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListNWFilters(conn, uuids, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(uuids);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
 
@@ -4315,8 +4311,9 @@ libvirt_virConnectListNWFilters(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    for (i = 0; i < c_retval; i++)
-        VIR_FREE(uuids[i]);
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(uuids[i]);
     VIR_FREE(uuids);
     return py_retval;
 }
@@ -4400,28 +4397,24 @@ libvirt_virConnectListInterfaces(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListInterfaces(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
-    py_retval = PyList_New(c_retval);
-    if (py_retval == NULL) {
-        if (names) {
-            for (i = 0; i < c_retval; i++)
-                VIR_FREE(names[i]);
-            VIR_FREE(names);
-        }
-        return NULL;
-    }
+
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
 
     if (names) {
-        for (i = 0; i < c_retval; i++) {
+        for (i = 0; i < c_retval; i++)
             PyList_SetItem(py_retval, i, libvirt_constcharPtrWrap(names[i]));
-            VIR_FREE(names[i]);
-        }
-        VIR_FREE(names);
     }
 
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
+    VIR_FREE(names);
     return py_retval;
 }
 
@@ -4457,28 +4450,24 @@ libvirt_virConnectListDefinedInterfaces(PyObject *self ATTRIBUTE_UNUSED,
         c_retval = virConnectListDefinedInterfaces(conn, names, c_retval);
         LIBVIRT_END_ALLOW_THREADS;
         if (c_retval < 0) {
-            VIR_FREE(names);
-            return VIR_PY_NONE;
+            py_retval = VIR_PY_NONE;
+            goto cleanup;
         }
     }
-    py_retval = PyList_New(c_retval);
-    if (py_retval == NULL) {
-        if (names) {
-            for (i = 0; i < c_retval; i++)
-                VIR_FREE(names[i]);
-            VIR_FREE(names);
-        }
-        return NULL;
-    }
+
+    if ((py_retval = PyList_New(c_retval)) == NULL)
+        goto cleanup;
 
     if (names) {
-        for (i = 0; i < c_retval; i++) {
+        for (i = 0; i < c_retval; i++)
             PyList_SetItem(py_retval, i, libvirt_constcharPtrWrap(names[i]));
-            VIR_FREE(names[i]);
-        }
-        VIR_FREE(names);
     }
 
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            VIR_FREE(names[i]);
+    VIR_FREE(names);
     return py_retval;
 }
 
@@ -4894,11 +4883,10 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    if (disks) {
+    if (count > 0)
         for (i = 0; i < count; i++)
             VIR_FREE(disks[i].disk);
-        VIR_FREE(disks);
-    }
+    VIR_FREE(disks);
     return py_retval;
 }
 
@@ -8186,10 +8174,9 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
     }
 
  cleanup:
-    if (leases) {
+    if (leases_count > 0)
         for (i = 0; i < leases_count; i++)
             virNetworkDHCPLeaseFree(leases[i]);
-    }
     VIR_FREE(leases);
 
     return py_retval;
@@ -8458,17 +8445,19 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
 
     /* convert to a Python list */
     if ((py_retval = PyList_New(c_retval)) == NULL)
-        goto cleanup;
+        goto error;
 
     for (i = 0; i < c_retval; i++) {
         virDomainFSInfoPtr fs = fsinfo[i];
         PyObject *info, *alias;
 
         if (fs == NULL)
-            goto cleanup;
+            goto error;
+
         info = PyTuple_New(4);
         if (info == NULL)
-            goto cleanup;
+            goto error;
+
         PyList_SetItem(py_retval, i, info);
 
         PyTuple_SetItem(info, 0, libvirt_constcharPtrWrap(fs->mountpoint));
@@ -8477,27 +8466,26 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
 
         alias = PyList_New(0);
         if (alias == NULL)
-            goto cleanup;
+            goto error;
 
         PyTuple_SetItem(info, 3, alias);
 
         for (j = 0; j < fs->ndevAlias; j++)
             if (PyList_Append(alias,
                               libvirt_constcharPtrWrap(fs->devAlias[j])) < 0)
-                goto cleanup;
+                goto error;
     }
 
-    for (i = 0; i < c_retval; i++)
-        virDomainFSInfoFree(fsinfo[i]);
+ cleanup:
+    if (c_retval > 0)
+        for (i = 0; i < c_retval; i++)
+            virDomainFSInfoFree(fsinfo[i]);
     VIR_FREE(fsinfo);
     return py_retval;
 
- cleanup:
-    for (i = 0; i < c_retval; i++)
-        virDomainFSInfoFree(fsinfo[i]);
-    VIR_FREE(fsinfo);
-    Py_XDECREF(py_retval);
-    return NULL;
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
 }
 
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
