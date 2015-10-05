@@ -1239,7 +1239,14 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
     if ((pycpuinfo = PyList_New(dominfo.nrVirtCpu)) == NULL)
         goto cleanup;
+
+    if (PyTuple_SetItem(pyretval, 0, pycpuinfo) < 0)
+        goto cleanup;
+
     if ((pycpumap = PyList_New(dominfo.nrVirtCpu)) == NULL)
+        goto cleanup;
+
+    if (PyTuple_SetItem(pyretval, 1, pycpumap) < 0)
         goto cleanup;
 
     for (i = 0; i < dominfo.nrVirtCpu; i++) {
@@ -1249,54 +1256,42 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
         if (info == NULL)
             goto cleanup;
 
+        if (PyList_SetItem(pycpuinfo, i, info) < 0)
+            goto cleanup;
+
         if ((item = libvirt_intWrap((long)cpuinfo[i].number)) == NULL ||
             PyTuple_SetItem(info, 0, item) < 0)
-            goto itemError;
+            goto cleanup;
 
         if ((item = libvirt_intWrap((long)cpuinfo[i].state)) == NULL ||
             PyTuple_SetItem(info, 1, item) < 0)
-            goto itemError;
+            goto cleanup;
 
         if ((item = libvirt_ulonglongWrap(cpuinfo[i].cpuTime)) == NULL ||
             PyTuple_SetItem(info, 2, item) < 0)
-            goto itemError;
+            goto cleanup;
 
         if ((item = libvirt_intWrap((long)cpuinfo[i].cpu)) == NULL ||
             PyTuple_SetItem(info, 3, item) < 0)
-            goto itemError;
-
-        if (PyList_SetItem(pycpuinfo, i, info) < 0)
-            goto itemError;
-
-        continue;
-     itemError:
-        Py_DECREF(info);
-        Py_XDECREF(item);
-        goto cleanup;
+            goto cleanup;
     }
     for (i = 0; i < dominfo.nrVirtCpu; i++) {
         PyObject *info = PyTuple_New(cpunum);
         size_t j;
         if (info == NULL)
             goto cleanup;
+
+        if (PyList_SetItem(pycpumap, i, info) < 0)
+            goto cleanup;
+
         for (j = 0; j < cpunum; j++) {
             PyObject *item = NULL;
             if ((item = PyBool_FromLong(VIR_CPU_USABLE(cpumap, cpumaplen,
                                                        i, j))) == NULL ||
-                PyTuple_SetItem(info, j, item) < 0) {
-                Py_DECREF(info);
-                Py_XDECREF(item);
+                PyTuple_SetItem(info, j, item) < 0)
                 goto cleanup;
-            }
-        }
-        if (PyList_SetItem(pycpumap, i, info) < 0) {
-            Py_DECREF(info);
-            goto cleanup;
         }
     }
-    if (PyTuple_SetItem(pyretval, 0, pycpuinfo) < 0 ||
-        PyTuple_SetItem(pyretval, 1, pycpumap) < 0)
-        goto cleanup;
 
     VIR_FREE(cpuinfo);
     VIR_FREE(cpumap);
@@ -1307,8 +1302,6 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
     VIR_FREE(cpuinfo);
     VIR_FREE(cpumap);
     Py_XDECREF(pyretval);
-    Py_XDECREF(pycpuinfo);
-    Py_XDECREF(pycpumap);
     return error;
 }
 
@@ -1490,12 +1483,13 @@ libvirt_virDomainGetVcpuPinInfo(PyObject *self ATTRIBUTE_UNUSED,
         if (mapinfo == NULL)
             goto cleanup;
 
+        PyList_SetItem(pycpumaps, vcpu, mapinfo);
+
         for (pcpu = 0; pcpu < cpunum; pcpu++) {
             PyTuple_SetItem(mapinfo, pcpu,
                             PyBool_FromLong(VIR_CPU_USABLE(cpumaps, cpumaplen,
                                                            vcpu, pcpu)));
         }
-        PyList_SetItem(pycpumaps, vcpu, mapinfo);
     }
 
     VIR_FREE(cpumaps);
@@ -1878,12 +1872,14 @@ libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx,
         if ((list = PyTuple_New(2)) == NULL)
             goto cleanup;
 
+        Py_XINCREF(libvirt_virPythonErrorFuncCtxt);
+        PyTuple_SetItem(list, 0, libvirt_virPythonErrorFuncCtxt);
+
         if ((info = PyTuple_New(9)) == NULL)
             goto cleanup;
 
-        PyTuple_SetItem(list, 0, libvirt_virPythonErrorFuncCtxt);
         PyTuple_SetItem(list, 1, info);
-        Py_XINCREF(libvirt_virPythonErrorFuncCtxt);
+
         PyTuple_SetItem(info, 0, libvirt_intWrap((long) err->code));
         PyTuple_SetItem(info, 1, libvirt_intWrap((long) err->domain));
         PyTuple_SetItem(info, 2, libvirt_constcharPtrWrap(err->message));
@@ -1895,14 +1891,11 @@ libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx,
         PyTuple_SetItem(info, 8, libvirt_intWrap((long) err->int2));
         /* TODO pass conn and dom if available */
         result = PyEval_CallObject(libvirt_virPythonErrorFuncHandler, list);
-        Py_XDECREF(list);
         Py_XDECREF(result);
     }
 
  cleanup:
     Py_XDECREF(list);
-    Py_XDECREF(info);
-
     LIBVIRT_RELEASE_THREAD_STATE;
 }
 
@@ -1967,6 +1960,8 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
     if ((pycred = PyTuple_New(ncred)) == NULL)
         goto cleanup;
 
+    PyTuple_SetItem(list, 0, pycred);
+
     for (i = 0; i < ncred; i++) {
         PyObject *pycreditem;
         if ((pycreditem = PyList_New(5)) == NULL)
@@ -1990,7 +1985,6 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
         PyList_SetItem(pycreditem, 4, VIR_PY_NONE);
     }
 
-    PyTuple_SetItem(list, 0, pycred);
     Py_XINCREF(pycbdata);
     PyTuple_SetItem(list, 1, pycbdata);
 
@@ -4720,19 +4714,18 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
-    if ((dict = PyDict_New()) == NULL)
-        return NULL;
-
     LIBVIRT_BEGIN_ALLOW_THREADS;
     c_ret = virDomainGetBlockJobInfo(domain, path, &info, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    if (c_ret == 0) {
-        return dict;
-    } else if (c_ret < 0) {
-        Py_DECREF(dict);
+    if (c_ret < 0)
         return VIR_PY_NONE;
-    }
+
+    if ((dict = PyDict_New()) == NULL)
+        return NULL;
+
+    if (c_ret == 0)
+        return dict;
 
     if ((type = libvirt_intWrap(info.type)) == NULL ||
         PyDict_SetItemString(dict, "type", type) < 0)
@@ -5270,15 +5263,21 @@ libvirt_virEventAddHandleFunc(int fd,
                               virFreeCallback ff)
 {
     PyObject *result;
-    PyObject *python_cb;
     PyObject *cb_obj;
     PyObject *ff_obj;
     PyObject *opaque_obj;
+    PyObject *python_cb = NULL;
     PyObject *cb_args = NULL;
     PyObject *pyobj_args = NULL;
     int retval = -1;
 
     LIBVIRT_ENSURE_THREAD_STATE;
+
+    if ((pyobj_args = PyTuple_New(4)) == NULL)
+        goto cleanup;
+
+    PyTuple_SetItem(pyobj_args, 0, libvirt_intWrap(fd));
+    PyTuple_SetItem(pyobj_args, 1, libvirt_intWrap(event));
 
     /* Lookup the python callback */
     python_cb = libvirt_lookupPythonFunc("_eventInvokeHandleCallback");
@@ -5287,25 +5286,20 @@ libvirt_virEventAddHandleFunc(int fd,
     }
     Py_INCREF(python_cb);
 
-    /* create tuple for cb */
-    cb_obj = libvirt_virEventHandleCallbackWrap(cb);
-    ff_obj = libvirt_virFreeCallbackWrap(ff);
-    opaque_obj = libvirt_virVoidPtrWrap(opaque);
+    PyTuple_SetItem(pyobj_args, 2, python_cb);
 
     if ((cb_args = PyTuple_New(3)) == NULL)
         goto cleanup;
 
+    PyTuple_SetItem(pyobj_args, 3, cb_args);
+
+    /* create tuple for cb */
+    cb_obj = libvirt_virEventHandleCallbackWrap(cb);
+    ff_obj = libvirt_virFreeCallbackWrap(ff);
+    opaque_obj = libvirt_virVoidPtrWrap(opaque);
     PyTuple_SetItem(cb_args, 0, cb_obj);
     PyTuple_SetItem(cb_args, 1, opaque_obj);
     PyTuple_SetItem(cb_args, 2, ff_obj);
-
-    if ((pyobj_args = PyTuple_New(4)) == NULL)
-        goto cleanup;
-
-    PyTuple_SetItem(pyobj_args, 0, libvirt_intWrap(fd));
-    PyTuple_SetItem(pyobj_args, 1, libvirt_intWrap(event));
-    PyTuple_SetItem(pyobj_args, 2, python_cb);
-    PyTuple_SetItem(pyobj_args, 3, cb_args);
 
     result = PyEval_CallObject(addHandleObj, pyobj_args);
     if (!result) {
@@ -5415,31 +5409,31 @@ libvirt_virEventAddTimeoutFunc(int timeout,
 
     LIBVIRT_ENSURE_THREAD_STATE;
 
+    if ((pyobj_args = PyTuple_New(3)) == NULL)
+        goto cleanup;
+
+    PyTuple_SetItem(pyobj_args, 0, libvirt_intWrap(timeout));
+
     /* Lookup the python callback */
     python_cb = libvirt_lookupPythonFunc("_eventInvokeTimeoutCallback");
     if (!python_cb) {
         goto cleanup;
     }
     Py_INCREF(python_cb);
+    PyTuple_SetItem(pyobj_args, 1, python_cb);
+
+    if ((cb_args = PyTuple_New(3)) == NULL)
+        goto cleanup;
+
+    PyTuple_SetItem(pyobj_args, 2, cb_args);
 
     /* create tuple for cb */
     cb_obj = libvirt_virEventTimeoutCallbackWrap(cb);
     ff_obj = libvirt_virFreeCallbackWrap(ff);
     opaque_obj = libvirt_virVoidPtrWrap(opaque);
-
-    if ((cb_args = PyTuple_New(3)) == NULL)
-        goto cleanup;
-
     PyTuple_SetItem(cb_args, 0, cb_obj);
     PyTuple_SetItem(cb_args, 1, opaque_obj);
     PyTuple_SetItem(cb_args, 2, ff_obj);
-
-    if ((pyobj_args = PyTuple_New(3)) == NULL)
-        goto cleanup;
-
-    PyTuple_SetItem(pyobj_args, 0, libvirt_intWrap(timeout));
-    PyTuple_SetItem(pyobj_args, 1, python_cb);
-    PyTuple_SetItem(pyobj_args, 2, cb_args);
 
     result = PyEval_CallObject(addTimeoutObj, pyobj_args);
     if (!result) {
@@ -6170,12 +6164,13 @@ libvirt_virConnectDomainEventGraphicsCallback(virConnectPtr conn ATTRIBUTE_UNUSE
         if (pair == NULL)
             goto cleanup;
 
+        PyList_SetItem(pyobj_subject, i, pair);
+
         PyTuple_SetItem(pair, 0,
                         libvirt_constcharPtrWrap(subject->identities[i].type));
         PyTuple_SetItem(pair, 1,
                         libvirt_constcharPtrWrap(subject->identities[i].name));
 
-        PyList_SetItem(pyobj_subject, i, pair);
     }
 
     /* Call the Callback Dispatcher */
@@ -7750,15 +7745,15 @@ libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
     if ((pycpumap = PyList_New(i_retval)) == NULL)
         goto error;
 
+    if (PyTuple_SetItem(ret, 1, pycpumap) < 0)
+        goto error;
+
     for (i = 0; i < i_retval; i++) {
         if ((pyused = PyBool_FromLong(VIR_CPU_USED(cpumap, i))) == NULL)
             goto error;
         if (PyList_SetItem(pycpumap, i, pyused) < 0)
             goto error;
     }
-
-    if (PyTuple_SetItem(ret, 1, pycpumap) < 0)
-        goto error;
 
     /* 2: number of online CPUs */
     if ((pyonline = libvirt_uintWrap(online)) == NULL ||
@@ -7768,12 +7763,9 @@ libvirt_virNodeGetCPUMap(PyObject *self ATTRIBUTE_UNUSED,
  cleanup:
     VIR_FREE(cpumap);
     return ret;
+
  error:
     Py_CLEAR(ret);
-    Py_XDECREF(pycpumap);
-    Py_XDECREF(pyused);
-    Py_XDECREF(pycpunum);
-    Py_XDECREF(pyonline);
     goto cleanup;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 0) */
@@ -8147,6 +8139,12 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
             goto cleanup;
         }
 
+        if (PyDict_SetItem(pyobj_counts, node, per_node) < 0) {
+            Py_XDECREF(per_node);
+            Py_XDECREF(node);
+            goto cleanup;
+        }
+
         for (j = 0; j < pyobj_pagesize_size; j ++) {
             PyObject *page = NULL;
             PyObject *count = NULL;
@@ -8162,12 +8160,6 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
             }
         }
         i += pyobj_pagesize_size;
-
-        if (PyDict_SetItem(pyobj_counts, node, per_node) < 0) {
-            Py_XDECREF(per_node);
-            Py_XDECREF(node);
-            goto cleanup;
-        }
     }
 
     py_retval = pyobj_counts;
@@ -8218,6 +8210,9 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
         if ((py_lease = PyDict_New()) == NULL)
             goto error;
 
+        if (PyList_SetItem(py_retval, i, py_lease) < 0)
+            goto error;
+
 #define VIR_SET_LEASE_ITEM(NAME, VALUE_OBJ_FUNC)                            \
         do {                                                                \
             PyObject *tmp_val;                                              \
@@ -8242,15 +8237,9 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
         VIR_SET_LEASE_ITEM("iaid", libvirt_charPtrWrap(lease->iaid));
 
 #undef VIR_SET_LEASE_ITEM
-
-        if (PyList_SetItem(py_retval, i, py_lease) < 0)
-            goto error;
-
-        py_lease = NULL;
     }
 
  cleanup:
-    Py_XDECREF(py_lease);
     if (leases) {
         for (i = 0; i < leases_count; i++)
             virNetworkDHCPLeaseFree(leases[i]);
@@ -8285,6 +8274,9 @@ convertDomainStatsRecord(virDomainStatsRecordPtr *records,
         if (!(py_record = PyTuple_New(2)))
             goto error;
 
+        if (PyList_SetItem(py_retval, i, py_record) < 0)
+            goto error;
+
         /* libvirt_virDomainPtrWrap steals the object */
         virDomainRef(records[i]->dom);
         if (!(py_record_domain = libvirt_virDomainPtrWrap(records[i]->dom))) {
@@ -8292,33 +8284,21 @@ convertDomainStatsRecord(virDomainStatsRecordPtr *records,
             goto error;
         }
 
+        if (PyTuple_SetItem(py_record, 0, py_record_domain) < 0)
+            goto error;
+
         if (!(py_record_stats = getPyVirTypedParameter(records[i]->params,
                                                        records[i]->nparams)))
             goto error;
 
-        if (PyTuple_SetItem(py_record, 0, py_record_domain) < 0)
-            goto error;
-
-        py_record_domain = NULL;
-
         if (PyTuple_SetItem(py_record, 1, py_record_stats) < 0)
             goto error;
-
-        py_record_stats = NULL;
-
-        if (PyList_SetItem(py_retval, i, py_record) < 0)
-            goto error;
-
-        py_record = NULL;
     }
 
     return py_retval;
 
  error:
     Py_XDECREF(py_retval);
-    Py_XDECREF(py_record);
-    Py_XDECREF(py_record_domain);
-    Py_XDECREF(py_record_stats);
     return NULL;
 }
 
@@ -8544,13 +8524,15 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
         if (info == NULL)
             goto cleanup;
         PyList_SetItem(py_retval, i, info);
-        alias = PyList_New(0);
-        if (alias == NULL)
-            goto cleanup;
 
         PyTuple_SetItem(info, 0, libvirt_constcharPtrWrap(fs->mountpoint));
         PyTuple_SetItem(info, 1, libvirt_constcharPtrWrap(fs->name));
         PyTuple_SetItem(info, 2, libvirt_constcharPtrWrap(fs->fstype));
+
+        alias = PyList_New(0);
+        if (alias == NULL)
+            goto cleanup;
+
         PyTuple_SetItem(info, 3, alias);
 
         for (j = 0; j < fs->ndevAlias; j++)
