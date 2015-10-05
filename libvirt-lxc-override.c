@@ -82,17 +82,8 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     if ((py_retval = PyList_New(0)) == NULL)
         goto error;
 
-    for (i = 0; i < c_retval; i++) {
-        PyObject *item = NULL;
-
-        if ((item = libvirt_intWrap(fdlist[i])) == NULL)
-            goto error;
-
-        if (PyList_Append(py_retval, item) < 0) {
-            Py_DECREF(item);
-            goto error;
-        }
-    }
+    for (i = 0; i < c_retval; i++)
+        VIR_PY_LIST_APPEND_GOTO(py_retval, libvirt_intWrap(fdlist[1]), error);
 
  cleanup:
     VIR_FREE(fdlist);
