@@ -2448,6 +2448,7 @@ libvirt_virDomainListAllSnapshots(PyObject *self ATTRIBUTE_UNUSED,
     for (i = 0; i < c_retval; i++) {
         VIR_PY_LIST_SET_GOTO(py_retval, i,
                              libvirt_virDomainSnapshotPtrWrap(snaps[i]), error);
+        snaps[i] = NULL;
     }
 
  cleanup:
@@ -2544,9 +2545,11 @@ libvirt_virDomainSnapshotListAllChildren(PyObject *self ATTRIBUTE_UNUSED,
     if (!(py_retval = PyList_New(c_retval)))
         goto cleanup;
 
-    for (i = 0; i < c_retval; i++)
+    for (i = 0; i < c_retval; i++) {
         VIR_PY_LIST_SET_GOTO(py_retval, i,
                              libvirt_virDomainSnapshotPtrWrap(snaps[i]), error);
+        snaps[i] = NULL;
+    }
 
  cleanup:
     for (i = 0; i < c_retval; i++)
@@ -3117,9 +3120,11 @@ libvirt_virConnectListAllNetworks(PyObject *self ATTRIBUTE_UNUSED,
     if (!(py_retval = PyList_New(c_retval)))
         goto cleanup;
 
-    for (i = 0; i < c_retval; i++)
+    for (i = 0; i < c_retval; i++) {
         VIR_PY_LIST_SET_GOTO(py_retval, i,
                              libvirt_virNetworkPtrWrap(nets[i]), error);
+        nets[i] = NULL;
+    }
 
  cleanup:
     for (i = 0; i < c_retval; i++)
