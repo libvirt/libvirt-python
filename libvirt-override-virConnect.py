@@ -216,6 +216,15 @@
         cb(self, virDomain(self, _obj=dom), devAlias, opaque)
         return 0
 
+    def _dispatchDomainEventMigrationIterationCallback(self, dom, iteration, cbData):
+        """Dispatches event to python user domain migration iteration event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virDomain(self, _obj=dom), iteration, opaque)
+        return 0
+
     def domainEventDeregisterAny(self, callbackID):
         """Removes a Domain Event Callback. De-registering for a
            domain callback will disable delivery of this event type """

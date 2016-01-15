@@ -530,6 +530,9 @@ def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
 def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
             dom.name(), dom.ID(), dev))
+def myDomainEventMigrationIteration(conn, dom, iteration, opaque):
+    print("myDomainEventMigrationIteration: Domain %s(%s) started migration iteration %d" % (
+            dom.name(), dom.ID(), iteration))
 
 ##########################################################################
 # Network events
@@ -642,6 +645,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_TUNABLE, myDomainEventTunableCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_AGENT_LIFECYCLE, myDomainEventAgentLifecycleCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_ADDED, myDomainEventDeviceAddedCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_MIGRATION_ITERATION, myDomainEventMigrationIteration, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 
