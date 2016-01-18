@@ -88,17 +88,15 @@ def get_module_lists():
 
     c_modules = []
     py_modules = []
-    ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False)
-    cflags = get_pkgconfig_data(["--cflags"], "libvirt", False)
+    ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
+    cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
 
     module = Extension('libvirtmod',
                        sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
                        libraries = [ "virt" ],
                        include_dirs = [ "." ])
-    if cflags != "":
-        module.extra_compile_args.append(cflags)
-    if ldflags != "":
-        module.extra_link_args.append(ldflags)
+    module.extra_compile_args.extend(cflags)
+    module.extra_link_args.extend(ldflags)
 
     c_modules.append(module)
     py_modules.append("libvirt")
@@ -107,10 +105,8 @@ def get_module_lists():
                            sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
                            libraries = [ "virt-qemu" ],
                            include_dirs = [ "." ])
-    if cflags != "":
-        moduleqemu.extra_compile_args.append(cflags)
-    if ldflags != "":
-        moduleqemu.extra_link_args.append(ldflags)
+    moduleqemu.extra_compile_args.extend(cflags)
+    moduleqemu.extra_link_args.extend(ldflags)
 
     c_modules.append(moduleqemu)
     py_modules.append("libvirt_qemu")
@@ -120,10 +116,8 @@ def get_module_lists():
                               sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
                               libraries = [ "virt-lxc" ],
                               include_dirs = [ "." ])
-        if cflags != "":
-            modulelxc.extra_compile_args.append(cflags)
-        if ldflags != "":
-            modulelxc.extra_link_args.append(ldflags)
+        modulelxc.extra_compile_args.extend(cflags)
+        modulelxc.extra_link_args.extend(ldflags)
 
         c_modules.append(modulelxc)
         py_modules.append("libvirt_lxc")
