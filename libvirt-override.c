@@ -7552,7 +7552,7 @@ libvirt_virDomainBlockPeek(PyObject *self ATTRIBUTE_UNUSED,
     char *buf;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OzLnI:virDomainBlockPeek",
+    if (!PyArg_ParseTuple(args, (char *)"OzKnI:virDomainBlockPeek",
                           &pyobj_domain, &disk, &offset, &size, &flags))
         return NULL;
 
@@ -7590,7 +7590,7 @@ libvirt_virDomainMemoryPeek(PyObject *self ATTRIBUTE_UNUSED,
     char *buf;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OLnI:virDomainMemoryPeek",
+    if (!PyArg_ParseTuple(args, (char *)"OKnI:virDomainMemoryPeek",
                           &pyobj_domain, &start, &size, &flags))
         return NULL;
 
