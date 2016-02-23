@@ -2148,7 +2148,7 @@ libvirt_virConnectGetCPUModelNames(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *rv = NULL, *pyobj_conn;
     char **models = NULL;
     size_t i;
-    int flags = 0;
+    unsigned int flags = 0;
     const char *arch = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"OsI:virConnectGetCPUModelNames",
