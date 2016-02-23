@@ -1149,7 +1149,7 @@ libvirt_virDomainGetInterfaceParameters(PyObject *self ATTRIBUTE_UNUSED,
     const char *device = NULL;
     virTypedParameterPtr params;
 
-    if (!PyArg_ParseTuple(args, (char *)"Ozi:virDomainGetInterfaceParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetInterfaceParameters",
                           &pyobj_domain, &device, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -4988,7 +4988,7 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
     int ifaces_count = 0;
     size_t i, j;
 
-    if (!PyArg_ParseTuple(args, (char *) "Oii:virDomainInterfaceAddresses",
+    if (!PyArg_ParseTuple(args, (char *) "OII:virDomainInterfaceAddresses",
                           &pyobj_domain, &source, &flags))
         return NULL;
 
@@ -7389,7 +7389,7 @@ libvirt_virDomainSendKey(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int keycodes[VIR_DOMAIN_SEND_KEY_MAX_KEYS];
     unsigned int nkeycodes;
 
-    if (!PyArg_ParseTuple(args, (char *)"OiiOiI:virDomainSendKey",
+    if (!PyArg_ParseTuple(args, (char *)"OiiOII:virDomainSendKey",
                           &pyobj_domain, &codeset, &holdtime, &pyobj_list,
                           &nkeycodes, &flags))
         return NULL;
@@ -8100,7 +8100,7 @@ libvirt_virNodeGetFreePages(PyObject *self ATTRIBUTE_UNUSED,
     int c_retval;
     ssize_t pyobj_pagesize_size, i, j;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOiiI:virNodeGetFreePages",
+    if (!PyArg_ParseTuple(args, (char *)"OOiII:virNodeGetFreePages",
                           &pyobj_conn, &pyobj_pagesize, &startCell,
                           &cellCount, &flags))
         return NULL;
@@ -8421,7 +8421,7 @@ libvirt_virNodeAllocPages(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags = VIR_NODE_ALLOC_PAGES_ADD;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOiiI:virNodeAllocPages",
+    if (!PyArg_ParseTuple(args, (char *)"OOiII:virNodeAllocPages",
                           &pyobj_conn, &pyobj_pages,
                           &startCell, &cellCount, &flags))
         return NULL;
@@ -8480,7 +8480,7 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
     size_t j;
     PyObject *py_retval = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainFSInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainFSInfo",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
