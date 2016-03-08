@@ -6835,6 +6835,65 @@ libvirt_virConnectDomainEventMigrationIterationCallback(virConnectPtr conn ATTRI
 }
 #endif /* VIR_DOMAIN_EVENT_ID_MIGRATION_ITERATION */
 
+#ifdef VIR_DOMAIN_EVENT_ID_JOB_COMPLETED
+static int
+libvirt_virConnectDomainEventJobCompletedCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                  virDomainPtr dom,
+                                                  virTypedParameterPtr params,
+                                                  int nparams,
+                                                  void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dom;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    PyObject *pyobj_dict = NULL;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    pyobj_dict = getPyVirTypedParameter(params, nparams);
+    if (!pyobj_dict)
+        goto cleanup;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virDomainPtr */
+    virDomainRef(dom);
+    if (!(pyobj_dom = libvirt_virDomainPtrWrap(dom))) {
+        virDomainFree(dom);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchDomainEventJobCompletedCallback",
+                                    (char*)"OOO",
+                                    pyobj_dom, pyobj_dict, pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dom);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+        Py_XDECREF(pyobj_dict);
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+#endif /* VIR_DOMAIN_EVENT_ID_JOB_COMPLETED */
+
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                          PyObject *args)
@@ -6940,6 +6999,11 @@ libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventMigrationIterationCallback);
         break;
 #endif /* VIR_DOMAIN_EVENT_ID_MIGRATION_ITERATION */
+#ifdef VIR_DOMAIN_EVENT_ID_JOB_COMPLETED
+    case VIR_DOMAIN_EVENT_ID_JOB_COMPLETED:
+        cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventJobCompletedCallback);
+        break;
+#endif /* VIR_DOMAIN_EVENT_ID_JOB_COMPLETED */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
