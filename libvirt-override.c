@@ -8607,6 +8607,102 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
 
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 11) */
 
+#if LIBVIR_CHECK_VERSION(1, 3, 3)
+static PyObject *
+libvirt_virDomainGetPerfEvents(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
+    PyObject *pyobj_domain;
+    virDomainPtr domain;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    PyObject *dict = NULL;
+    unsigned int flags;
+    int rc;
+
+    if (!PyArg_ParseTuple(args, (char *) "OI:virDomainGetPerfEvents",
+                          &pyobj_domain, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    rc = virDomainGetPerfEvents(domain, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (rc < 0)
+        return VIR_PY_NONE;
+
+    if (!(dict = getPyVirTypedParameter(params, nparams)))
+        goto cleanup;
+
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    return dict;
+}
+
+static PyObject *
+libvirt_virDomainSetPerfEvents(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
+    virDomainPtr domain;
+    PyObject *pyobj_domain, *info;
+    PyObject *ret = NULL;
+    int i_retval;
+    int nparams = 0;
+    Py_ssize_t size = 0;
+    unsigned int flags;
+    virTypedParameterPtr params = NULL, new_params = NULL;
+
+    if (!PyArg_ParseTuple(args,
+                          (char *)"OOI:virDomainSetPerfEvents",
+                          &pyobj_domain, &info, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if ((size = PyDict_Size(info)) < 0)
+        return NULL;
+
+    if (size == 0) {
+        PyErr_Format(PyExc_LookupError,
+                     "Need non-empty dictionary to set attributes");
+        return NULL;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virDomainGetPerfEvents(domain, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0)
+        return VIR_PY_INT_FAIL;
+
+    if (nparams == 0) {
+        PyErr_Format(PyExc_LookupError,
+                     "Domain has no settable attributes");
+        return NULL;
+    }
+
+    new_params = setPyVirTypedParameter(info, params, nparams);
+    if (!new_params)
+        goto cleanup;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virDomainSetPerfEvents(domain, new_params, size, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_INT_FAIL;
+        goto cleanup;
+    }
+
+    ret = VIR_PY_INT_SUCCESS;
+
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    virTypedParamsFree(new_params, size);
+    return ret;
+}
+#endif /* LIBVIR_CHECK_VERSION(1, 3, 3) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -8810,6 +8906,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 2, 14)
     {(char *) "virDomainInterfaceAddresses", libvirt_virDomainInterfaceAddresses, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
+#if LIBVIR_CHECK_VERSION(1, 3, 3)
+    {(char *) "virDomainGetPerfEvents", libvirt_virDomainGetPerfEvents, METH_VARARGS, NULL},
+    {(char *) "virDomainSetPerfEvents", libvirt_virDomainSetPerfEvents, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(1, 3, 3) */
     {NULL, NULL, 0, NULL}
 };
 

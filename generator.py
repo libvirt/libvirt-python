@@ -488,6 +488,8 @@ skip_impl = (
     'virNodeAllocPages',
     'virDomainGetFSInfo',
     'virDomainInterfaceAddresses',
+    'virDomainGetPerfEvents',
+    'virDomainSetPerfEvents',
 )
 
 lxc_skip_impl = (
