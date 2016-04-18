@@ -535,6 +535,9 @@ def myDomainEventMigrationIteration(conn, dom, iteration, opaque):
             dom.name(), dom.ID(), iteration))
 def myDomainEventJobCompletedCallback(conn, dom, params, opaque):
     print("myDomainEventJobCompletedCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
+def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque):
+    print("myDomainEventDeviceRemovalFailedCallback: Domain %s(%s) failed to remove device: %s" % (
+            dom.name(), dom.ID(), dev))
 
 ##########################################################################
 # Network events
@@ -649,6 +652,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_ADDED, myDomainEventDeviceAddedCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_MIGRATION_ITERATION, myDomainEventMigrationIteration, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_JOB_COMPLETED, myDomainEventJobCompletedCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, myDomainEventDeviceRemovalFailedCallback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 
