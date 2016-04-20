@@ -49,6 +49,11 @@ of recent versions of Linux (and other OSes).
 %prep
 %setup -q
 
+# Unset execute bit for example scripts; it can introduce spurious
+# RPM dependencies, like /usr/bin/python which can pull in python2
+# for the -python3 package
+find examples -type f -exec chmod 0644 \{\} \;
+
 %build
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 %if %{with_python3}
