@@ -33,6 +33,7 @@ onlyOverrides = False
 
 libvirt_headers = [
     "libvirt",
+    "libvirt-common",
     "libvirt-domain",
     "libvirt-domain-snapshot",
     "libvirt-event",
