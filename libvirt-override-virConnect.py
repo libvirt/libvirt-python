@@ -302,6 +302,41 @@
         self.domainEventCallbackID[ret] = opaque
         return ret
 
+    def _dispatchStoragePoolEventLifecycleCallback(self, pool, event, detail, cbData):
+        """Dispatches events to python user storage pool
+           lifecycle event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virStoragePool(self, _obj=pool), event, detail, opaque)
+        return 0
+
+    def storagePoolEventDeregisterAny(self, callbackID):
+        """Removes a Storage Pool Event Callback. De-registering for a
+           storage pool callback will disable delivery of this event type"""
+        try:
+            ret = libvirtmod.virConnectStoragePoolEventDeregisterAny(self._o, callbackID)
+            if ret == -1: raise libvirtError ('virConnectStoragePoolEventDeregisterAny() failed', conn=self)
+            del self.storagePoolEventCallbackID[callbackID]
+        except AttributeError:
+            pass
+
+    def storagePoolEventRegisterAny(self, pool, eventID, cb, opaque):
+        """Adds a Storage Pool Event Callback. Registering for a storage pool
+           callback will enable delivery of the events"""
+        if not hasattr(self, 'storagePoolEventCallbackID'):
+            self.storagePoolEventCallbackID = {}
+        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        if pool is None:
+            ret = libvirtmod.virConnectStoragePoolEventRegisterAny(self._o, None, eventID, cbData)
+        else:
+            ret = libvirtmod.virConnectStoragePoolEventRegisterAny(self._o, pool._o, eventID, cbData)
+        if ret == -1:
+            raise libvirtError ('virConnectStoragePoolEventRegisterAny() failed', conn=self)
+        self.storagePoolEventCallbackID[ret] = opaque
+        return ret
+
     def listAllDomains(self, flags=0):
         """List all domains and returns a list of domain objects"""
         ret = libvirtmod.virConnectListAllDomains(self._o, flags)
