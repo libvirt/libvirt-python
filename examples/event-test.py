@@ -565,6 +565,23 @@ def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
                                                                  netDetailToString(event, detail)))
 
 ##########################################################################
+# Storage pool events
+##########################################################################
+def storageEventToString(event):
+    storageEventStrings = ( "Defined",
+                            "Undefined",
+                            "Started",
+                            "Stopped",
+                            "Refreshed",
+    )
+    return storageEventStrings[event]
+
+def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
+    print("myStoragePoolEventLifecycleCallback: Storage pool %s %s %d" % (pool.name(),
+                                                                          storageEventToString(event),
+                                                                          detail))
+
+##########################################################################
 # Set up and run the program
 ##########################################################################
 
@@ -655,6 +672,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, myDomainEventDeviceRemovalFailedCallback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
+    vc.storagePoolEventRegisterAny(None, libvirt.VIR_STORAGE_POOL_EVENT_ID_LIFECYCLE, myStoragePoolEventLifecycleCallback, None)
 
     vc.setKeepAlive(5, 3)
 
