@@ -8915,6 +8915,38 @@ libvirt_virConnectStoragePoolEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
 
     return libvirt_intWrap(ret);
 }
+
+static PyObject *
+libvirt_virDomainGetGuestVcpus(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
+    PyObject *pyobj_domain;
+    virDomainPtr domain;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags;
+    int i_retval;
+    PyObject *ret = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetGuestVcpus",
+                          &pyobj_domain, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virDomainGetGuestVcpus(domain, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    ret = getPyVirTypedParameter(params, nparams);
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    return ret;
+}
 #endif /* LIBVIR_CHECK_VERSION(2, 0, 0)*/
 
 
@@ -9128,6 +9160,7 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(2, 0, 0)
     {(char *) "virConnectStoragePoolEventRegisterAny", libvirt_virConnectStoragePoolEventRegisterAny, METH_VARARGS, NULL},
     {(char *) "virConnectStoragePoolEventDeregisterAny", libvirt_virConnectStoragePoolEventDeregisterAny, METH_VARARGS, NULL},
+    {(char *) "virDomainGetGuestVcpus", libvirt_virDomainGetGuestVcpus, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(2, 0, 0) */
     {NULL, NULL, 0, NULL}
 };
