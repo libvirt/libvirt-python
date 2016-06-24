@@ -8799,7 +8799,7 @@ libvirt_virConnectStoragePoolEventLifecycleCallback(virConnectPtr conn ATTRIBUTE
     pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
     Py_DECREF(dictKey);
 
-    /* Create a python instance of this virNetworkPtr */
+    /* Create a python instance of this virStoragePoolPtr */
     virStoragePoolRef(pool);
     if (!(pyobj_pool = libvirt_virStoragePoolPtrWrap(pool))) {
         virStoragePoolFree(pool);
@@ -8814,6 +8814,56 @@ libvirt_virConnectStoragePoolEventLifecycleCallback(virConnectPtr conn ATTRIBUTE
                                     pyobj_pool,
                                     event,
                                     detail,
+                                    pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_pool);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+
+static int
+libvirt_virConnectStoragePoolEventGenericCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                  virStoragePoolPtr pool,
+                                                  void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_pool;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virStoragePoolPtr */
+    virStoragePoolRef(pool);
+    if (!(pyobj_pool = libvirt_virStoragePoolPtrWrap(pool))) {
+        virStoragePoolFree(pool);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchStoragePoolEventGenericCallback",
+                                    (char*)"OiiO",
+                                    pyobj_pool,
                                     pyobj_cbData);
 
     Py_DECREF(pyobj_cbData);
@@ -8861,6 +8911,10 @@ libvirt_virConnectStoragePoolEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     switch ((virStoragePoolEventID) eventID) {
     case VIR_STORAGE_POOL_EVENT_ID_LIFECYCLE:
         cb = VIR_STORAGE_POOL_EVENT_CALLBACK(libvirt_virConnectStoragePoolEventLifecycleCallback);
+        break;
+
+    case VIR_STORAGE_POOL_EVENT_ID_REFRESH:
+        cb = VIR_STORAGE_POOL_EVENT_CALLBACK(libvirt_virConnectStoragePoolEventGenericCallback);
         break;
 
     case VIR_STORAGE_POOL_EVENT_ID_LAST:

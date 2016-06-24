@@ -312,6 +312,16 @@
         cb(self, virStoragePool(self, _obj=pool), event, detail, opaque)
         return 0
 
+    def _dispatchStoragePoolEventGenericCallback(self, pool, cbData):
+        """Dispatches events to python user storage pool
+           generic event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virStoragePool(self, _obj=pool), opaque)
+        return 0
+
     def storagePoolEventDeregisterAny(self, callbackID):
         """Removes a Storage Pool Event Callback. De-registering for a
            storage pool callback will disable delivery of this event type"""
