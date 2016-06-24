@@ -8923,7 +8923,7 @@ libvirt_virDomainGetGuestVcpus(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_domain;
     virDomainPtr domain;
     virTypedParameterPtr params = NULL;
-    int nparams = 0;
+    unsigned int nparams = 0;
     unsigned int flags;
     int i_retval;
     PyObject *ret = NULL;
