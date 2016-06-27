@@ -28,6 +28,8 @@ _pkgcfg = -1
 def get_pkgcfg(do_fail=True):
     global _pkgcfg
     if _pkgcfg == -1:
+        _pkgcfg = os.getenv('PKG_CONFIG')
+    if _pkgcfg is None:
         _pkgcfg = distutils.spawn.find_executable("pkg-config")
     if _pkgcfg is None and do_fail:
         raise Exception("pkg-config binary is required to compile libvirt-python")
