@@ -580,7 +580,7 @@ def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
                                                                           storageEventToString(event),
                                                                           detail))
 
-def myStoragePoolEventRefreshCallback(conn, pool, event, detail, opaque):
+def myStoragePoolEventRefreshCallback(conn, pool, opaque):
     print("myStoragePoolEventRefreshCallback: Storage pool %s" % pool.name())
 
 ##########################################################################

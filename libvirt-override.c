@@ -8862,7 +8862,7 @@ libvirt_virConnectStoragePoolEventGenericCallback(virConnectPtr conn ATTRIBUTE_U
     /* Call the Callback Dispatcher */
     pyobj_ret = PyObject_CallMethod(pyobj_conn,
                                     (char*)"_dispatchStoragePoolEventGenericCallback",
-                                    (char*)"OiiO",
+                                    (char*)"OO",
                                     pyobj_pool,
                                     pyobj_cbData);
 
