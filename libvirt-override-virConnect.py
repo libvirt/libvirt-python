@@ -347,6 +347,41 @@
         self.storagePoolEventCallbackID[ret] = opaque
         return ret
 
+    def _dispatchNodeDeviceEventLifecycleCallback(self, dev, event, detail, cbData):
+        """Dispatches events to python user node device
+           lifecycle event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virNodeDevice(self, _obj=dev), event, detail, opaque)
+        return 0
+
+    def nodeDeviceEventDeregisterAny(self, callbackID):
+        """Removes a Node Device Event Callback. De-registering for a
+           node device callback will disable delivery of this event type"""
+        try:
+            ret = libvirtmod.virConnectNodeDeviceEventDeregisterAny(self._o, callbackID)
+            if ret == -1: raise libvirtError ('virConnectNodeDeviceEventDeregisterAny() failed', conn=self)
+            del self.nodeDeviceEventCallbackID[callbackID]
+        except AttributeError:
+            pass
+
+    def nodeDeviceEventRegisterAny(self, dev, eventID, cb, opaque):
+        """Adds a Node Device Event Callback. Registering for a node device
+           callback will enable delivery of the events"""
+        if not hasattr(self, 'nodeDeviceEventCallbackID'):
+            self.nodeDeviceEventCallbackID = {}
+        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        if dev is None:
+            ret = libvirtmod.virConnectNodeDeviceEventRegisterAny(self._o, None, eventID, cbData)
+        else:
+            ret = libvirtmod.virConnectNodeDeviceEventRegisterAny(self._o, dev._o, eventID, cbData)
+        if ret == -1:
+            raise libvirtError ('virConnectNodeDeviceEventRegisterAny() failed', conn=self)
+        self.nodeDeviceEventCallbackID[ret] = opaque
+        return ret
+
     def listAllDomains(self, flags=0):
         """List all domains and returns a list of domain objects"""
         ret = libvirtmod.virConnectListAllDomains(self._o, flags)

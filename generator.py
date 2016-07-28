@@ -525,6 +525,8 @@ skip_function = (
     'virConnectNetworkEventDeregisterAny', # overridden in virConnect.py
     'virConnectStoragePoolEventRegisterAny',   # overridden in virConnect.py
     'virConnectStoragePoolEventDeregisterAny', # overridden in virConnect.py
+    'virConnectNodeDeviceEventRegisterAny',   # overridden in virConnect.py
+    'virConnectNodeDeviceEventDeregisterAny', # overridden in virConnect.py
     'virSaveLastError', # We have our own python error wrapper
     'virFreeError', # Only needed if we use virSaveLastError
     'virConnectListAllDomains', # overridden in virConnect.py
