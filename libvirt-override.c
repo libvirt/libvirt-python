@@ -9067,6 +9067,56 @@ libvirt_virConnectNodeDeviceEventLifecycleCallback(virConnectPtr conn ATTRIBUTE_
     return ret;
 }
 
+static int
+libvirt_virConnectNodeDeviceEventGenericCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                 virNodeDevicePtr dev,
+                                                 void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dev;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virNodeDevicePtr */
+    virNodeDeviceRef(dev);
+    if (!(pyobj_dev = libvirt_virNodeDevicePtrWrap(dev))) {
+        virNodeDeviceFree(dev);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchNodeDeviceEventGenericCallback",
+                                    (char*)"OO",
+                                    pyobj_dev,
+                                    pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dev);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+
 static PyObject *
 libvirt_virConnectNodeDeviceEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                              PyObject *args)
@@ -9096,6 +9146,10 @@ libvirt_virConnectNodeDeviceEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     switch ((virNodeDeviceEventID) eventID) {
     case VIR_NODE_DEVICE_EVENT_ID_LIFECYCLE:
         cb = VIR_NODE_DEVICE_EVENT_CALLBACK(libvirt_virConnectNodeDeviceEventLifecycleCallback);
+        break;
+
+    case VIR_NODE_DEVICE_EVENT_ID_UPDATE:
+        cb = VIR_NODE_DEVICE_EVENT_CALLBACK(libvirt_virConnectNodeDeviceEventGenericCallback);
         break;
 
     case VIR_NODE_DEVICE_EVENT_ID_LAST:

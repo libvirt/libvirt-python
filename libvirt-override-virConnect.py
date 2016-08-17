@@ -357,6 +357,16 @@
         cb(self, virNodeDevice(self, _obj=dev), event, detail, opaque)
         return 0
 
+    def _dispatchNodeDeviceEventGenericCallback(self, dev, cbData):
+        """Dispatches events to python user node device
+           generic event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virNodeDevice(self, _obj=dev), opaque)
+        return 0
+
     def nodeDeviceEventDeregisterAny(self, callbackID):
         """Removes a Node Device Event Callback. De-registering for a
            node device callback will disable delivery of this event type"""
