@@ -270,7 +270,8 @@ libvirt_qemu_virConnectDomainQemuMonitorEventRegister(PyObject *self ATTRIBUTE_U
     virDomainPtr dom;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *) "OOzOI", &pyobj_conn, &pyobj_dom,
+    if (!PyArg_ParseTuple(args, (char *) "OOzOI:virConnectDomainQemuMonitorEventRegister",
+                          &pyobj_conn, &pyobj_dom,
                           &event, &pyobj_cbData, &flags))
         return NULL;
 

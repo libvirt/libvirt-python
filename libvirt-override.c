@@ -1510,7 +1510,7 @@ libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
     int i_retval;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainPinVcpu",
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainPinEmulator",
                           &pyobj_domain, &pycpumap, &flags))
         return NULL;
 
@@ -1577,7 +1577,7 @@ libvirt_virDomainGetEmulatorPinInfo(PyObject *self ATTRIBUTE_UNUSED,
     int ret;
     int cpunum;
 
-    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainEmulatorPinInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetEmulatorPinInfo",
                           &pyobj_domain, &flags))
         return NULL;
 
@@ -1907,7 +1907,7 @@ libvirt_virRegisterErrorHandler(ATTRIBUTE_UNUSED PyObject *self,
     PyObject *pyobj_f;
     PyObject *pyobj_ctx;
 
-    if (!PyArg_ParseTuple(args, (char *) "OO:xmlRegisterErrorHandler",
+    if (!PyArg_ParseTuple(args, (char *) "OO:virRegisterErrorHandler",
                           &pyobj_f, &pyobj_ctx))
         return NULL;
 
@@ -2091,7 +2091,7 @@ libvirt_virGetVersion(PyObject *self ATTRIBUTE_UNUSED,
     unsigned long libVer, typeVer = 0;
     int c_retval;
 
-    if (!PyArg_ParseTuple(args, (char *) "|s", &type))
+    if (!PyArg_ParseTuple(args, (char *) "|s:virGetVersion", &type))
         return NULL;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
@@ -2712,7 +2712,7 @@ libvirt_virDomainGetBlockInfo(PyObject *self ATTRIBUTE_UNUSED,
     const char *path;
     unsigned int flags;
 
-    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OzI:virDomainGetBlockInfo",
                           &pyobj_domain, &path, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -2750,7 +2750,7 @@ libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_conn;
     virNodeInfo info;
 
-    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetInfo", &pyobj_conn))
+    if (!PyArg_ParseTuple(args, (char *)"O:virNodeGetInfo", &pyobj_conn))
         return NULL;
     conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
 
@@ -2865,7 +2865,7 @@ libvirt_virDomainGetSecurityLabelList(PyObject *self ATTRIBUTE_UNUSED,
     virSecurityLabel *labels = NULL;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityLabel",
+    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetSecurityLabelList",
                           &pyobj_dom))
         return NULL;
 
@@ -7338,7 +7338,7 @@ libvirt_virConnectUnregisterCloseCallback(PyObject * self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple(args, (char *) "O:virConnectDomainEventUnregister",
+    if (!PyArg_ParseTuple(args, (char *) "O:virConnectUnregisterCloseCallback",
                           &pyobj_conn))
         return NULL;
 
@@ -7482,7 +7482,7 @@ libvirt_virStreamSend(PyObject *self ATTRIBUTE_UNUSED,
     Py_ssize_t datalen;
     int ret;
 
-    if (!PyArg_ParseTuple(args, (char *) "OO:virStreamRecv",
+    if (!PyArg_ParseTuple(args, (char *) "OO:virStreamSend",
                           &pyobj_stream, &pyobj_data))
         return NULL;
 
@@ -8311,7 +8311,7 @@ libvirt_virNetworkGetDHCPLeases(PyObject *self ATTRIBUTE_UNUSED,
     char *mac = NULL;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *) "OzI:virNetworkDHCPLeasePtr",
+    if (!PyArg_ParseTuple(args, (char *) "OzI:virNetworkGetDHCPLeases",
                           &pyobj_network, &mac, &flags))
         return NULL;
 
@@ -8610,7 +8610,7 @@ libvirt_virDomainGetFSInfo(PyObject *self ATTRIBUTE_UNUSED,
     size_t j;
     PyObject *py_retval = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainFSInfo",
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetFSInfo",
                           &pyobj_domain, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -8952,7 +8952,7 @@ libvirt_virConnectStoragePoolEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     int ret = 0;
 
-    if (!PyArg_ParseTuple(args, (char *) "Oi:virConnectStoragePoolEventDeregister",
+    if (!PyArg_ParseTuple(args, (char *) "Oi:virConnectStoragePoolEventDeregisterAny",
                           &pyobj_conn, &callbackID))
         return NULL;
 
