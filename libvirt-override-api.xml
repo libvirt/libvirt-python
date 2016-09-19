@@ -698,5 +698,11 @@
       <arg name='flags' type='unsigned int' info='extra flags; not used yet, so callers should always pass 0'/>
       <return type='char *' info="dictionary of domain interfaces along with their MAC and IP addresses"/>
     </function>
+    <function name='virDomainGetGuestVcpus' file='python'>
+      <info>returns a dictionary containing information regarding guest vcpus</info>
+      <arg name='dom' type='virDomainPtr' info='pointer to the domain'/>
+      <arg name='flags' type='unsigned int' info='extra flags; not used yet, so callers should always pass 0'/>
+      <return type='int' info="dictionary of vcpu data returned by the guest agent"/>
+    </function>
   </symbols>
 </api>
