@@ -307,7 +307,7 @@ class my_clean(clean):
 _c_modules, _py_modules = get_module_lists()
 
 setup(name = 'libvirt-python',
-      version = '2.2.0',
+      version = '2.3.0',
       url = 'http://www.libvirt.org',
       maintainer = 'Libvirt Maintainers',
       maintainer_email = 'libvir-list@redhat.com',
