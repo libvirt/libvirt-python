@@ -311,7 +311,13 @@ setup(name = 'libvirt-python',
       url = 'http://www.libvirt.org',
       maintainer = 'Libvirt Maintainers',
       maintainer_email = 'libvir-list@redhat.com',
-      description = 'The libvirt virtualization API',
+      description = 'The libvirt virtualization API python binding',
+      long_description =
+        '''The libvirt-python package provides a module that permits applications
+written in the Python programming language to call the interface
+supplied by the libvirt library, to manage the virtualization capabilities
+of recent versions of Linux (and other OSes).''',
+      license = 'LGPLv2+',
       ext_modules = _c_modules,
       py_modules = _py_modules,
       package_dir = {
