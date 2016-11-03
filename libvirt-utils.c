@@ -623,7 +623,7 @@ virPyCpumapConvert(int cpunum,
         return -1;
     }
 
-    for (i = 0; i < tuple_size; i++) {
+    for (i = 0; i < cpunum && i < tuple_size; i++) {
         PyObject *flag = PyTuple_GetItem(pycpumap, i);
         bool b;
 
@@ -634,12 +634,7 @@ virPyCpumapConvert(int cpunum,
 
         if (b)
             VIR_USE_CPU(*cpumapptr, i);
-        else
-            VIR_UNUSE_CPU(*cpumapptr, i);
     }
-
-    for (; i < cpunum; i++)
-        VIR_UNUSE_CPU(*cpumapptr, i);
 
     return 0;
 }
