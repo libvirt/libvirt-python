@@ -586,3 +586,60 @@ virPyDictToTypedParams(PyObject *dict,
     return ret;
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 0) */
+
+
+/* virPyCpumapConvert
+ * @cpunum: the number of physical cpus of the host.
+ * @pycpumap: source cpu map, python tuple of bools.
+ * @cpumapptr: destination cpu map.
+ * @cpumaplen: destination cpu map length.
+ *
+ * Helper function to convert a pycpumap to char*.
+ *
+ * Returns 0 on success, -1 on failure with error set.
+ */
+int
+virPyCpumapConvert(int cpunum,
+                   PyObject *pycpumap,
+                   unsigned char **cpumapptr,
+                   int *cpumaplen)
+{
+    int tuple_size;
+    size_t i;
+    *cpumapptr = NULL;
+
+    if (!PyTuple_Check(pycpumap)) {
+        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+        return -1;
+    }
+
+    *cpumaplen = VIR_CPU_MAPLEN(cpunum);
+
+    if ((tuple_size = PyTuple_Size(pycpumap)) == -1)
+        return -1;
+
+    if (VIR_ALLOC_N(*cpumapptr, *cpumaplen) < 0) {
+        PyErr_NoMemory();
+        return -1;
+    }
+
+    for (i = 0; i < tuple_size; i++) {
+        PyObject *flag = PyTuple_GetItem(pycpumap, i);
+        bool b;
+
+        if (!flag || libvirt_boolUnwrap(flag, &b) < 0) {
+            VIR_FREE(*cpumapptr);
+            return -1;
+        }
+
+        if (b)
+            VIR_USE_CPU(*cpumapptr, i);
+        else
+            VIR_UNUSE_CPU(*cpumapptr, i);
+    }
+
+    for (; i < cpunum; i++)
+        VIR_UNUSE_CPU(*cpumapptr, i);
+
+    return 0;
+}

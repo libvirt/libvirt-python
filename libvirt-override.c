@@ -1302,8 +1302,7 @@ libvirt_virDomainPinVcpu(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_domain, *pycpumap;
     PyObject *ret = NULL;
     unsigned char *cpumap;
-    int cpumaplen, vcpu, tuple_size, cpunum;
-    size_t i;
+    int cpumaplen, vcpu, cpunum;
     int i_retval;
 
     if (!PyArg_ParseTuple(args, (char *)"OiO:virDomainPinVcpu",
@@ -1314,34 +1313,8 @@ libvirt_virDomainPinVcpu(PyObject *self ATTRIBUTE_UNUSED,
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
         return VIR_PY_INT_FAIL;
 
-    if (PyTuple_Check(pycpumap)) {
-        tuple_size = PyTuple_Size(pycpumap);
-        if (tuple_size == -1)
-            return ret;
-    } else {
-        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-        return ret;
-    }
-
-    cpumaplen = VIR_CPU_MAPLEN(cpunum);
-    if (VIR_ALLOC_N(cpumap, cpumaplen) < 0)
-        return PyErr_NoMemory();
-
-    for (i = 0; i < tuple_size; i++) {
-        PyObject *flag = PyTuple_GetItem(pycpumap, i);
-        bool b;
-
-        if (!flag || libvirt_boolUnwrap(flag, &b) < 0)
-            goto cleanup;
-
-        if (b)
-            VIR_USE_CPU(cpumap, i);
-        else
-            VIR_UNUSE_CPU(cpumap, i);
-    }
-
-    for (; i < cpunum; i++)
-        VIR_UNUSE_CPU(cpumap, i);
+    if (virPyCpumapConvert(cpunum, pycpumap, &cpumap, &cpumaplen) < 0)
+        return NULL;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainPinVcpu(domain, vcpu, cpumap, cpumaplen);
@@ -1366,8 +1339,7 @@ libvirt_virDomainPinVcpuFlags(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_domain, *pycpumap;
     PyObject *ret = NULL;
     unsigned char *cpumap;
-    int cpumaplen, vcpu, tuple_size, cpunum;
-    size_t i;
+    int cpumaplen, vcpu, cpunum;
     unsigned int flags;
     int i_retval;
 
@@ -1379,34 +1351,8 @@ libvirt_virDomainPinVcpuFlags(PyObject *self ATTRIBUTE_UNUSED,
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
         return VIR_PY_INT_FAIL;
 
-    if (PyTuple_Check(pycpumap)) {
-        tuple_size = PyTuple_Size(pycpumap);
-        if (tuple_size == -1)
-            return ret;
-    } else {
-        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-        return ret;
-    }
-
-    cpumaplen = VIR_CPU_MAPLEN(cpunum);
-    if (VIR_ALLOC_N(cpumap, cpumaplen) < 0)
-        return PyErr_NoMemory();
-
-    for (i = 0; i < tuple_size; i++) {
-        PyObject *flag = PyTuple_GetItem(pycpumap, i);
-        bool b;
-
-        if (!flag || libvirt_boolUnwrap(flag, &b) < 0)
-            goto cleanup;
-
-        if (b)
-            VIR_USE_CPU(cpumap, i);
-        else
-            VIR_UNUSE_CPU(cpumap, i);
-    }
-
-    for (; i < cpunum; i++)
-        VIR_UNUSE_CPU(cpumap, i);
+    if (virPyCpumapConvert(cpunum, pycpumap, &cpumap, &cpumaplen) < 0)
+        return NULL;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainPinVcpuFlags(domain, vcpu, cpumap, cpumaplen, flags);
@@ -1505,8 +1451,7 @@ libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
     virDomainPtr domain;
     PyObject *pyobj_domain, *pycpumap;
     unsigned char *cpumap = NULL;
-    int cpumaplen, tuple_size, cpunum;
-    size_t i;
+    int cpumaplen, cpunum;
     int i_retval;
     unsigned int flags;
 
@@ -1519,36 +1464,8 @@ libvirt_virDomainPinEmulator(PyObject *self ATTRIBUTE_UNUSED,
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
         return VIR_PY_INT_FAIL;
 
-    cpumaplen = VIR_CPU_MAPLEN(cpunum);
-
-    if (!PyTuple_Check(pycpumap)) {
-        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
+    if (virPyCpumapConvert(cpunum, pycpumap, &cpumap, &cpumaplen) < 0)
         return NULL;
-    }
-
-    if ((tuple_size = PyTuple_Size(pycpumap)) == -1)
-        return NULL;
-
-    if (VIR_ALLOC_N(cpumap, cpumaplen) < 0)
-        return PyErr_NoMemory();
-
-    for (i = 0; i < tuple_size; i++) {
-        PyObject *flag = PyTuple_GetItem(pycpumap, i);
-        bool b;
-
-        if (!flag || libvirt_boolUnwrap(flag, &b) < 0) {
-            VIR_FREE(cpumap);
-            return NULL;
-        }
-
-        if (b)
-            VIR_USE_CPU(cpumap, i);
-        else
-            VIR_UNUSE_CPU(cpumap, i);
-    }
-
-    for (; i < cpunum; i++)
-        VIR_UNUSE_CPU(cpumap, i);
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainPinEmulator(domain, cpumap, cpumaplen, flags);
@@ -1713,8 +1630,7 @@ libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_domain, *pycpumap;
     PyObject *ret = NULL;
     unsigned char *cpumap;
-    int cpumaplen, iothread_val, tuple_size, cpunum;
-    size_t i;
+    int cpumaplen, iothread_val, cpunum;
     unsigned int flags;
     int i_retval;
 
@@ -1726,33 +1642,8 @@ libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
     if ((cpunum = getPyNodeCPUCount(virDomainGetConnect(domain))) < 0)
         return VIR_PY_INT_FAIL;
 
-    if (PyTuple_Check(pycpumap)) {
-        if ((tuple_size = PyTuple_Size(pycpumap)) == -1)
-            return ret;
-    } else {
-        PyErr_SetString(PyExc_TypeError, "Unexpected type, tuple is required");
-        return ret;
-    }
-
-    cpumaplen = VIR_CPU_MAPLEN(cpunum);
-    if (VIR_ALLOC_N(cpumap, cpumaplen) < 0)
-        return PyErr_NoMemory();
-
-    for (i = 0; i < tuple_size; i++) {
-        PyObject *flag = PyTuple_GetItem(pycpumap, i);
-        bool b;
-
-        if (!flag || libvirt_boolUnwrap(flag, &b) < 0)
-            goto cleanup;
-
-        if (b)
-            VIR_USE_CPU(cpumap, i);
-        else
-            VIR_UNUSE_CPU(cpumap, i);
-    }
-
-    for (; i < cpunum; i++)
-        VIR_UNUSE_CPU(cpumap, i);
+    if (virPyCpumapConvert(cpunum, pycpumap, &cpumap, &cpumaplen) < 0)
+        return NULL;
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
     i_retval = virDomainPinIOThread(domain, iothread_val,

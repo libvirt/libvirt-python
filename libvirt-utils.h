@@ -349,4 +349,9 @@ int virPyDictToTypedParams(PyObject *dict,
 ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2) ATTRIBUTE_NONNULL(3);
 # endif /* LIBVIR_CHECK_VERSION(1, 1, 0) */
 
+int virPyCpumapConvert(int cpunum,
+                       PyObject *pycpumap,
+                       unsigned char **cpumapptr,
+                       int *cpumaplen);
+
 #endif /* __LIBVIRT_UTILS_H__ */
