@@ -3,7 +3,7 @@
 
 Most of the libvirt python binding code is automatically generated
 using the script  generator.py, and the API description that the
-libvirt library installs the location shown by pkg-config, with
+libvirt library installs at the location shown by pkg-config, with
 this command:
 
   $ pkg-config --variable libvirt_api libvirt
