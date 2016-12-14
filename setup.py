@@ -277,6 +277,20 @@ class my_test(Command):
             self.build_platlib = os.path.join(self.build_base,
                                               'lib' + plat_specifier)
 
+    def find_nosetests_path(self):
+        paths = [
+            "/usr/bin/nosetests-%d.%d" % (sys.version_info[0],
+                                          sys.version_info[1]),
+            "/usr/bin/nosetests-%d" % (sys.version_info[0]),
+            "/usr/bin/nosetests",
+        ]
+
+        for path in paths:
+            if os.path.exists(path):
+                return path
+
+        raise Exception("Cannot find any nosetests binary")
+
     def run(self):
         """
         Run test suite
@@ -289,7 +303,8 @@ class my_test(Command):
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
         self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
-        self.spawn([sys.executable, "/usr/bin/nosetests"])
+        nose = self.find_nosetests_path()
+        self.spawn([sys.executable, nose])
 
 
 class my_clean(clean):
