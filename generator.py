@@ -1091,7 +1091,7 @@ def is_integral_type (name):
     return not re.search ("^(unsigned)? ?(int|long)$", name) is None
 
 def is_optional_arg(info):
-    return re.search("^\(?\optional\)?", info) is not None
+    return re.search("^\(?optional\)?", info) is not None
 # Functions returning lists which need special rules to check for errors
 # and raise exceptions.
 functions_list_exception_test = {
