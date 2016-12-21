@@ -410,6 +410,12 @@
       <return type='char *' info='the list of information or None in case of error'/>
       <arg name='vol' type='virStorageVolPtr' info='a storage vol object'/>
     </function>
+    <function name='virStorageVolGetInfoFlags' file='python'>
+      <info>Extract information about a storage volume. Note that if the connection used to get the domain is limited only a partial set of the information can be extracted.</info>
+      <return type='char *' info='the list of information or None in case of error'/>
+      <arg name='vol' type='virStorageVolPtr' info='a storage vol object'/>
+      <arg name='flags' type='unsigned int' info='bitwise-OR of virStorageVolInfoFlags'/>
+    </function>
     <function name='virNodeListDevices' file='python'>
       <info>list the node devices</info>
       <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>

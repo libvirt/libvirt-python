@@ -3681,6 +3681,46 @@ libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED,
     return NULL;
 }
 
+#if LIBVIR_CHECK_VERSION(3, 0, 0)
+static PyObject *
+libvirt_virStorageVolGetInfoFlags(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
+    PyObject *py_retval;
+    int c_retval;
+    virStorageVolPtr pool;
+    PyObject *pyobj_pool;
+    virStorageVolInfo info;
+    unsigned int flags;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virStorageVolGetInfoFlags", &pyobj_pool, &flags))
+        return NULL;
+    pool = (virStorageVolPtr) PyvirStorageVol_Get(pyobj_pool);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virStorageVolGetInfoFlags(pool, &info, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    if ((py_retval = PyList_New(3)) == NULL)
+        return NULL;
+
+    VIR_PY_LIST_SET_GOTO(py_retval, 0,
+                         libvirt_intWrap((int) info.type), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 1,
+                         libvirt_ulonglongWrap(info.capacity), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 2,
+                         libvirt_ulonglongWrap(info.allocation), error);
+
+    return py_retval;
+
+ error:
+    Py_DECREF(py_retval);
+    return NULL;
+}
+#endif
+
 static PyObject *
 libvirt_virStoragePoolGetUUID(PyObject *self ATTRIBUTE_UNUSED,
                               PyObject *args)
@@ -9203,6 +9243,9 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
     {(char *) "virStoragePoolGetInfo", libvirt_virStoragePoolGetInfo, METH_VARARGS, NULL},
     {(char *) "virStorageVolGetInfo", libvirt_virStorageVolGetInfo, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(3, 0, 0)
+    {(char *) "virStorageVolGetInfoFlags", libvirt_virStorageVolGetInfoFlags, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(3, 0, 0) */
     {(char *) "virStoragePoolGetUUID", libvirt_virStoragePoolGetUUID, METH_VARARGS, NULL},
     {(char *) "virStoragePoolGetUUIDString", libvirt_virStoragePoolGetUUIDString, METH_VARARGS, NULL},
     {(char *) "virStoragePoolLookupByUUID", libvirt_virStoragePoolLookupByUUID, METH_VARARGS, NULL},

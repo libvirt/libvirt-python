@@ -455,6 +455,7 @@ skip_impl = (
     'virStoragePoolLookupByUUID',
     'virStoragePoolGetInfo',
     'virStorageVolGetInfo',
+    'virStorageVolGetInfoFlags',
     'virStoragePoolGetAutostart',
     'virStoragePoolListVolumes',
     'virDomainBlockPeek',
