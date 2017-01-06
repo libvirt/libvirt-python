@@ -632,7 +632,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
     int nparams = 0;
     Py_ssize_t size = 0;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OOI:virDomainSetScedulerParametersFlags",
@@ -694,7 +694,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
 
  cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
@@ -7739,7 +7739,7 @@ libvirt_virNodeSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
     int nparams = 0;
     Py_ssize_t size = 0;
     unsigned int flags;
-    virTypedParameterPtr params, new_params = NULL;
+    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
                           (char *)"OOI:virNodeSetMemoryParameters",
@@ -7798,7 +7798,7 @@ libvirt_virNodeSetMemoryParameters(PyObject *self ATTRIBUTE_UNUSED,
 
  cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, nparams);
+    virTypedParamsFree(new_params, size);
     return ret;
 }
 
