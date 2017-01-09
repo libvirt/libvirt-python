@@ -179,6 +179,9 @@ for cname in wantfunctions:
     if (name.startswith("virConnectNodeDeviceEvent") and
         name.endswith("Callback")):
         continue
+    if (name.startswith("virConnectSecretEvent") and
+        name.endswith("Callback")):
+        continue
 
 
     # virEvent APIs go into main 'libvirt' namespace not any class
