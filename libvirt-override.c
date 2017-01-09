@@ -6879,6 +6879,58 @@ libvirt_virConnectDomainEventDeviceRemovalFailedCallback(virConnectPtr conn ATTR
 }
 #endif /* VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED */
 
+#ifdef VIR_DOMAIN_EVENT_ID_METADATA_CHANGE
+static int
+libvirt_virConnectDomainEventMetadataChangeCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                    virDomainPtr dom,
+                                                    int type,
+                                                    const char *nsuri,
+                                                    void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dom;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virDomainPtr */
+    virDomainRef(dom);
+    if (!(pyobj_dom = libvirt_virDomainPtrWrap(dom))) {
+        virDomainFree(dom);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchDomainEventMetadataChangeCallback",
+                                    (char*)"OisO",
+                                    pyobj_dom, type, nsuri, pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dom);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+#endif /* VIR_DOMAIN_EVENT_ID_METADATA_CHANGE */
 
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
@@ -6995,6 +7047,11 @@ libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventDeviceRemovalFailedCallback);
         break;
 #endif /* VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED */
+#ifdef VIR_DOMAIN_EVENT_ID_METADATA_CHANGE
+    case VIR_DOMAIN_EVENT_ID_METADATA_CHANGE:
+        cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventMetadataChangeCallback);
+        break;
+#endif /* VIR_DOMAIN_EVENT_ID_METADATA_CHANGE */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
