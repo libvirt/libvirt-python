@@ -401,22 +401,22 @@
         self.nodeDeviceEventCallbackID[ret] = opaque
         return ret
 
-    def _dispatchSecretEventLifecycleCallback(self, net, event, detail, cbData):
+    def _dispatchSecretEventLifecycleCallback(self, secret, event, detail, cbData):
         """Dispatches events to python user secret lifecycle event callbacks
         """
         cb = cbData["cb"]
         opaque = cbData["opaque"]
 
-        cb(self, virSecret(self, _obj=net), event, detail, opaque)
+        cb(self, virSecret(self, _obj=secret), event, detail, opaque)
         return 0
 
-    def _dispatchSecretEventGEnericCallback(self, net, cbData):
+    def _dispatchSecretEventGenericCallback(self, secret, cbData):
         """Dispatches events to python user secret generic event callbacks
         """
         cb = cbData["cb"]
         opaque = cbData["opaque"]
 
-        cb(self, virSecret(self, _obj=net), opaque)
+        cb(self, virSecret(self, _obj=secret), opaque)
         return 0
 
     def secretEventDeregisterAny(self, callbackID):
@@ -429,16 +429,16 @@
         except AttributeError:
             pass
 
-    def secretEventRegisterAny(self, net, eventID, cb, opaque):
+    def secretEventRegisterAny(self, secret, eventID, cb, opaque):
         """Adds a Secret Event Callback. Registering for a secret
            callback will enable delivery of the events"""
         if not hasattr(self, 'secretEventCallbackID'):
             self.secretEventCallbackID = {}
         cbData = { "cb": cb, "conn": self, "opaque": opaque }
-        if net is None:
+        if secret is None:
             ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, None, eventID, cbData)
         else:
-            ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, net._o, eventID, cbData)
+            ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, secret._o, eventID, cbData)
         if ret == -1:
             raise libvirtError ('virConnectSecretEventRegisterAny() failed', conn=self)
         self.secretEventCallbackID[ret] = opaque
