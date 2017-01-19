@@ -365,9 +365,6 @@ py_types = {
     'const virDomainSnapshot *':  ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
 }
 
-py_return_types = {
-}
-
 unknown_types = {}
 
 #######################################################################
@@ -743,14 +740,6 @@ def print_function_wrapper(module, name, output, export, include):
         if n == "charPtr":
             ret_convert = ret_convert + "    free(c_retval);\n"
         ret_convert = ret_convert + "    return py_retval;\n"
-    elif ret[0] in py_return_types:
-        (f, t, n, c) = py_return_types[ret[0]]
-        c_return = "    %s c_retval;\n" % (ret[0])
-        c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
-        ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n,c)
-        if n == "charPtr":
-            ret_convert = ret_convert + "    free(c_retval);\n"
-        ret_convert = ret_convert + "    return py_retval;\n"
     else:
         if ret[0] in skipped_types:
             return 0
@@ -863,7 +852,6 @@ def print_c_pointer(classname, output, export, include):
 
 def buildStubs(module, api_xml):
     global py_types
-    global py_return_types
     global unknown_types
     global onlyOverrides
 
@@ -1290,7 +1278,6 @@ def writeDoc(module, name, args, indent, output):
 def buildWrappers(module):
     global ctypes
     global py_types
-    global py_return_types
     global unknown_types
     global functions
     global function_classes
