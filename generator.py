@@ -1067,11 +1067,6 @@ def is_integral_type (name):
 
 def is_optional_arg(info):
     return re.search("^\(?optional\)?", info) is not None
-# Functions returning lists which need special rules to check for errors
-# and raise exceptions.
-functions_list_exception_test = {
-}
-functions_list_default_test = "%s is None"
 
 def is_python_noninteger_type (name):
 
@@ -1447,11 +1442,7 @@ def buildWrappers(module):
 
                 elif is_python_noninteger_type (ret[0]):
                     if name not in functions_noexcept:
-                        if name in functions_list_exception_test:
-                            test = functions_list_exception_test[name]
-                        else:
-                            test = functions_list_default_test
-                        classes.write (("    if " + test +
+                        classes.write (("    if %s is None" +
                                         ": raise libvirtError ('%s() failed')\n") %
                                        ("ret", name))
                     classes.write("    return ret\n")
@@ -1673,36 +1664,32 @@ def buildWrappers(module):
 
                     elif is_python_noninteger_type (ret[0]):
                         if name not in functions_noexcept:
-                            if name in functions_list_exception_test:
-                                test = functions_list_exception_test[name]
-                            else:
-                                test = functions_list_default_test
                             if classname == "virConnect":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', conn=self)\n") %
                                                ("ret", name))
                             elif classname == "virDomain":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', dom=self)\n") %
                                                ("ret", name))
                             elif classname == "virNetwork":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', net=self)\n") %
                                                ("ret", name))
                             elif classname == "virInterface":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', net=self)\n") %
                                                ("ret", name))
                             elif classname == "virStoragePool":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', pool=self)\n") %
                                                ("ret", name))
                             elif classname == "virStorageVol":
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed', vol=self)\n") %
                                                ("ret", name))
                             else:
-                                classes.write (("        if " + test +
+                                classes.write (("        if %s is None" +
                                                 ": raise libvirtError ('%s() failed')\n") %
                                                ("ret", name))
 
