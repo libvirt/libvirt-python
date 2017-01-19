@@ -1009,9 +1009,6 @@ classes_type = {
     "virDomainSnapshot *": ("._o", "virDomainSnapshot(self, _obj=%s)", "virDomainSnapshot"),
 }
 
-converter_type = {
-}
-
 primary_classes = ["virDomain", "virNetwork", "virInterface",
                    "virStoragePool", "virStorageVol",
                    "virConnect", "virNodeDevice", "virSecret",
@@ -1281,7 +1278,6 @@ def buildWrappers(module):
     global classes_type
     global classes_list
     global primary_classes
-    global converter_type
     global classes_destructors
     global functions_noexcept
 
@@ -1634,17 +1630,6 @@ def buildWrappers(module):
                         # return the class
                         #
                         classes.write("        return __tmp\n")
-                    elif ret[0] in converter_type:
-                        #
-                        # Raise an exception
-                        #
-                        if name in functions_noexcept:
-                            classes.write(
-                                "        if ret is None:return None")
-
-                        classes.write("        return ")
-                        classes.write(converter_type[ret[0]] % ("ret"))
-                        classes.write("\n")
 
                     # For functions returning an integral type there
                     # are several things that we can do, depending on
