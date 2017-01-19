@@ -370,9 +370,6 @@ py_return_types = {
 
 unknown_types = {}
 
-foreign_encoding_args = (
-)
-
 #######################################################################
 #
 #  This part writes the C <-> Python stubs libvirt.[ch] and
@@ -693,8 +690,6 @@ def print_function_wrapper(module, name, output, export, include):
         c_args = c_args + "    %s %s;\n" % (arg[1], arg[0])
         if arg[1] in py_types:
             (f, t, n, c) = py_types[arg[1]]
-            if (f == 'z') and (name in foreign_encoding_args) and (num_bufs == 0):
-                f = 't#'
             if f is not None:
                 format = format + f
             if t is not None:
