@@ -1017,9 +1017,6 @@ primary_classes = ["virDomain", "virNetwork", "virInterface",
                    "virConnect", "virNodeDevice", "virSecret",
                    "virNWFilter", "virStream", "virDomainSnapshot"]
 
-classes_ancestor = {
-}
-
 classes_destructors = {
     "virDomain": "virDomainFree",
     "virNetwork": "virNetworkFree",
@@ -1284,7 +1281,6 @@ def buildWrappers(module):
     global classes_type
     global classes_list
     global primary_classes
-    global classes_ancestor
     global converter_type
     global classes_destructors
     global functions_noexcept
@@ -1473,37 +1469,29 @@ def buildWrappers(module):
         if classname == "None":
             pass
         else:
-            if classname in classes_ancestor:
-                classes.write("class %s(%s):\n" % (classname,
-                              classes_ancestor[classname]))
-                classes.write("    def __init__(self, _obj=None):\n")
-                classes.write("        self._o = _obj\n")
-                classes.write("        %s.__init__(self, _obj=_obj)\n\n" % (
-                              classes_ancestor[classname]))
+            classes.write("class %s(object):\n" % (classname))
+            if classname in [ "virDomain", "virNetwork", "virInterface", "virStoragePool",
+                              "virStorageVol", "virNodeDevice", "virSecret","virStream",
+                              "virNWFilter" ]:
+                classes.write("    def __init__(self, conn, _obj=None):\n")
+            elif classname in [ 'virDomainSnapshot' ]:
+                classes.write("    def __init__(self, dom, _obj=None):\n")
             else:
-                classes.write("class %s(object):\n" % (classname))
-                if classname in [ "virDomain", "virNetwork", "virInterface", "virStoragePool",
-                                  "virStorageVol", "virNodeDevice", "virSecret","virStream",
-                                  "virNWFilter" ]:
-                    classes.write("    def __init__(self, conn, _obj=None):\n")
-                elif classname in [ 'virDomainSnapshot' ]:
-                    classes.write("    def __init__(self, dom, _obj=None):\n")
-                else:
-                    classes.write("    def __init__(self, _obj=None):\n")
-                if classname in [ "virDomain", "virNetwork", "virInterface",
-                                  "virNodeDevice", "virSecret", "virStream",
-                                  "virNWFilter" ]:
-                    classes.write("        self._conn = conn\n")
-                elif classname in [ "virStorageVol", "virStoragePool" ]:
-                    classes.write("        self._conn = conn\n" + \
-                                  "        if not isinstance(conn, virConnect):\n" + \
-                                  "            self._conn = conn._conn\n")
-                elif classname in [ "virDomainSnapshot" ]:
-                    classes.write("        self._dom = dom\n")
-                    classes.write("        self._conn = dom.connect()\n")
-                classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
-                classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
-                classes.write("        self._o = _obj\n\n")
+                classes.write("    def __init__(self, _obj=None):\n")
+            if classname in [ "virDomain", "virNetwork", "virInterface",
+                              "virNodeDevice", "virSecret", "virStream",
+                              "virNWFilter" ]:
+                classes.write("        self._conn = conn\n")
+            elif classname in [ "virStorageVol", "virStoragePool" ]:
+                classes.write("        self._conn = conn\n" + \
+                              "        if not isinstance(conn, virConnect):\n" + \
+                              "            self._conn = conn._conn\n")
+            elif classname in [ "virDomainSnapshot" ]:
+                classes.write("        self._dom = dom\n")
+                classes.write("        self._conn = dom.connect()\n")
+            classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
+            classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
+            classes.write("        self._o = _obj\n\n")
             destruct=None
             if classname in classes_destructors:
                 classes.write("    def __del__(self):\n")
