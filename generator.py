@@ -1074,9 +1074,6 @@ functions_noexcept = {
     'virNWFilterGetName': True,
 }
 
-reference_keepers = {
-}
-
 function_classes = {}
 
 function_classes["None"] = []
@@ -1500,10 +1497,6 @@ def buildWrappers(module):
                 classes.write("class %s(%s):\n" % (classname,
                               classes_ancestor[classname]))
                 classes.write("    def __init__(self, _obj=None):\n")
-                if classname in reference_keepers:
-                    rlist = reference_keepers[classname]
-                    for ref in rlist:
-                        classes.write("        self.%s = None\n" % ref[1])
                 classes.write("        self._o = _obj\n")
                 classes.write("        %s.__init__(self, _obj=_obj)\n\n" % (
                               classes_ancestor[classname]))
@@ -1517,10 +1510,6 @@ def buildWrappers(module):
                     classes.write("    def __init__(self, dom, _obj=None):\n")
                 else:
                     classes.write("    def __init__(self, _obj=None):\n")
-                if classname in reference_keepers:
-                    rlist = reference_keepers[classname]
-                    for ref in rlist:
-                        classes.write("        self.%s = None\n" % ref[1])
                 if classname in [ "virDomain", "virNetwork", "virInterface",
                                   "virNodeDevice", "virSecret", "virStream",
                                   "virNWFilter" ]:
@@ -1672,19 +1661,6 @@ def buildWrappers(module):
                         classes.write("        __tmp = ")
                         classes.write(classes_type[ret[0]][1] % ("ret"))
                         classes.write("\n")
-
-                        #
-                        # Sometime one need to keep references of the source
-                        # class in the returned class object.
-                        # See reference_keepers for the list
-                        #
-                        tclass = classes_type[ret[0]][2]
-                        if tclass in reference_keepers:
-                            rlist = reference_keepers[tclass]
-                            for pref in rlist:
-                                if pref[0] == classname:
-                                    classes.write("        __tmp.%s = self\n" %
-                                                  pref[1])
 
                         # Post-processing - just before we return.
                         if name in function_post:
