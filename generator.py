@@ -1078,8 +1078,6 @@ function_classes = {}
 
 function_classes["None"] = []
 
-function_post = {}
-
 # Functions returning an integral type which need special rules to
 # check for errors and raise exceptions.
 functions_int_exception_test = {
@@ -1662,11 +1660,6 @@ def buildWrappers(module):
                         classes.write(classes_type[ret[0]][1] % ("ret"))
                         classes.write("\n")
 
-                        # Post-processing - just before we return.
-                        if name in function_post:
-                            classes.write("        %s\n" %
-                                          (function_post[name]))
-
                         #
                         # return the class
                         #
@@ -1678,11 +1671,6 @@ def buildWrappers(module):
                         if name in functions_noexcept:
                             classes.write(
                                 "        if ret is None:return None")
-
-                        # Post-processing - just before we return.
-                        if name in function_post:
-                            classes.write("        %s\n" %
-                                          (function_post[name]))
 
                         classes.write("        return ")
                         classes.write(converter_type[ret[0]] % ("ret"))
@@ -1726,11 +1714,6 @@ def buildWrappers(module):
                                                 ": raise libvirtError ('%s() failed')\n") %
                                                ("ret", name))
 
-                        # Post-processing - just before we return.
-                        if name in function_post:
-                            classes.write("        %s\n" %
-                                          (function_post[name]))
-
                         classes.write ("        return ret\n")
 
                     elif is_python_noninteger_type (ret[0]):
@@ -1768,19 +1751,8 @@ def buildWrappers(module):
                                                 ": raise libvirtError ('%s() failed')\n") %
                                                ("ret", name))
 
-                        # Post-processing - just before we return.
-                        if name in function_post:
-                            classes.write("        %s\n" %
-                                          (function_post[name]))
-
                         classes.write ("        return ret\n")
-
                     else:
-                        # Post-processing - just before we return.
-                        if name in function_post:
-                            classes.write("        %s\n" %
-                                          (function_post[name]))
-
                         classes.write("        return ret\n")
 
                 classes.write("\n")
