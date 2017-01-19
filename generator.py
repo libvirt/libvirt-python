@@ -1532,6 +1532,8 @@ def buildWrappers(module):
                 elif classname in [ "virDomainSnapshot" ]:
                     classes.write("        self._dom = dom\n")
                     classes.write("        self._conn = dom.connect()\n")
+                classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
+                classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
                 classes.write("        self._o = _obj\n\n")
             destruct=None
             if classname in classes_destructors:
