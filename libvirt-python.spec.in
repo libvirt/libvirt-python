@@ -86,11 +86,13 @@ rm -f %{buildroot}%{_libdir}/python*/site-packages/*egg-info
 %defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
 %{_libdir}/python3*/site-packages/libvirt.py*
+%{_libdir}/python3*/site-packages/libvirtaio.py*
 %{_libdir}/python3*/site-packages/libvirt_qemu.py*
 %{_libdir}/python3*/site-packages/libvirt_lxc.py*
 %{_libdir}/python3*/site-packages/__pycache__/libvirt.cpython-*.py*
 %{_libdir}/python3*/site-packages/__pycache__/libvirt_qemu.cpython-*.py*
 %{_libdir}/python3*/site-packages/__pycache__/libvirt_lxc.cpython-*.py*
+%{_libdir}/python3*/site-packages/__pycache__/libvirtaio.cpython-*.py*
 %{_libdir}/python3*/site-packages/libvirtmod*
 %endif
 

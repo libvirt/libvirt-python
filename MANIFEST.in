@@ -31,6 +31,7 @@ include libvirt-qemu-override-api.xml
 include libvirt-qemu-override.c
 include libvirt-utils.h
 include libvirt-utils.c
+include libvirtaio.py
 include MANIFEST
 include README
 include sanitytest.py
