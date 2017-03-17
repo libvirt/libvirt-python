@@ -211,3 +211,26 @@ def virEventAddTimeout(timeout, cb, opaque):
     ret = libvirtmod.virEventAddTimeout(timeout, cbData)
     if ret == -1: raise libvirtError ('virEventAddTimeout() failed')
     return ret
+
+
+#
+# a caller for the ff callbacks for custom event loop implementations
+#
+
+def virEventInvokeFreeCallback(opaque):
+    """
+    Execute callback which frees the opaque buffer
+
+    @opaque: the opaque object passed to addHandle or addTimeout
+
+    WARNING: This function should not be called from any call by libvirt's
+    core. It will most probably cause deadlock in C-level libvirt code.
+    Instead it should be scheduled and called from implementation's stack.
+
+    See https://libvirt.org/html/libvirt-libvirt-event.html#virEventAddHandleFunc
+    for more information.
+
+    This function is not dependent on any event loop implementation.
+    """
+
+    libvirtmod.virEventInvokeFreeCallback(opaque[2], opaque[1])

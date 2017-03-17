@@ -5223,6 +5223,9 @@ libvirt_virEventAddHandleFunc(int fd,
 
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 3, cb_args, cleanup);
 
+    /* If changing contents of the opaque object, please also change
+     * virEventInvokeFreeCallback() in libvirt-override.py
+     */
     VIR_PY_TUPLE_SET_GOTO(cb_args, 0, libvirt_virEventHandleCallbackWrap(cb), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 1, libvirt_virVoidPtrWrap(opaque), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 2, libvirt_virFreeCallbackWrap(ff), cleanup);
@@ -5279,10 +5282,7 @@ libvirt_virEventRemoveHandleFunc(int watch)
 {
     PyObject *result = NULL;
     PyObject *pyobj_args;
-    PyObject *opaque;
-    PyObject *ff;
     int retval = -1;
-    virFreeCallback cff;
 
     LIBVIRT_ENSURE_THREAD_STATE;
 
@@ -5292,20 +5292,11 @@ libvirt_virEventRemoveHandleFunc(int watch)
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(watch), cleanup);
 
     result = PyEval_CallObject(removeHandleObj, pyobj_args);
-    if (!result) {
+    if (result) {
+        retval = 0;
+    } else {
         PyErr_Print();
         PyErr_Clear();
-    } else if (!PyTuple_Check(result) || PyTuple_Size(result) != 3) {
-        DEBUG("%s: %s must return opaque obj registered with %s"
-              "to avoid leaking libvirt memory\n",
-              __FUNCTION__, NAME(removeHandle), NAME(addHandle));
-    } else {
-        opaque = PyTuple_GetItem(result, 1);
-        ff = PyTuple_GetItem(result, 2);
-        cff = PyvirFreeCallback_Get(ff);
-        if (cff)
-            (*cff)(PyvirVoidPtr_Get(opaque));
-        retval = 0;
     }
 
  cleanup:
@@ -5350,6 +5341,9 @@ libvirt_virEventAddTimeoutFunc(int timeout,
 
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 2, cb_args, cleanup);
 
+    /* If changing contents of the opaque object, please also change
+     * virEventInvokeFreeCallback() in libvirt-override.py
+     */
     VIR_PY_TUPLE_SET_GOTO(cb_args, 0, libvirt_virEventTimeoutCallbackWrap(cb), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 1, libvirt_virVoidPtrWrap(opaque), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 2, libvirt_virFreeCallbackWrap(ff), cleanup);
@@ -5403,10 +5397,7 @@ libvirt_virEventRemoveTimeoutFunc(int timer)
 {
     PyObject *result = NULL;
     PyObject *pyobj_args;
-    PyObject *opaque;
-    PyObject *ff;
     int retval = -1;
-    virFreeCallback cff;
 
     LIBVIRT_ENSURE_THREAD_STATE;
 
@@ -5416,20 +5407,11 @@ libvirt_virEventRemoveTimeoutFunc(int timer)
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(timer), cleanup);
 
     result = PyEval_CallObject(removeTimeoutObj, pyobj_args);
-    if (!result) {
+    if (result) {
+        retval = 0;
+    } else {
         PyErr_Print();
         PyErr_Clear();
-    } else if (!PyTuple_Check(result) || PyTuple_Size(result) != 3) {
-        DEBUG("%s: %s must return opaque obj registered with %s"
-              "to avoid leaking libvirt memory\n",
-              __FUNCTION__, NAME(removeTimeout), NAME(addTimeout));
-    } else {
-        opaque = PyTuple_GetItem(result, 1);
-        ff = PyTuple_GetItem(result, 2);
-        cff = PyvirFreeCallback_Get(ff);
-        if (cff)
-            (*cff)(PyvirVoidPtr_Get(opaque));
-        retval = 0;
     }
 
  cleanup:
@@ -5552,6 +5534,31 @@ libvirt_virEventInvokeTimeoutCallback(PyObject *self ATTRIBUTE_UNUSED,
     if (cb) {
         LIBVIRT_BEGIN_ALLOW_THREADS;
         cb(timer, opaque);
+        LIBVIRT_END_ALLOW_THREADS;
+    }
+
+    return VIR_PY_INT_SUCCESS;
+}
+
+static PyObject *
+libvirt_virEventInvokeFreeCallback(PyObject *self ATTRIBUTE_UNUSED,
+                                   PyObject *args)
+{
+    PyObject *py_f;
+    PyObject *py_opaque;
+    virFreeCallback cb;
+    void *opaque;
+
+    if (!PyArg_ParseTuple(args, (char *) "OO:virEventInvokeFreeCallback",
+                          &py_f, &py_opaque))
+        return NULL;
+
+    cb     = (virFreeCallback) PyvirEventHandleCallback_Get(py_f);
+    opaque = (void *) PyvirVoidPtr_Get(py_opaque);
+
+    if (cb) {
+        LIBVIRT_BEGIN_ALLOW_THREADS;
+        cb(opaque);
         LIBVIRT_END_ALLOW_THREADS;
     }
 
@@ -9572,6 +9579,7 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virEventAddTimeout", libvirt_virEventAddTimeout, METH_VARARGS, NULL},
     {(char *) "virEventInvokeHandleCallback", libvirt_virEventInvokeHandleCallback, METH_VARARGS, NULL},
     {(char *) "virEventInvokeTimeoutCallback", libvirt_virEventInvokeTimeoutCallback, METH_VARARGS, NULL},
+    {(char *) "virEventInvokeFreeCallback", libvirt_virEventInvokeFreeCallback, METH_VARARGS, NULL},
     {(char *) "virNodeListDevices", libvirt_virNodeListDevices, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllNodeDevices", libvirt_virConnectListAllNodeDevices, METH_VARARGS, NULL},

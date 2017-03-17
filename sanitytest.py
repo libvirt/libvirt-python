@@ -349,7 +349,8 @@ for klass in gotfunctions:
         continue
     for func in sorted(gotfunctions[klass]):
         # These are pure python methods with no C APi
-        if func in ["connect", "getConnect", "domain", "getDomain"]:
+        if func in ["connect", "getConnect", "domain", "getDomain",
+                    "virEventInvokeFreeCallback"]:
             continue
 
         key = "%s.%s" % (klass, func)
