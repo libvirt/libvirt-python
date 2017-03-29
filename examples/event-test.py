@@ -541,6 +541,9 @@ def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque):
 def myDomainEventMetadataChangeCallback(conn, dom, mtype, nsuri, opaque):
     print("myDomainEventMetadataChangeCallback: Domain %s(%s) changed metadata mtype=%d nsuri=%s" % (
             dom.name(), dom.ID(), mtype, nsuri))
+def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess, opaque):
+    print("myDomainEventBlockThresholdCallback: Domain %s(%s) block device %s(%s) threshold %d exceeded by %d" % (
+            dom.name(), dom.ID(), dev, path, threshold, excess))
 
 ##########################################################################
 # Network events
@@ -710,6 +713,7 @@ def main():
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_JOB_COMPLETED, myDomainEventJobCompletedCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, myDomainEventDeviceRemovalFailedCallback, None)
     vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_METADATA_CHANGE, myDomainEventMetadataChangeCallback, None)
+    vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, myDomainEventBlockThresholdCallback, None)
 
     vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None)
 
