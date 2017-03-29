@@ -244,7 +244,7 @@
         return 0
 
     def _dispatchDomainEventMetadataChangeCallback(self, dom, mtype, nsuri, cbData):
-        """Dispatches event to python user domain device removal failed event callbacks
+        """Dispatches event to python user domain metadata change event callbacks
         """
         cb = cbData["cb"]
         opaque = cbData["opaque"]
