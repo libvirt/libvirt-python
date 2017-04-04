@@ -107,6 +107,7 @@ class virEventLoopPure:
         self.nextTimerID = 1
         self.handles = []
         self.timers = []
+        self.cleanup = []
         self.quit = False
 
         # The event loop can be used from multiple threads at once.
@@ -178,6 +179,11 @@ class virEventLoopPure:
     def run_once(self):
         sleep = -1
         self.runningPoll = True
+
+        for opaque in self.cleanup:
+            libvirt.virEventInvokeFreeCallback(opaque)
+        self.cleanup = []
+
         try:
             next = self.next_timeout()
             debug("Next timeout due at %d" % next)
@@ -300,8 +306,9 @@ class virEventLoopPure:
         handles = []
         for h in self.handles:
             if h.get_id() == handleID:
-                self.poll.unregister(h.get_fd())
                 debug("Remove handle %d fd %d" % (handleID, h.get_fd()))
+                self.poll.unregister(h.get_fd())
+                self.cleanup.append(h.opaque)
             else:
                 handles.append(h)
         self.handles = handles
@@ -313,7 +320,9 @@ class virEventLoopPure:
         for h in self.timers:
             if h.get_id() != timerID:
                 timers.append(h)
+            else:
                 debug("Remove timer %d" % timerID)
+                self.cleanup.append(h.opaque)
         self.timers = timers
         self.interrupt()
 
