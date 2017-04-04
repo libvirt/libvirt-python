@@ -651,15 +651,17 @@ def usage():
     print("   --help, -h   Print(this help message")
     print("   --debug, -d  Print(debug output")
     print("   --loop, -l   Toggle event-loop-implementation")
+    print("   --timeout=SECS  Quit after SECS seconds running")
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hdl", ["help", "debug", "loop"])
+        opts, args = getopt.getopt(sys.argv[1:], "hdl", ["help", "debug", "loop", "timeout="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err)) # will print something like "option -a not recognized"
         usage()
         sys.exit(2)
+    timeout = None
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
@@ -670,6 +672,8 @@ def main():
         if o in ("-l", "--loop"):
             global use_pure_python_event_loop
             use_pure_python_event_loop ^= True
+        if o in ("--timeout"):
+            timeout = int(a)
 
     if len(args) >= 1:
         uri = args[0]
@@ -741,7 +745,9 @@ def main():
     # of demo we'll just go to sleep. The other option is to
     # run the event loop in your main thread if your app is
     # totally event based.
-    while run:
+    count = 0
+    while run and (timeout is None or count < timeout):
+        count = count + 1
         time.sleep(1)
 
 
