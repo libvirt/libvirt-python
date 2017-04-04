@@ -39,10 +39,10 @@ def debug(msg):
 #
 # It is a pure python implementation based around the poll() API
 #
-class virEventLoopPure:
+class virEventLoopPoll:
     # This class contains the data we need to track for a
     # single file handle
-    class virEventLoopPureHandle:
+    class virEventLoopPollHandle:
         def __init__(self, handle, fd, events, cb, opaque):
             self.handle = handle
             self.fd = fd
@@ -70,7 +70,7 @@ class virEventLoopPure:
 
     # This class contains the data we need to track for a
     # single periodic timer
-    class virEventLoopPureTimer:
+    class virEventLoopPollTimer:
         def __init__(self, timer, interval, cb, opaque):
             self.timer = timer
             self.interval = interval
@@ -142,14 +142,14 @@ class virEventLoopPure:
 
         return next
 
-    # Lookup a virEventLoopPureHandle object based on file descriptor
+    # Lookup a virEventLoopPollHandle object based on file descriptor
     def get_handle_by_fd(self, fd):
         for h in self.handles:
             if h.get_fd() == fd:
                 return h
         return None
 
-    # Lookup a virEventLoopPureHandle object based on its event loop ID
+    # Lookup a virEventLoopPollHandle object based on its event loop ID
     def get_handle_by_id(self, handleID):
         for h in self.handles:
             if h.get_id() == handleID:
@@ -253,7 +253,7 @@ class virEventLoopPure:
         handleID = self.nextHandleID + 1
         self.nextHandleID = self.nextHandleID + 1
 
-        h = self.virEventLoopPureHandle(handleID, fd, events, cb, opaque)
+        h = self.virEventLoopPollHandle(handleID, fd, events, cb, opaque)
         self.handles.append(h)
 
         self.poll.register(fd, self.events_to_poll(events))
@@ -272,7 +272,7 @@ class virEventLoopPure:
         timerID = self.nextTimerID + 1
         self.nextTimerID = self.nextTimerID + 1
 
-        h = self.virEventLoopPureTimer(timerID, interval, cb, opaque)
+        h = self.virEventLoopPollTimer(timerID, interval, cb, opaque)
         self.timers.append(h)
         self.interrupt()
 
@@ -361,7 +361,7 @@ class virEventLoopPure:
 
 # This single global instance of the event loop wil be used for
 # monitoring libvirt events
-eventLoop = virEventLoopPure()
+eventLoop = virEventLoopPoll()
 
 # This keeps track of what thread is running the event loop,
 # (if it is run in a background thread)
@@ -371,7 +371,7 @@ eventLoopThread = None
 # These next set of 6 methods are the glue between the official
 # libvirt events API, and our particular impl of the event loop
 #
-# There is no reason why the 'virEventLoopPure' has to be used.
+# There is no reason why the 'virEventLoopPoll' has to be used.
 # An application could easily may these 6 glue methods hook into
 # another event loop such as GLib's, or something like the python
 # Twisted event framework.
@@ -402,7 +402,7 @@ def virEventRemoveTimerImpl(timerID):
 
 # This tells libvirt what event loop implementation it
 # should use
-def virEventLoopPureRegister():
+def virEventLoopPollRegister():
     libvirt.virEventRegisterImpl(virEventAddHandleImpl,
                                  virEventUpdateHandleImpl,
                                  virEventRemoveHandleImpl,
@@ -411,7 +411,7 @@ def virEventLoopPureRegister():
                                  virEventRemoveTimerImpl)
 
 # Directly run the event loop in the current thread
-def virEventLoopPureRun():
+def virEventLoopPollRun():
     global eventLoop
     eventLoop.run_loop()
 
@@ -420,10 +420,10 @@ def virEventLoopNativeRun():
         libvirt.virEventRunDefaultImpl()
 
 # Spawn a background thread to run the event loop
-def virEventLoopPureStart():
+def virEventLoopPollStart():
     global eventLoopThread
-    virEventLoopPureRegister()
-    eventLoopThread = threading.Thread(target=virEventLoopPureRun, name="libvirtEventLoop")
+    virEventLoopPollRegister()
+    eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
     eventLoopThread.setDaemon(True)
     eventLoopThread.start()
 
@@ -684,7 +684,7 @@ def main():
 
     # Run a background thread with the event loop
     if use_pure_python_event_loop:
-        virEventLoopPureStart()
+        virEventLoopPollStart()
     else:
         virEventLoopNativeStart()
 
