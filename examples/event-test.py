@@ -15,16 +15,19 @@ import errno
 import time
 import threading
 
-# For the sake of demonstration, this example program includes
-# an implementation of a pure python event loop. Most applications
-# would be better off just using the default libvirt event loop
-# APIs, instead of implementing this in python. The exception is
-# where an application wants to integrate with an existing 3rd
-# party event loop impl
+# This example can use three different event loop impls. It defaults
+# to a portable pure-python impl based on poll that is implemented
+# in this file.
 #
-# Change this to 'False' to make the demo use the native
-# libvirt event loop impl
-use_pure_python_event_loop = True
+# When Python >= 3.4, it can optionally use an impl based on the
+# new asyncio module.
+#
+# Finally, it can also use the libvirt native event loop impl
+#
+# This setting thus allows 'poll', 'native' or 'asyncio' as valid
+# choices
+#
+event_impl = "poll"
 
 do_debug = False
 def debug(msg):
@@ -415,6 +418,11 @@ def virEventLoopPollRun():
     global eventLoop
     eventLoop.run_loop()
 
+def virEventLoopAIORun(loop):
+    import asyncio
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
 def virEventLoopNativeRun():
     while True:
         libvirt.virEventRunDefaultImpl()
@@ -424,6 +432,16 @@ def virEventLoopPollStart():
     global eventLoopThread
     virEventLoopPollRegister()
     eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
+    eventLoopThread.setDaemon(True)
+    eventLoopThread.start()
+
+def virEventLoopAIOStart():
+    global eventLoopThread
+    import libvirtaio
+    import asyncio
+    loop = asyncio.new_event_loop()
+    libvirtaio.virEventRegisterAsyncIOImpl(loop=loop)
+    eventLoopThread = threading.Thread(target=virEventLoopAIORun, args=(loop,), name="libvirtEventLoop")
     eventLoopThread.setDaemon(True)
     eventLoopThread.start()
 
@@ -650,12 +668,12 @@ def usage():
     print("   uri will default to qemu:///system")
     print("   --help, -h   Print(this help message")
     print("   --debug, -d  Print(debug output")
-    print("   --loop, -l   Toggle event-loop-implementation")
+    print("   --loop=TYPE, -l   Choose event-loop-implementation (native, poll, asyncio)")
     print("   --timeout=SECS  Quit after SECS seconds running")
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hdl", ["help", "debug", "loop", "timeout="])
+        opts, args = getopt.getopt(sys.argv[1:], "hdl:", ["help", "debug", "loop=", "timeout="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(str(err)) # will print something like "option -a not recognized"
@@ -670,8 +688,8 @@ def main():
             global do_debug
             do_debug = True
         if o in ("-l", "--loop"):
-            global use_pure_python_event_loop
-            use_pure_python_event_loop ^= True
+            global event_impl
+            event_impl = a
         if o in ("--timeout"):
             timeout = int(a)
 
@@ -680,11 +698,13 @@ def main():
     else:
         uri = "qemu:///system"
 
-    print("Using uri:" + uri)
+    print("Using uri '%s' and event loop '%s'" % (uri, event_impl))
 
     # Run a background thread with the event loop
-    if use_pure_python_event_loop:
+    if event_impl == "poll":
         virEventLoopPollStart()
+    elif event_impl == "asyncio":
+        virEventLoopAIOStart()
     else:
         virEventLoopNativeStart()
 
