@@ -83,7 +83,7 @@
                     pass
                 raise e
 
-            if got == "":
+            if not got:
                 break
 
             ret = self.send(got)
