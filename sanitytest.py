@@ -167,7 +167,8 @@ for cname in wantfunctions:
     # These aren't functions, they're callback signatures
     if name in ["virConnectAuthCallbackPtr", "virConnectCloseFunc",
                 "virStreamSinkFunc", "virStreamSourceFunc", "virStreamEventCallback",
-                "virEventHandleCallback", "virEventTimeoutCallback", "virFreeCallback"]:
+                "virEventHandleCallback", "virEventTimeoutCallback", "virFreeCallback",
+                "virStreamSinkHoleFunc", "virStreamSourceHoleFunc", "virStreamSourceSkipFunc"]:
         continue
     if name[0:21] == "virConnectDomainEvent" and name[-8:] == "Callback":
         continue
@@ -373,7 +374,8 @@ for name in sorted(finalklassmap):
 
     # These exist in C and exist in python, but we've got
     # a pure-python impl so don't check them
-    if name in ["virStreamRecvAll", "virStreamSendAll"]:
+    if name in ["virStreamRecvAll", "virStreamSendAll",
+            "virStreamSparseRecvAll", "virStreamSparseSendAll"]:
         continue
 
     try:

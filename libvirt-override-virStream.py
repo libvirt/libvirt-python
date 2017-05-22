@@ -164,3 +164,106 @@
         ret = libvirtmod.virStreamRecvFlags(self._o, nbytes, flags)
         if ret is None: raise libvirtError ('virStreamRecvFlags() failed')
         return ret
+
+    def sparseRecvAll(self, handler, holeHandler, opaque):
+        """Receive the entire data stream, sending the data to
+        the requested data sink handler and calling the skip
+        holeHandler to generate holes for sparse stream targets.
+        This is simply a convenient alternative to recvFlags, for
+        apps that do blocking-I/O and want to preserve sparseness.
+
+        Hypothetical callbacks can look like this:
+
+            def handler(stream, # virStream instance
+                        buf,    # string containing received data
+                        opaque): # extra data passed to sparseRecvAll as opaque
+                fd = opaque
+                return os.write(fd, buf)
+
+            def holeHandler(stream, # virStream instance
+                            length, # number of bytes to skip
+                            opaque): # extra data passed to sparseRecvAll as opaque
+                fd = opaque
+                cur = os.lseek(fd, length, os.SEEK_CUR)
+                return os.ftruncate(fd, cur) # take this extra step to
+                                             # actually allocate the hole
+        """
+        while True:
+            want = 64 * 1024
+            got = self.recvFlags(want, VIR_STREAM_RECV_STOP_AT_HOLE)
+            if got == -2:
+                raise libvirtError("cannot use sparseRecvAll with "
+                                   "nonblocking stream")
+            if got == -3:
+                length = self.recvHole()
+                if length is None:
+                    self.abort()
+                    raise RuntimeError("recvHole handler failed")
+                ret = holeHandler(self, length, opaque)
+                if type(ret) is int and ret < 0:
+                    self.abort()
+                    raise RuntimeError("holeHandler handler returned %d" % ret)
+                continue
+
+            if len(got) == 0:
+                break
+
+            ret = handler(self, got, opaque)
+            if type(ret) is int and ret < 0:
+                self.abort()
+                raise RuntimeError("sparseRecvAll handler returned %d" % ret)
+
+    def sparseSendAll(self, handler, holeHandler, skipHandler, opaque):
+        """Send the entire data stream, reading the data from the
+        requested data source. This is simply a convenient
+        alternative to virStreamSend, for apps that do
+        blocking-I/O and want to preserve sparseness.
+
+        Hypothetical callbacks can look like this:
+
+            def handler(stream, # virStream instance
+                        nbytes, # int amt of data to read
+                        opaque): # extra data passed to sparseSendAll as opaque
+                fd = opaque
+                return os.read(fd, nbytes)
+
+            def holeHandler(stream, # virStream instance
+                            opaque): # extra data passed to sparseSendAll as opaque
+                fd = opaque
+                cur = os.lseek(fd, 0, os.SEEK_CUR)
+                # ... find out current section and its boundaries
+                # and set inData = True/False and sectionLen correspondingly
+                os.lseek(fd, cur, os.SEEK_SET)
+                return [inData, sectionLen]
+
+            def skipHandler(stream, # virStream instance
+                            length, # number of bytes to skip
+                            opaque): # extra data passed to sparseSendAll as opaque
+                fd = opaque
+                return os.lseek(fd, length, os.SEEK_CUR)
+
+        """
+        while True:
+            [inData, sectionLen] = holeHandler(self, opaque)
+            if (inData == False and sectionLen > 0):
+                if (self.sendHole(sectionLen) < 0 or
+                        skipHandler(self, sectionLen, opaque) < 0):
+                    self.abort()
+                continue
+
+            want = 64 * 1024
+            if (want > sectionLen):
+                want = sectionLen
+
+            got = handler(self, want, opaque)
+            if type(got) is int and got < 0:
+                self.abort()
+                raise RuntimeError("sparseSendAll handler returned %d" % ret)
+
+            if not got:
+                break
+
+            ret = self.send(got)
+            if ret == -2:
+                raise libvirtError("cannot use sparseSendAll with "
+                                   "nonblocking stream")
