@@ -9519,6 +9519,44 @@ libvirt_virStreamSendHole(PyObject *self ATTRIBUTE_UNUSED,
     return libvirt_intWrap(ret);
 }
 
+
+static PyObject *
+libvirt_virStreamRecvFlags(PyObject *self ATTRIBUTE_UNUSED,
+                           PyObject *args)
+{
+    PyObject *pyobj_stream;
+    PyObject *rv;
+    virStreamPtr stream;
+    char *buf = NULL;
+    size_t nbytes;
+    unsigned int flags;
+    int ret;
+
+    if (!PyArg_ParseTuple(args, (char *) "OkI:virStreamRecvFlags",
+                          &pyobj_stream, &nbytes, &flags))
+        return NULL;
+
+    stream = PyvirStream_Get(pyobj_stream);
+
+    if (VIR_ALLOC_N(buf, nbytes + 1) < 0)
+        return PyErr_NoMemory();
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    ret = virStreamRecvFlags(stream, buf, nbytes, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    buf[ret > -1 ? ret : 0] = '\0';
+    DEBUG("StreamRecvFlags ret=%d strlen=%d\n", ret, (int) strlen(buf));
+
+    if (ret == -2 || ret == -3)
+        return libvirt_intWrap(ret);
+    if (ret < 0)
+        return VIR_PY_NONE;
+    rv = libvirt_charPtrSizeWrap((char *) buf, (Py_ssize_t) ret);
+    VIR_FREE(buf);
+    return rv;
+}
+
 #endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
 
 
@@ -9749,6 +9787,7 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(3, 4, 0)
     {(char *) "virStreamRecvHole", libvirt_virStreamRecvHole, METH_VARARGS, NULL},
     {(char *) "virStreamSendHole", libvirt_virStreamSendHole, METH_VARARGS, NULL},
+    {(char *) "virStreamRecvFlags", libvirt_virStreamRecvFlags, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
     {NULL, NULL, 0, NULL}
 };

@@ -146,3 +146,21 @@
         ret = libvirtmod.virStreamSendHole(self._o, length, flags)
         if ret == -1: raise libvirtError('virStreamSendHole() failed')
         return ret
+
+    def recvFlags(self, nbytes, flags = 0):
+        """Reads a series of bytes from the stream. This method may
+        block the calling application for an arbitrary amount
+        of time. This is just like recv except it has flags
+        argument.
+
+        Errors are not guaranteed to be reported synchronously
+        with the call, but may instead be delayed until a
+        subsequent call.
+
+        On success, the received data is returned. On failure, an
+        exception is raised. If the stream is a NONBLOCK stream and
+        the request would block, integer -2 is returned.
+        """
+        ret = libvirtmod.virStreamRecvFlags(self._o, nbytes, flags)
+        if ret is None: raise libvirtError ('virStreamRecvFlags() failed')
+        return ret
