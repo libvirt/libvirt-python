@@ -125,3 +125,24 @@
         ret = libvirtmod.virStreamSend(self._o, data)
         if ret == -1: raise libvirtError ('virStreamSend() failed')
         return ret
+
+    def recvHole(self, flags = 0):
+        """This method is used to determine the length in bytes
+        of the empty space to be created in a stream's target
+        file when uploading or downloading sparsely populated
+        files. This is the counterpart to sendHole.
+        """
+        ret = libvirtmod.virStreamRecvHole(self._o, flags)
+        if ret is None: raise libvirtError ('virStreamRecvHole() failed')
+        return ret
+
+    def sendHole(self, length, flags = 0):
+        """Rather than transmitting empty file space, this method
+        directs the stream target to create length bytes of empty
+        space.  This method would be used when uploading or
+        downloading sparsely populated files to avoid the
+        needless copy of empty file space.
+        """
+        ret = libvirtmod.virStreamSendHole(self._o, length, flags)
+        if ret == -1: raise libvirtError('virStreamSendHole() failed')
+        return ret

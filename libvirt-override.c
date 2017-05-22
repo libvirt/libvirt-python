@@ -9463,6 +9463,65 @@ libvirt_virConnectSecretEventDeregisterAny(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(3, 0, 0)*/
 
+
+#if LIBVIR_CHECK_VERSION(3, 4, 0)
+static PyObject *
+libvirt_virStreamRecvHole(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
+{
+    PyObject *pyobj_stream;
+    virStreamPtr stream;
+    long long length = -1;
+    unsigned int flags;
+    int ret;
+
+    if (!PyArg_ParseTuple(args, (char *) "OI:virStreamRecvHole",
+                          &pyobj_stream, &flags))
+        return NULL;
+
+    stream = PyvirStream_Get(pyobj_stream);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    ret = virStreamRecvHole(stream, &length, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    DEBUG("StreamRecvHole ret=%d length=%lld\n", ret, length);
+
+    if (ret < 0)
+        return VIR_PY_NONE;
+
+    return libvirt_longlongWrap(length);
+}
+
+
+static PyObject *
+libvirt_virStreamSendHole(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
+{
+    PyObject *pyobj_stream;
+    virStreamPtr stream;
+    long long length;
+    unsigned int flags;
+    int ret;
+
+    if (!PyArg_ParseTuple(args, (char *) "OLI:virStreamSendHole",
+                          &pyobj_stream, &length, &flags))
+        return NULL;
+
+    stream = PyvirStream_Get(pyobj_stream);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    ret = virStreamSendHole(stream, length, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    DEBUG("StreamSendHole ret=%d\n", ret);
+
+    return libvirt_intWrap(ret);
+}
+
+#endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -9687,6 +9746,10 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virConnectSecretEventRegisterAny", libvirt_virConnectSecretEventRegisterAny, METH_VARARGS, NULL},
     {(char *) "virConnectSecretEventDeregisterAny", libvirt_virConnectSecretEventDeregisterAny, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(3, 0, 0) */
+#if LIBVIR_CHECK_VERSION(3, 4, 0)
+    {(char *) "virStreamRecvHole", libvirt_virStreamRecvHole, METH_VARARGS, NULL},
+    {(char *) "virStreamSendHole", libvirt_virStreamSendHole, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
     {NULL, NULL, 0, NULL}
 };
 

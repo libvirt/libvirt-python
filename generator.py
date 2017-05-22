@@ -543,6 +543,8 @@ skip_function = (
     'virStreamSendAll', # Pure python libvirt-override-virStream.py
     'virStreamRecv', # overridden in libvirt-override-virStream.py
     'virStreamSend', # overridden in libvirt-override-virStream.py
+    'virStreamRecvHole', # overridden in libvirt-override-virStream.py
+    'virStreamSendHole', # overridden in libvirt-override-virStream.py
 
     'virConnectUnregisterCloseCallback', # overridden in virConnect.py
     'virConnectRegisterCloseCallback', # overridden in virConnect.py
