@@ -63,7 +63,7 @@
     def getTime(self, flags=0):
         """Extract information about guest time """
         ret = libvirtmod.virDomainGetTime(self._o, flags)
-        if ret == -1: raise libvirtError ('virDomainGetTime() failed', dom=self)
+        if ret == None: raise libvirtError ('virDomainGetTime() failed', dom=self)
         return ret
 
     def setTime(self, time=None, flags=0):
