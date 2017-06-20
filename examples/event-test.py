@@ -477,7 +477,7 @@ def domDetailToString(event, detail):
         ( "Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error" ),
         ( "Unpaused", "Migrated", "Snapshot" ),
         ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
-        ( "Finished", ),
+        ( "Finished", "On guest request", "On host request"),
         ( "Memory", "Disk" ),
         ( "Panicked", ),
         )
