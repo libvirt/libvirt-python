@@ -398,6 +398,14 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         case VIR_DOMAIN_MEMORY_STAT_RSS:
             key = libvirt_constcharPtrWrap("rss");
             break;
+#if LIBVIR_CHECK_VERSION(2, 1, 0)
+        case VIR_DOMAIN_MEMORY_STAT_USABLE:
+            key = libvirt_constcharPtrWrap("usable");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_LAST_UPDATE:
+            key = libvirt_constcharPtrWrap("last_update");
+            break;
+#endif /* LIBVIR_CHECK_VERSION(2, 1, 0) */
         default:
             continue;
         }
