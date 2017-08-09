@@ -25,14 +25,32 @@ written in the Python programming language to use the interface
 supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
 
-%package -n libvirt-python3
+%package -n python2-libvirt
+Summary: The libvirt virtualization API python2 binding
+Url: http://libvirt.org
+License: LGPLv2+
+Group: Development/Libraries
+%{?python_provide:%python_provide python2-libvirt}
+Provides: libvirt-python = %{version}-%{release}
+Obsoletes: libvirt-python < %{version}-%{release}
+
+%description -n python2-libvirt
+The libvirt-python2 package contains a module that permits applications
+written in the Python programming language to use the interface
+supplied by the libvirt library to use the virtualization capabilities
+of recent versions of Linux (and other OSes).
+
+%package -n python3-libvirt
 Summary: The libvirt virtualization API python3 binding
 Url: http://libvirt.org
 License: LGPLv2+
 Group: Development/Libraries
+%{?python_provide:%python_provide python3-libvirt}
+Provides: libvirt-python3 = %{version}-%{release}
+Obsoletes: libvirt-python3 < %{version}-%{release}
 
-%description -n libvirt-python3
-The libvirt-python package contains a module that permits applications
+%description -n python3-libvirt
+The libvirt-python3 package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
@@ -57,7 +75,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 %{__python} setup.py test
 %{__python3} setup.py test
 
-%files
+%files -n python2-libvirt
 %defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
 %{_libdir}/python2*/site-packages/libvirt.py*
@@ -66,7 +84,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 %{_libdir}/python2*/site-packages/libvirtmod*
 %{_libdir}/python2*/site-packages/*egg-info
 
-%files -n libvirt-python3
+%files -n python3-libvirt
 %defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
 %{_libdir}/python3*/site-packages/libvirt.py*
