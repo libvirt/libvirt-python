@@ -42,7 +42,7 @@ Provides: libvirt-python = %{version}-%{release}
 Obsoletes: libvirt-python < %{version}-%{release}
 
 %description -n python2-libvirt
-The libvirt-python2 package contains a module that permits applications
+The python2-libvirt package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
@@ -58,7 +58,7 @@ Provides: libvirt-python3 = %{version}-%{release}
 Obsoletes: libvirt-python3 < %{version}-%{release}
 
 %description -n python3-libvirt
-The libvirt-python3 package contains a module that permits applications
+The python3-libvirt package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
