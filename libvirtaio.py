@@ -74,7 +74,7 @@ class Callback(object):
     def close(self):
         '''Schedule *ff* callback'''
         self.impl.log.debug('callback %d close(), scheduling ff', self.iden)
-        self.impl.schedule_ff_callback(self.opaque)
+        self.impl.schedule_ff_callback(self.iden, self.opaque)
 
 #
 # file descriptors
@@ -275,6 +275,10 @@ class virEventAsyncIOImpl(object):
         self.descriptors = DescriptorDict(self)
         self.log = logging.getLogger(self.__class__.__name__)
 
+    def __repr__(self):
+        return '<{} callbacks={} descriptors={}>'.format(
+            type(self).__name__, self.callbacks, self.descriptors)
+
     def register(self):
         '''Register this instance as event loop implementation'''
         # pylint: disable=bad-whitespace
@@ -284,9 +288,18 @@ class virEventAsyncIOImpl(object):
             self._add_timeout, self._update_timeout, self._remove_timeout)
         return self
 
-    def schedule_ff_callback(self, opaque):
+    def schedule_ff_callback(self, iden, opaque):
         '''Schedule a ff callback from one of the handles or timers'''
-        self.loop.call_soon(libvirt.virEventInvokeFreeCallback, opaque)
+        ensure_future(self._ff_callback(iden, opaque), loop=self.loop)
+
+    @asyncio.coroutine
+    def _ff_callback(self, iden, opaque):
+        '''Directly free the opaque object
+
+        This is a coroutine.
+        '''
+        self.log.debug('ff_callback(iden=%d, opaque=...)', iden)
+        return libvirt.virEventInvokeFreeCallback(opaque)
 
     def is_idle(self):
         '''Returns False if there are leftovers from a connection
@@ -309,10 +322,10 @@ class virEventAsyncIOImpl(object):
         .. seealso::
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventAddHandleFuncFunc
         '''
-        self.log.debug('add_handle(fd=%d, event=%d, cb=%r, opaque=%r)',
-                fd, event, cb, opaque)
         callback = FDCallback(self, cb, opaque,
                 descriptor=self.descriptors[fd], event=event)
+        self.log.debug('add_handle(fd=%d, event=%d, cb=..., opaque=...) = %d',
+                fd, event, callback.iden)
         self.callbacks[callback.iden] = callback
         self.descriptors[fd].add_handle(callback)
         return callback.iden
@@ -339,7 +352,11 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventRemoveHandleFunc
         '''
         self.log.debug('remove_handle(watch=%d)', watch)
-        callback = self.callbacks.pop(watch)
+        try:
+            callback = self.callbacks.pop(watch)
+        except KeyError as err:
+            self.log.warning('remove_handle(): no such handle: %r', err.args[0])
+            raise
         fd = callback.descriptor.fd
         assert callback is self.descriptors[fd].remove_handle(watch)
         if len(self.descriptors[fd].callbacks) == 0:
@@ -358,9 +375,9 @@ class virEventAsyncIOImpl(object):
         .. seealso::
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventAddTimeoutFunc
         '''
-        self.log.debug('add_timeout(timeout=%d, cb=%r, opaque=%r)',
-                timeout, cb, opaque)
         callback = TimeoutCallback(self, cb, opaque)
+        self.log.debug('add_timeout(timeout=%d, cb=..., opaque=...) = %d',
+                timeout, callback.iden)
         self.callbacks[callback.iden] = callback
         callback.update(timeout=timeout)
         return callback.iden
