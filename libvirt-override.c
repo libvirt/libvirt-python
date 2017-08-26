@@ -7663,6 +7663,35 @@ libvirt_virDomainMigrateGetMaxSpeed(PyObject *self ATTRIBUTE_UNUSED,
     return libvirt_ulongWrap(bandwidth);
 }
 
+#if LIBVIR_CHECK_VERSION(3, 7, 0)
+static PyObject *
+libvirt_virDomainMigrateGetMaxDowntime(PyObject *self ATTRIBUTE_UNUSED,
+                                       PyObject *args)
+{
+    PyObject *pyobj_domain;
+    virDomainPtr domain;
+    unsigned int flags;
+    unsigned long long downtime;
+    int rc;
+
+    if (!PyArg_ParseTuple(args,
+                          (char *) "OI:virDomainMigrateGetMaxDowntime",
+                          &pyobj_domain, &flags))
+        return NULL;
+
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    rc = virDomainMigrateGetMaxDowntime(domain, &downtime, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (rc < 0)
+        return VIR_PY_NONE;
+
+    return libvirt_ulonglongWrap(downtime);
+}
+#endif /* LIBVIR_CHECK_VERSION(3, 7, 0) */
+
 #if LIBVIR_CHECK_VERSION(1, 1, 0)
 static PyObject *
 libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
@@ -9732,6 +9761,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 0, 3)
     {(char *) "virDomainMigrateGetCompressionCache", libvirt_virDomainMigrateGetCompressionCache, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
+    {(char *) "virDomainMigrateGetMaxSpeed", libvirt_virDomainMigrateGetMaxSpeed, METH_VARARGS, NULL},
+#if LIBVIR_CHECK_VERSION(3, 7, 0)
+    {(char *) "virDomainMigrateGetMaxDowntime", libvirt_virDomainMigrateGetMaxDowntime, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(3, 7, 0) */
     {(char *) "virDomainMigrateGetMaxSpeed", libvirt_virDomainMigrateGetMaxSpeed, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(1, 1, 0)
     {(char *) "virDomainMigrate3", libvirt_virDomainMigrate3, METH_VARARGS, NULL},

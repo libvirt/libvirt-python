@@ -582,6 +582,13 @@
       <arg name='flags' type='unsigned int' info='flags, currently unused, pass 0.'/>
       <return type='unsigned long' info='current max migration speed, or None in case of error'/>
     </function>
+    <function name='virDomainMigrateGetMaxDowntime' file='python'>
+      <info>Get the current value of the maximum downtime (in milliseconds)
+            allowed during a migration of a guest.</info>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+      <arg name='flags' type='unsigned int' info='flags, currently unused, pass 0.'/>
+      <return type='unsigned long long' info='current downtime or None in case of error'/>
+    </function>
     <function name='virDomainMigrate3' file='python'>
       <info>Migrate the domain object from its current host to the destination host
             given by dconn (a connection to the destination host).</info>
