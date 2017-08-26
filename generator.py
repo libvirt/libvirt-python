@@ -465,6 +465,7 @@ skip_impl = (
     'virDomainGetBlockJobInfo',
     'virDomainMigrateGetCompressionCache',
     'virDomainMigrateGetMaxSpeed',
+    'virDomainMigrateGetMaxDowntime',
     'virDomainBlockStatsFlags',
     'virDomainSetBlockIoTune',
     'virDomainGetBlockIoTune',
