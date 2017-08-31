@@ -96,7 +96,7 @@ class Descriptor(object):
 
         :param int event: The event (from libvirt's constants) being dispatched
         '''
-        for callback in self.callbacks.values():
+        for callback in list(self.callbacks.values()):
             if callback.event is not None and callback.event & event:
                 callback.cb(callback.iden, self.fd, event, callback.opaque)
 
