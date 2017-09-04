@@ -5182,19 +5182,11 @@ libvirt_virConnectDomainEventDeregister(PyObject *self ATTRIBUTE_UNUSED,
  * Event Impl
  *******************************************/
 static PyObject *addHandleObj;
-static char *addHandleName;
 static PyObject *updateHandleObj;
-static char *updateHandleName;
 static PyObject *removeHandleObj;
-static char *removeHandleName;
 static PyObject *addTimeoutObj;
-static char *addTimeoutName;
 static PyObject *updateTimeoutObj;
-static char *updateTimeoutName;
 static PyObject *removeTimeoutObj;
-static char *removeTimeoutName;
-
-#define NAME(fn) ( fn ## Name ? fn ## Name : # fn )
 
 static int
 libvirt_virEventAddHandleFunc(int fd,
@@ -5442,12 +5434,6 @@ libvirt_virEventRegisterImpl(PyObject *self ATTRIBUTE_UNUSED,
     Py_XDECREF(addTimeoutObj);
     Py_XDECREF(updateTimeoutObj);
     Py_XDECREF(removeTimeoutObj);
-    VIR_FREE(addHandleName);
-    VIR_FREE(updateHandleName);
-    VIR_FREE(removeHandleName);
-    VIR_FREE(addTimeoutName);
-    VIR_FREE(updateTimeoutName);
-    VIR_FREE(removeTimeoutName);
 
     /* Parse and check arguments */
     if (!PyArg_ParseTuple(args, (char *) "OOOOOO:virEventRegisterImpl",
@@ -5461,14 +5447,6 @@ libvirt_virEventRegisterImpl(PyObject *self ATTRIBUTE_UNUSED,
         !PyCallable_Check(updateTimeoutObj) ||
         !PyCallable_Check(removeTimeoutObj))
         return NULL;
-
-    /* Get argument string representations (for error reporting) */
-    addHandleName = py_str(addHandleObj);
-    updateHandleName = py_str(updateHandleObj);
-    removeHandleName = py_str(removeHandleObj);
-    addTimeoutName = py_str(addTimeoutObj);
-    updateTimeoutName = py_str(updateTimeoutObj);
-    removeTimeoutName = py_str(removeTimeoutObj);
 
     /* Inc refs since we're holding on to these objects until
      * the next call (if any) to this function.
