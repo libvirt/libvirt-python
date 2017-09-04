@@ -5427,13 +5427,12 @@ static PyObject *
 libvirt_virEventRegisterImpl(PyObject *self ATTRIBUTE_UNUSED,
                              PyObject *args)
 {
-    /* Unref the previously-registered impl (if any) */
-    Py_XDECREF(addHandleObj);
-    Py_XDECREF(updateHandleObj);
-    Py_XDECREF(removeHandleObj);
-    Py_XDECREF(addTimeoutObj);
-    Py_XDECREF(updateTimeoutObj);
-    Py_XDECREF(removeTimeoutObj);
+    if (addHandleObj || updateHandleObj || removeHandleObj ||
+        addTimeoutObj || updateTimeoutObj || removeTimeoutObj) {
+        PyErr_SetString(PyExc_RuntimeError,
+                        "Event loop is already registered");
+        return NULL;
+    }
 
     /* Parse and check arguments */
     if (!PyArg_ParseTuple(args, (char *) "OOOOOO:virEventRegisterImpl",
