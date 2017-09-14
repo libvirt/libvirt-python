@@ -63,11 +63,6 @@ class Callback(object):
         self.cb = cb
         self.opaque = opaque
 
-        assert self.iden not in self.impl.callbacks, \
-            'found {} callback: {!r}'.format(
-                self.iden, self.impl.callbacks[self.iden])
-        self.impl.callbacks[self.iden] = self
-
     def __repr__(self):
         return '<{} iden={}>'.format(self.__class__.__name__, self.iden)
 
@@ -324,6 +319,8 @@ class virEventAsyncIOImpl(object):
         '''
         callback = FDCallback(self, cb, opaque,
                 descriptor=self.descriptors[fd], event=event)
+        assert callback.iden not in self.callbacks
+
         self.log.debug('add_handle(fd=%d, event=%d, cb=..., opaque=...) = %d',
                 fd, event, callback.iden)
         self.callbacks[callback.iden] = callback
@@ -376,6 +373,8 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventAddTimeoutFunc
         '''
         callback = TimeoutCallback(self, cb, opaque)
+        assert callback.iden not in self.callbacks
+
         self.log.debug('add_timeout(timeout=%d, cb=..., opaque=...) = %d',
                 timeout, callback.iden)
         self.callbacks[callback.iden] = callback
