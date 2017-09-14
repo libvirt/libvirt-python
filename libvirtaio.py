@@ -154,11 +154,6 @@ class Descriptor(object):
         self.update()
         return callback
 
-    def close(self):
-        ''''''
-        self.callbacks.clear()
-        self.update()
-
 class DescriptorDict(dict):
     '''Descriptors collection
 
@@ -249,8 +244,8 @@ class TimeoutCallback(Callback):
 
     def close(self):
         '''Stop the timer and call ff callback'''
-        super(TimeoutCallback, self).close()
         self.update(timeout=-1)
+        super(TimeoutCallback, self).close()
 
 #
 # main implementation
