@@ -30,7 +30,11 @@ Register the implementation of default loop:
 
 __author__ = 'Wojtek Porczyk <woju@invisiblethingslab.com>'
 __license__ = 'LGPL-2.1+'
-__all__ = ['virEventAsyncIOImpl', 'virEventRegisterAsyncIOImpl']
+__all__ = [
+    'getCurrentImpl',
+    'virEventAsyncIOImpl',
+    'virEventRegisterAsyncIOImpl',
+]
 
 import asyncio
 import itertools
@@ -401,10 +405,18 @@ class virEventAsyncIOImpl(object):
         callback = self.callbacks.pop(timer)
         callback.close()
 
+
+_current_impl = None
+def getCurrentImpl():
+    '''Return the current implementation, or None if not yet registered'''
+    return _current_impl
+
 def virEventRegisterAsyncIOImpl(loop=None):
     '''Arrange for libvirt's callbacks to be dispatched via asyncio event loop
 
     The implementation object is returned, but in normal usage it can safely be
     discarded.
     '''
-    return virEventAsyncIOImpl(loop=loop).register()
+    global _current_impl
+    _current_impl = virEventAsyncIOImpl(loop=loop).register()
+    return _current_impl
