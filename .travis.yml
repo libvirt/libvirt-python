@@ -1,0 +1,55 @@
+language: python
+os: linux
+
+python:
+  - 2.6
+  - 2.7
+  - 3.2
+  - 3.6
+
+env:
+  - LIBVIRT=1.2.0 EXT=gz
+  - LIBVIRT=2.0.0 EXT=xz
+  - LIBVIRT=3.6.0 EXT=xz
+
+install:
+  - sudo apt-get -qqy build-dep libvirt libxml2-dev
+  - sudo apt-get -qqy install curl
+  - pip install -r requirements-test.txt
+  - curl -O -s https://libvirt.org/sources/libvirt-${LIBVIRT}.tar.${EXT}
+  - tar -xf libvirt-${LIBVIRT}.tar.${EXT}
+  - pushd libvirt-${LIBVIRT}
+  - |
+        ./configure --prefix=`pwd`/../libvirt-vroot \
+                    --without-libvirtd \
+                    --without-esx \
+                    --without-vbox \
+                    --without-libxl \
+                    --without-xen \
+                    --without-qemu \
+                    --without-lxc \
+                    --without-hyperv \
+                    --without-macvtap \
+                    --disable-werror
+  - make
+  - make install
+  - popd
+
+script:
+  - LD_LIBRARY_PATH=`pwd`/libvirt-vroot/lib PKG_CONFIG_PATH=`pwd`/libvirt-vroot/lib/pkgconfig python setup.py build sdist test
+
+notifications:
+  irc:
+    # The channel name "irc.oftc.net#virt" is encrypted against libvirt/libvirt-python
+    # to prevent IRC notifications from github forks. This was created using:
+    # $ travis encrypt -r "libvirt/libvirt-python" "irc.oftc.net#virt"
+    channels:
+      - secure: "K4JrbRpz4CHtZ1vjthVwseT8K6INJgjtZethP4DN1jOpm1uC5esbe1Q1qJOfB92JbMcdM6DNjrVg5eyTJj35aD9UoGpTUcPMsYrhlTPHZtfAuLv/at2eB2XRmETlhiXHgI6LizX6gTiwGW5ZHYwGChzumWxu141d/L9harNh9R6z8XH9uJpkNdOAIsJcwS56XGZ74CKsrqF5dK6ZYPIyP+i7gPO67gEWo0oD6TiJKR908fw03ZiXarIFmLRlk4MbHywLRF0byfD0gg2Ht/tDX73+59QXjLKo/GvQecwoU8UuuFRJlyhUfvm1JYYydnS+O7fPJvI0FWlYFY7i76aeVqkARHRpHknFueT6kZADOmiyMLuvdr+gWVuyIdX33vVJtDm4T1OtNMG/wy9EUZUU1vEu+gHhaRkf/O0GkMj0Hac4I14BGyd/Wdhto6zWojFiMEG/HRHey6l15MBQu49QyW/YMyWi/LeBWXuCUgwQ/ij5EPgsn36OxCafV9zMz0oXZskwX6rJGQRZsdgdwYvt2hP3muLaJbwVyT0bGlOJDJieOa/LVKOXPcQm26aGfyMuLgm0//E9v++6W1IDKh6+BNsfTKAwTxlAvJyz6Bns3XuUJUxUz2+uQVSS6S3EwEZUJ+yHDd2F4sX5OP1L7TWIOWFbI4vQK90ZZ7/jgiYQbwo="
+    on_success: change
+    on_failure: always
+  email:
+    # The list name 'libvirt-ci@redhat.com" is encrypted against libvirt/libvirt-python
+    # to prevent IRC notifications from github forks. This was created using:
+    # $ travis encrypt -r "libvirt/libvirt-python" "libvirt-ci@redhat.com"
+    recipients:
+      - secure: "l6TTLcEcXdDEldHE2NgSIdt6a0k99ug3hp2W4IlnqJWJfIk/87nysJtLNrA0va20pPApCa3iJfMq4PUmBGiIIimTN0/KgC7tONDraogXhCbgfZp9Ejy/57TXxygSp4oum2kDw/c5uLnfrFV/xcn1fk6hvH6CD3bVcJPOQ/mc5FSKLqN5UzwqNnMpMTtG9qxCwfXJ/Bdm9fbURfezC7djcYRwRfPUe3TSD0L76G2HnQnSy4RqR3KFSjQHFPnSGM5IbsokbOaFKCyp/pHOt7QomQaY7YAPX/K9O+eP+hkkp6DGADkkumHctcgnMoyxpahf7pNKw9S8JYabH2NwREIq8whbp9Mo+R4rYO2ozroLWHaboYs/pBLrs606ivTwOmWGRCpJdCmmKTiZNyo6MRrwiOM6x+2YHUTMOa2kVheRNzaaxMFzHPW2kZ20bujPhfViJsRYj9flo5GJXJLyjluGZK5RjrguNJeIh8VJNBiSHW37uj7drmNBsqMad+65mf/4xtGITBqhz5Spx5R9UMZbuiJvcm8GasJMMdQ+bCfuWYjF2nZvSvFEr54Ii1YrDp6FKQ8YG1aD1/D8Z0/b3pLd/8Pn+M9yIWyO/Sto5TbSUjxBTmTStuDmtYE5uu1miYebvgJH5MovWPBegYgrfI417kPJgCG3q/R0YcZFMKFfQyo="

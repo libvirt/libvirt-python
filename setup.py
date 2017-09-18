@@ -290,15 +290,16 @@ class my_test(Command):
                                               'lib' + plat_specifier)
 
     def find_nosetests_path(self):
-        paths = [
-            "/usr/bin/nosetests-%d.%d" % (sys.version_info[0],
-                                          sys.version_info[1]),
-            "/usr/bin/nosetests-%d" % (sys.version_info[0]),
-            "/usr/bin/nosetests",
+        binaries = [
+            "nosetests-%d.%d" % (sys.version_info[0],
+                                 sys.version_info[1]),
+            "nosetests-%d" % (sys.version_info[0]),
+            "nosetests",
         ]
 
-        for path in paths:
-            if os.path.exists(path):
+        for binary in binaries:
+            path = distutils.spawn.find_executable(binary)
+            if path is not None:
                 return path
 
         raise Exception("Cannot find any nosetests binary")
