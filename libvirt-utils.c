@@ -108,7 +108,7 @@ virReallocN(void *ptrptr,
         return -1;
     }
     tmp = realloc(*(void**)ptrptr, size * count);
-    if (!tmp && (size * count)) {
+    if (!tmp && ((size * count) != 0)) {
         return -1;
     }
     *(void**)ptrptr = tmp;
