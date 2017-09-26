@@ -63,7 +63,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     int c_retval;
     int *fdlist = NULL;
-    size_t i;
+    ssize_t i;
 
     if (!PyArg_ParseTuple(args, (char *)"OI:virDomainLxcOpenNamespace",
                           &pyobj_domain, &flags))

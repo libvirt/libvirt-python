@@ -221,7 +221,7 @@ getPyVirTypedParameter(const virTypedParameter *params,
                        int nparams)
 {
     PyObject *key, *val, *info;
-    size_t i;
+    ssize_t i;
 
     if ((info = PyDict_New()) == NULL)
         return NULL;
@@ -295,7 +295,7 @@ setPyVirTypedParameter(PyObject *info,
 #endif
     virTypedParameterPtr temp = NULL, ret = NULL;
     Py_ssize_t size;
-    size_t i;
+    ssize_t i;
 
     if ((size = PyDict_Size(info)) < 0)
         return NULL;
@@ -412,7 +412,7 @@ virPyDictToTypedParamOne(virTypedParameterPtr *params,
                          PyObject *value)
 {
     int rv = -1, type = -1;
-    size_t i;
+    ssize_t i;
 
     for (i = 0; i < nhints; i++) {
         if (STREQ(hints[i].name, keystr)) {
@@ -605,7 +605,7 @@ virPyCpumapConvert(int cpunum,
                    int *cpumaplen)
 {
     int tuple_size;
-    size_t i;
+    ssize_t i;
     *cpumapptr = NULL;
 
     if (!PyTuple_Check(pycpumap)) {

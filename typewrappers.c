@@ -319,7 +319,7 @@ libvirt_ulonglongUnwrap(PyObject *obj,
         PyErr_SetString(PyExc_TypeError, "an integer is required");
     }
 
-    if ((ullong_val == -1) && PyErr_Occurred())
+    if ((ullong_val == (unsigned long long)-1) && PyErr_Occurred())
         return -1;
 
     *val = ullong_val;
