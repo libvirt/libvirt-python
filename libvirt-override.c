@@ -363,8 +363,11 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
+    LIBVIRT_BEGIN_ALLOW_THREADS;
     nr_stats = virDomainMemoryStats(domain, stats,
                                     VIR_DOMAIN_MEMORY_STAT_NR, 0);
+    LIBVIRT_END_ALLOW_THREADS;
+
     if (nr_stats == (unsigned int)-1)
         return VIR_PY_NONE;
 
@@ -4872,7 +4875,11 @@ libvirt_virDomainGetDiskErrors(PyObject *self ATTRIBUTE_UNUSED,
 
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
-    if ((count = virDomainGetDiskErrors(domain, NULL, 0, 0)) < 0)
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    count = virDomainGetDiskErrors(domain, NULL, 0, 0);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (count < 0)
         return VIR_PY_NONE;
     ndisks = count;
 
