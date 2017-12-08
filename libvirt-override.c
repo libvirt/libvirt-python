@@ -6662,11 +6662,11 @@ libvirt_virConnectDomainEventTunableCallback(virConnectPtr conn ATTRIBUTE_UNUSED
     if (!pyobj_ret) {
         DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
         PyErr_Print();
-        Py_XDECREF(pyobj_dict);
     } else {
         Py_DECREF(pyobj_ret);
         ret = 0;
     }
+    Py_XDECREF(pyobj_dict);
 
     LIBVIRT_RELEASE_THREAD_STATE;
     return ret;
