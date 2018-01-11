@@ -18,6 +18,12 @@
 %define _with_python3 1
 %endif
 
+# Whether py2 packages are assumed to have python2- name prefix
+%define py2_versioned_deps 0
+%if 0%{?fedora} || 0%{?rhel} > 7
+%define py2_versioned_deps 1
+%endif
+
 %{!?with_python2: %define with_python2 %{_with_python2}}
 %{!?with_python3: %define with_python3 %{_with_python3}}
 
@@ -31,9 +37,15 @@ License: LGPLv2+
 Group: Development/Libraries
 BuildRequires: libvirt-devel >= @C_VERSION@
 %if %{with_python2}
+%if %{py2_versioned_deps}
+BuildRequires: python2-devel
+BuildRequires: python2-nose
+BuildRequires: python2-lxml
+%else
 BuildRequires: python-devel
 BuildRequires: python-nose
 BuildRequires: python-lxml
+%endif
 %endif
 %if %{with_python3}
 BuildRequires: python3-devel
