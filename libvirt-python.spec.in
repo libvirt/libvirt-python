@@ -1,9 +1,12 @@
 
-%define with_python2 1
-%define with_python3 0
+%define _with_python2 1
+%define _with_python3 0
 %if 0%{?fedora}
-%define with_python3 1
+%define _with_python3 1
 %endif
+
+%{!?with_python2: %define with_python2 %{_with_python2}}
+%{!?with_python3: %define with_python3 %{_with_python3}}
 
 Summary: The libvirt virtualization API python2 binding
 Name: libvirt-python
