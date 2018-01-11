@@ -35,7 +35,7 @@ Source0: http://libvirt.org/sources/python/%{name}-%{version}.tar.gz
 Url: http://libvirt.org
 License: LGPLv2+
 Group: Development/Libraries
-BuildRequires: libvirt-devel >= @C_VERSION@
+BuildRequires: libvirt-devel == %{version}
 %if %{with_python2}
 %if %{py2_versioned_deps}
 BuildRequires: python2-devel

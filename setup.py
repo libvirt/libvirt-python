@@ -175,8 +175,7 @@ class my_sdist(sdist):
         f2 = open('libvirt-python.spec', 'w')
         for line in f1:
             f2.write(line
-                     .replace('@PY_VERSION@', self.distribution.get_version())
-                     .replace('@C_VERSION@', MIN_LIBVIRT))
+                     .replace('@PY_VERSION@', self.distribution.get_version()))
         f1.close()
         f2.close()
 
