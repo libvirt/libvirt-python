@@ -1,3 +1,14 @@
+# This spec file assumes you are building on a Fedora or RHEL version
+# that's still supported by the vendor. It may work on other distros
+# or versions, but no effort will be made to ensure that going forward
+%define min_rhel 6
+%define min_fedora 25
+
+%if (0%{?fedora} && 0%{?fedora} >= %{min_fedora}) || (0%{?rhel} && 0%{?rhel} >= %{min_rhel})
+    %define supported_platform 1
+%else
+    %define supported_platform 0
+%endif
 
 %define _with_python2 1
 %define _with_python3 0
@@ -81,6 +92,11 @@ of recent versions of Linux (and other OSes).
 find examples -type f -exec chmod 0644 \{\} \;
 
 %build
+%if ! %{supported_platform}
+echo "This RPM requires either Fedora >= %{min_fedora} or RHEL >= %{min_rhel}"
+exit 1
+%endif
+
 %if %{with_python2}
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py build
 %endif
