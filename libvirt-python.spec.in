@@ -54,7 +54,12 @@ BuildRequires: python3-lxml
 %endif
 
 # Don't want provides for python shared objects
+%if %{with_python2}
 %{?filter_provides_in: %filter_provides_in %{python_sitearch}/.*\.so}
+%endif
+%if %{with_python3}
+%{?filter_provides_in: %filter_provides_in %{python3_sitearch}/.*\.so}
+%endif
 %{?filter_setup}
 
 %description
