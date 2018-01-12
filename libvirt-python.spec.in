@@ -143,27 +143,27 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 %files -n python2-libvirt
 %defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
-%{_libdir}/python2*/site-packages/libvirt.py*
-%{_libdir}/python2*/site-packages/libvirt_qemu.py*
-%{_libdir}/python2*/site-packages/libvirt_lxc.py*
-%{_libdir}/python2*/site-packages/libvirtmod*
-%{_libdir}/python2*/site-packages/*egg-info
+%{python_sitearch}/libvirt.py*
+%{python_sitearch}/libvirt_qemu.py*
+%{python_sitearch}/libvirt_lxc.py*
+%{python_sitearch}/libvirtmod*
+%{python_sitearch}/*egg-info
 %endif
 
 %if %{with_python3}
 %files -n python3-libvirt
 %defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
-%{_libdir}/python3*/site-packages/libvirt.py*
-%{_libdir}/python3*/site-packages/libvirtaio.py*
-%{_libdir}/python3*/site-packages/libvirt_qemu.py*
-%{_libdir}/python3*/site-packages/libvirt_lxc.py*
-%{_libdir}/python3*/site-packages/__pycache__/libvirt.cpython-*.py*
-%{_libdir}/python3*/site-packages/__pycache__/libvirt_qemu.cpython-*.py*
-%{_libdir}/python3*/site-packages/__pycache__/libvirt_lxc.cpython-*.py*
-%{_libdir}/python3*/site-packages/__pycache__/libvirtaio.cpython-*.py*
-%{_libdir}/python3*/site-packages/libvirtmod*
-%{_libdir}/python3*/site-packages/*egg-info
+%{python3_sitearch}/libvirt.py*
+%{python3_sitearch}/libvirtaio.py*
+%{python3_sitearch}/libvirt_qemu.py*
+%{python3_sitearch}/libvirt_lxc.py*
+%{python3_sitearch}/__pycache__/libvirt.cpython-*.py*
+%{python3_sitearch}/__pycache__/libvirt_qemu.cpython-*.py*
+%{python3_sitearch}/__pycache__/libvirt_lxc.cpython-*.py*
+%{python3_sitearch}/__pycache__/libvirtaio.cpython-*.py*
+%{python3_sitearch}/libvirtmod*
+%{python3_sitearch}/*egg-info
 %endif
 
 %changelog
