@@ -258,7 +258,8 @@ for name in sorted(basicklassmap):
                 "LookupByUUIDString", "LookupByVolume" "LookupByName",
                 "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
                 "LookupByMACString", "LookupByUsage", "LookupByVolume",
-                "LookupSCSIHostByWWN", "Restore", "RestoreFlags",
+                "LookupByTargetPath","LookupSCSIHostByWWN",
+                "Restore", "RestoreFlags",
                 "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags"]:
         if klass != "virDomain":
             func = klass[3:] + func
