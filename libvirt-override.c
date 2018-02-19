@@ -7739,6 +7739,25 @@ libvirt_virDomainMigrateGetMaxDowntime(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(3, 7, 0) */
 
 #if LIBVIR_CHECK_VERSION(1, 1, 0)
+static virPyTypedParamsHint virPyDomainMigrate3Params[] = {
+    { VIR_MIGRATE_PARAM_URI, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_DEST_NAME, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_DEST_XML, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_GRAPHICS_URI, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_BANDWIDTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_MIGRATE_PARAM_LISTEN_ADDRESS, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_DISKS_PORT, VIR_TYPED_PARAM_INT },
+    { VIR_MIGRATE_PARAM_COMPRESSION, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS, VIR_TYPED_PARAM_INT },
+    { VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL, VIR_TYPED_PARAM_INT },
+    { VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS, VIR_TYPED_PARAM_INT },
+    { VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE, VIR_TYPED_PARAM_ULLONG },
+    { VIR_MIGRATE_PARAM_PERSIST_XML, VIR_TYPED_PARAM_STRING },
+    { VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL, VIR_TYPED_PARAM_INT },
+    { VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT, VIR_TYPED_PARAM_INT },
+};
+
+
 static PyObject *
 libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
                           PyObject *args)
@@ -7750,9 +7769,7 @@ libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *dict;
     unsigned int flags;
     virTypedParameterPtr params;
-    virPyTypedParamsHintPtr hparams;
     int nparams = 0;
-    int nhparams = 15;
     virDomainPtr ddom = NULL;
 
     if (!PyArg_ParseTuple(args, (char *) "OOOI:virDomainMigrate3",
@@ -7762,55 +7779,9 @@ libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
     dconn = (virConnectPtr) PyvirConnect_Get(pyobj_dconn);
 
-    hparams = malloc(sizeof(virPyTypedParamsHint) * nhparams);
-    hparams[0].name = VIR_MIGRATE_PARAM_URI;
-    hparams[0].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[1].name = VIR_MIGRATE_PARAM_DEST_NAME;
-    hparams[1].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[2].name = VIR_MIGRATE_PARAM_DEST_XML;
-    hparams[2].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[3].name = VIR_MIGRATE_PARAM_GRAPHICS_URI;
-    hparams[3].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[4].name = VIR_MIGRATE_PARAM_BANDWIDTH;
-    hparams[4].type = VIR_TYPED_PARAM_ULLONG;
-
-    hparams[5].name = VIR_MIGRATE_PARAM_LISTEN_ADDRESS;
-    hparams[5].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[6].name = VIR_MIGRATE_PARAM_DISKS_PORT;
-    hparams[6].type = VIR_TYPED_PARAM_INT;
-
-    hparams[7].name = VIR_MIGRATE_PARAM_COMPRESSION;
-    hparams[7].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[8].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS;
-    hparams[8].type = VIR_TYPED_PARAM_INT;
-
-    hparams[9].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL;
-    hparams[9].type = VIR_TYPED_PARAM_INT;
-
-    hparams[10].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS;
-    hparams[10].type = VIR_TYPED_PARAM_INT;
-
-    hparams[11].name = VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE;
-    hparams[11].type = VIR_TYPED_PARAM_ULLONG;
-
-    hparams[12].name = VIR_MIGRATE_PARAM_PERSIST_XML;
-    hparams[12].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[13].name = VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL;
-    hparams[13].type = VIR_TYPED_PARAM_INT;
-
-    hparams[14].name = VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT;
-    hparams[14].type = VIR_TYPED_PARAM_INT;
-
     if (virPyDictToTypedParams(dict, &params, &nparams,
-                               hparams, nhparams) < 0) {
-        free(hparams);
+                               virPyDomainMigrate3Params,
+                               VIR_N_ELEMENTS(virPyDomainMigrate3Params)) < 0) {
         return NULL;
     }
 
@@ -7819,7 +7790,6 @@ libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     virTypedParamsFree(params, nparams);
-    free(hparams);
     return libvirt_virDomainPtrWrap(ddom);
 }
 
@@ -7833,9 +7803,7 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *dict;
     unsigned int flags;
     virTypedParameterPtr params;
-    virPyTypedParamsHintPtr hparams;
     int nparams;
-    int nhparams = 15;
     int ret = -1;
 
     if (!PyArg_ParseTuple(args, (char *) "OzOI:virDomainMigrate3",
@@ -7844,55 +7812,9 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
 
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
 
-    hparams = malloc(sizeof(virPyTypedParamsHint) * nhparams);
-    hparams[0].name = VIR_MIGRATE_PARAM_URI;
-    hparams[0].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[1].name = VIR_MIGRATE_PARAM_DEST_NAME;
-    hparams[1].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[2].name = VIR_MIGRATE_PARAM_DEST_XML;
-    hparams[2].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[3].name = VIR_MIGRATE_PARAM_GRAPHICS_URI;
-    hparams[3].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[4].name = VIR_MIGRATE_PARAM_BANDWIDTH;
-    hparams[4].type = VIR_TYPED_PARAM_ULLONG;
-
-    hparams[5].name = VIR_MIGRATE_PARAM_LISTEN_ADDRESS;
-    hparams[5].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[6].name = VIR_MIGRATE_PARAM_DISKS_PORT;
-    hparams[6].type = VIR_TYPED_PARAM_INT;
-
-    hparams[7].name = VIR_MIGRATE_PARAM_COMPRESSION;
-    hparams[7].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[8].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_DTHREADS;
-    hparams[8].type = VIR_TYPED_PARAM_INT;
-
-    hparams[9].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_LEVEL;
-    hparams[9].type = VIR_TYPED_PARAM_INT;
-
-    hparams[10].name = VIR_MIGRATE_PARAM_COMPRESSION_MT_THREADS;
-    hparams[10].type = VIR_TYPED_PARAM_INT;
-
-    hparams[11].name = VIR_MIGRATE_PARAM_COMPRESSION_XBZRLE_CACHE;
-    hparams[11].type = VIR_TYPED_PARAM_ULLONG;
-
-    hparams[12].name = VIR_MIGRATE_PARAM_PERSIST_XML;
-    hparams[12].type = VIR_TYPED_PARAM_STRING;
-
-    hparams[13].name = VIR_MIGRATE_PARAM_AUTO_CONVERGE_INITIAL;
-    hparams[13].type = VIR_TYPED_PARAM_INT;
-
-    hparams[14].name = VIR_MIGRATE_PARAM_AUTO_CONVERGE_INCREMENT;
-    hparams[14].type = VIR_TYPED_PARAM_INT;
-
     if (virPyDictToTypedParams(dict, &params, &nparams,
-                               hparams, nhparams) < 0) {
-        free(hparams);
+                               virPyDomainMigrate3Params,
+                               VIR_N_ELEMENTS(virPyDomainMigrate3Params)) < 0) {
         return NULL;
     }
 
@@ -7901,7 +7823,6 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     virTypedParamsFree(params, nparams);
-    free(hparams);
     return libvirt_intWrap(ret);
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 1, 0) */
@@ -8743,6 +8664,13 @@ libvirt_virDomainListGetStats(PyObject *self ATTRIBUTE_UNUSED,
 }
 
 
+static virPyTypedParamsHint virPyDomainBlockCopyParams[] = {
+    { VIR_DOMAIN_BLOCK_COPY_BANDWIDTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_COPY_GRANULARITY, VIR_TYPED_PARAM_UINT },
+    { VIR_DOMAIN_BLOCK_COPY_BUF_SIZE, VIR_TYPED_PARAM_UINT },
+};
+
+
 static PyObject *
 libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
                            PyObject *args)
@@ -8754,9 +8682,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
     char *disk = NULL;
     char *destxml = NULL;
     virTypedParameterPtr params = NULL;
-    virPyTypedParamsHintPtr hparams;
     int nparams = 0;
-    int nhparams = 3;
     unsigned int flags = 0;
     int c_retval;
 
@@ -8765,22 +8691,11 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     if (PyDict_Check(pyobj_dict)) {
-        hparams = malloc(sizeof(virPyTypedParamsHint) * nhparams);
-        hparams[0].name = VIR_DOMAIN_BLOCK_COPY_BANDWIDTH;
-        hparams[0].type = VIR_TYPED_PARAM_ULLONG;
-
-        hparams[1].name = VIR_DOMAIN_BLOCK_COPY_GRANULARITY;
-        hparams[1].type = VIR_TYPED_PARAM_UINT;
-
-        hparams[2].name = VIR_DOMAIN_BLOCK_COPY_BUF_SIZE;
-        hparams[2].type = VIR_TYPED_PARAM_UINT;
-
         if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
-                                   hparams, nhparams) < 0) {
-            free(hparams);
+                                   virPyDomainBlockCopyParams,
+                                   VIR_N_ELEMENTS(virPyDomainBlockCopyParams)) < 0) {
             return NULL;
         }
-        free(hparams);
     }
 
     dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
