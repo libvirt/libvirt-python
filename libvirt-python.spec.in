@@ -13,6 +13,10 @@
 %endif
 
 %define _with_python2 1
+%if 0%{?fedora} > 29 || 0%{?rhel} > 7
+%define _with_python2 0
+%endif
+
 %define _with_python3 0
 %if 0%{?fedora} || 0%{?rhel} > 7
 %define _with_python3 1
