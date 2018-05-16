@@ -258,7 +258,7 @@
             got = handler(self, want, opaque)
             if type(got) is int and got < 0:
                 self.abort()
-                raise RuntimeError("sparseSendAll handler returned %d" % ret)
+                raise RuntimeError("sparseSendAll handler returned %d" % got)
 
             if not got:
                 break
