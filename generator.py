@@ -1828,6 +1828,8 @@ def qemuBuildWrappers(module):
     fd.write("# Automatically written part of python bindings for libvirt\n")
     fd.write("#\n")
 
+    fd.write("import sys\n")
+
     fd.write("try:\n")
     fd.write("    import libvirtmod_qemu\n")
     fd.write("except ImportError:\n")
@@ -1950,6 +1952,8 @@ def lxcBuildWrappers(module):
     fd.write("# WARNING WARNING WARNING WARNING\n")
     if extra is not None:
         extra.close()
+
+    fd.write("import sys\n")
 
     fd.write("try:\n")
     fd.write("    import libvirtmod_lxc\n")
