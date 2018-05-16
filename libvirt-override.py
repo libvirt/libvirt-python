@@ -16,7 +16,6 @@ except ImportError:
         if str(cyg_e).count("No module named"):
             raise lib_e
 
-import types
 
 # The root of all libvirt errors.
 class libvirtError(Exception):
