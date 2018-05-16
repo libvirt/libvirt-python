@@ -1896,7 +1896,7 @@ def qemuBuildWrappers(module):
         if ret[0] != "void":
             fd.write("    if ret is None: raise libvirt.libvirtError('" + name + "() failed')\n")
             if ret[0] == "virDomainPtr":
-                fd.write("    __tmp = virDomain(" + conn + ",_obj=ret)\n")
+                fd.write("    __tmp = libvirt.virDomain(" + conn + ", _obj=ret)\n")
                 fd.write("    return __tmp\n")
             else:
                 fd.write("    return ret\n")
@@ -2011,7 +2011,7 @@ def lxcBuildWrappers(module):
         if ret[0] != "void":
             fd.write("    if ret is None: raise libvirt.libvirtError('" + name + "() failed')\n")
             if ret[0] == "virDomainPtr":
-                fd.write("    __tmp = virDomain(" + conn + ",_obj=ret)\n")
+                fd.write("    __tmp = libvirt.virDomain(" + conn + ", _obj=ret)\n")
                 fd.write("    return __tmp\n")
             else:
                 fd.write("    return ret\n")
