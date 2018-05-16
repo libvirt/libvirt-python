@@ -11,6 +11,12 @@
             libvirtmod.virConnectClose(self._o)
         self._o = None
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type_, exc_value_, traceback_):
+        self.close()
+
     def domainEventDeregister(self, cb):
         """Removes a Domain Event Callback. De-registering for a
            domain callback will disable delivery of this event type """
