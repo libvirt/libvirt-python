@@ -605,6 +605,8 @@ def storageEventToString(event):
                             "Undefined",
                             "Started",
                             "Stopped",
+                            "Created",
+                            "Deleted",
     )
     return storageEventStrings[event]
 
