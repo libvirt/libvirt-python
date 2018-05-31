@@ -488,6 +488,7 @@ skip_impl = (
     'virDomainGetPerfEvents',
     'virDomainSetPerfEvents',
     'virDomainGetGuestVcpus',
+    'virConnectBaselineHypervisorCPU',
 )
 
 lxc_skip_impl = (

@@ -9708,6 +9708,63 @@ libvirt_virStreamRecvFlags(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
 
 
+#if LIBVIR_CHECK_VERSION(4, 4, 0)
+static PyObject *
+libvirt_virConnectBaselineHypervisorCPU(PyObject *self ATTRIBUTE_UNUSED,
+                                        PyObject *args)
+{
+    virConnectPtr conn;
+    PyObject *pyobj_conn;
+    char *emulator;
+    char *arch;
+    char *machine;
+    char *virttype;
+    PyObject *list;
+    unsigned int flags;
+    char **xmlCPUs = NULL;
+    int ncpus = 0;
+    size_t i;
+    char *cpu;
+    PyObject *ret = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"OzzzzOI:virConnectBaselineHypervisorCPU",
+                          &pyobj_conn, &emulator, &arch, &machine, &virttype,
+                          &list, &flags))
+        return NULL;
+
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    if (PyList_Check(list)) {
+        ncpus = PyList_Size(list);
+        if (VIR_ALLOC_N(xmlCPUs, ncpus) < 0)
+            return PyErr_NoMemory();
+
+        for (i = 0; i < ncpus; i++) {
+            if (libvirt_charPtrUnwrap(PyList_GetItem(list, i),
+                                      &(xmlCPUs[i])) < 0 ||
+                !xmlCPUs[i])
+                goto cleanup;
+        }
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    cpu = virConnectBaselineHypervisorCPU(conn, emulator, arch, machine, virttype,
+                                          (const char **)xmlCPUs, ncpus, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    ret = libvirt_constcharPtrWrap(cpu);
+
+ cleanup:
+    for (i = 0; i < ncpus; i++)
+        VIR_FREE(xmlCPUs[i]);
+    VIR_FREE(xmlCPUs);
+    VIR_FREE(cpu);
+
+    return ret;
+}
+#endif /* LIBVIR_CHECK_VERSION(4, 4, 0) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -9941,6 +9998,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virStreamSendHole", libvirt_virStreamSendHole, METH_VARARGS, NULL},
     {(char *) "virStreamRecvFlags", libvirt_virStreamRecvFlags, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(3, 4, 0) */
+#if LIBVIR_CHECK_VERSION(4, 4, 0)
+    {(char *) "virConnectBaselineHypervisorCPU", libvirt_virConnectBaselineHypervisorCPU, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(4, 4, 0) */
     {NULL, NULL, 0, NULL}
 };
 
