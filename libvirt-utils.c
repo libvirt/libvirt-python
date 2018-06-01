@@ -199,20 +199,6 @@ virTypedParamsFree(virTypedParameterPtr params,
 }
 #endif /* ! LIBVIR_CHECK_VERSION(1, 0, 2) */
 
-char *
-py_str(PyObject *obj)
-{
-    PyObject *str = PyObject_Str(obj);
-    char *ret;
-    if (!str) {
-        PyErr_Print();
-        PyErr_Clear();
-        return NULL;
-    };
-    libvirt_charPtrUnwrap(str, &ret);
-    return ret;
-}
-
 /* Helper function to convert a virTypedParameter output array into a
  * Python dictionary for return to the user.  Return NULL on failure,
  * after raising a python exception.  */

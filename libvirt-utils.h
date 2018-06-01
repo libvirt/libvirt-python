@@ -319,7 +319,6 @@ void virTypedParamsClear(virTypedParameterPtr params, int nparams);
 void virTypedParamsFree(virTypedParameterPtr params, int nparams);
 # endif /* ! LIBVIR_CHECK_VERSION(1, 0, 2) */
 
-char * py_str(PyObject *obj);
 PyObject * getPyVirTypedParameter(const virTypedParameter *params,
                                   int nparams);
 virTypedParameterPtr setPyVirTypedParameter(PyObject *info,
