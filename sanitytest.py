@@ -234,7 +234,9 @@ for name in sorted(basicklassmap):
                     "ErrorFunc", "FreeError",
                     "SaveLastError", "ResetError"]:
             continue
-        elif func in ["GetLastError", "GetLastErrorMessage", "ResetLastError", "Initialize"]:
+        elif func in ["GetLastError", "GetLastErrorMessage",
+                      "GetLastErrorCode", "GetLastErrorDomain",
+                      "ResetLastError", "Initialize"]:
             func = "vir" + func
         elif func == "SetErrorFunc":
             func = "RegisterErrorHandler"
