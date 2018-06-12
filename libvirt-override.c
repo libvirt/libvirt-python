@@ -1918,8 +1918,10 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
             char *result = NULL;
             pycreditem = PyTuple_GetItem(pycred, i);
             pyresult = PyList_GetItem(pycreditem, 4);
-            if (pyresult != Py_None)
+            if (pyresult != Py_None) {
                 libvirt_charPtrUnwrap(pyresult, &result);
+                PyErr_Clear();
+            }
             if (result != NULL) {
                 cred[i].result = result;
                 cred[i].resultlen = strlen(result);
