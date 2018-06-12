@@ -4639,8 +4639,7 @@ libvirt_virConnectBaselineCPU(PyObject *self ATTRIBUTE_UNUSED,
 
         for (i = 0; i < ncpus; i++) {
             if (libvirt_charPtrUnwrap(PyList_GetItem(list, i),
-                                      &(xmlcpus[i])) < 0 ||
-                xmlcpus[i] == NULL) {
+                                      &(xmlcpus[i])) < 0) {
                 for (j = 0 ; j < i ; j++)
                     VIR_FREE(xmlcpus[j]);
                 VIR_FREE(xmlcpus);
@@ -8245,8 +8244,7 @@ libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED,
 
         for (i = 0; i < nmountpoints; i++) {
             if (libvirt_charPtrUnwrap(PyList_GetItem(pyobj_list, i),
-                                      mountpoints+i) < 0 ||
-                mountpoints[i] == NULL)
+                                      mountpoints+i) < 0)
                 goto cleanup;
         }
     }
@@ -8293,8 +8291,7 @@ libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED,
 
         for (i = 0; i < nmountpoints; i++) {
             if (libvirt_charPtrUnwrap(PyList_GetItem(pyobj_list, i),
-                                      mountpoints+i) < 0 ||
-                mountpoints[i] == NULL)
+                                      mountpoints+i) < 0)
                 goto cleanup;
         }
     }
@@ -9743,8 +9740,7 @@ libvirt_virConnectBaselineHypervisorCPU(PyObject *self ATTRIBUTE_UNUSED,
 
         for (i = 0; i < ncpus; i++) {
             if (libvirt_charPtrUnwrap(PyList_GetItem(list, i),
-                                      &(xmlCPUs[i])) < 0 ||
-                !xmlCPUs[i])
+                                      &(xmlCPUs[i])) < 0)
                 goto cleanup;
         }
     }
