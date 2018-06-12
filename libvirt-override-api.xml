@@ -734,5 +734,11 @@
       <arg name='domain' type='virDomainPtr' info='pointer to domain object'/>
       <arg name='flags' type='int' info='unused, always pass 0'/>
     </function>
+    <function name='virNodeGetSEVInfo' file='python'>
+      <info>Get platform specific information from the SEV firmware</info>
+      <return type='char *' info='None in case of error, returns a dictionary of params'/>
+      <arg name='conn' type='virConnectPtr' info='pointer to hypervisor connection'/>
+      <arg name='flags' type='int' info='unused, always pass 0'/>
+    </function>
   </symbols>
 </api>

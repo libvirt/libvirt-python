@@ -9796,6 +9796,40 @@ libvirt_virDomainGetLaunchSecurityInfo(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParamsFree(params, nparams);
     return ret;
 }
+
+
+static PyObject *
+libvirt_virNodeGetSEVInfo(PyObject *self ATTRIBUTE_UNUSED,
+                          PyObject *args)
+{
+    PyObject *pyobj_conn = NULL;
+    PyObject *ret = NULL;
+
+    virConnectPtr conn = NULL;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags = 0;
+    int i_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virNodeGetSEVInfo",
+                          &pyobj_conn, &flags))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virNodeGetSEVInfo(conn, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    ret = getPyVirTypedParameter(params, nparams);
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    return ret;
+}
 #endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
 
 
@@ -10037,6 +10071,7 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(4, 4, 0) */
 #if LIBVIR_CHECK_VERSION(4, 5, 0)
     {(char *) "virDomainGetLaunchSecurityInfo", libvirt_virDomainGetLaunchSecurityInfo, METH_VARARGS, NULL},
+    {(char *) "virNodeGetSEVInfo", libvirt_virNodeGetSEVInfo, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
     {NULL, NULL, 0, NULL}
 };

@@ -490,6 +490,7 @@ skip_impl = (
     'virDomainGetGuestVcpus',
     'virConnectBaselineHypervisorCPU',
     'virDomainGetLaunchSecurityInfo',
+    'virNodeGetSEVInfo',
 )
 
 lxc_skip_impl = (
