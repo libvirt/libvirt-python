@@ -9763,6 +9763,42 @@ libvirt_virConnectBaselineHypervisorCPU(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(4, 4, 0) */
 
 
+#if LIBVIR_CHECK_VERSION(4, 5, 0)
+static PyObject *
+libvirt_virDomainGetLaunchSecurityInfo(PyObject *self ATTRIBUTE_UNUSED,
+                                       PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *ret = NULL;
+
+    virDomainPtr dom = NULL;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags = 0;
+    int i_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetLaunchSecurityInfo",
+                          &pyobj_dom, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virDomainGetLaunchSecurityInfo(dom, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    ret = getPyVirTypedParameter(params, nparams);
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    return ret;
+}
+#endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -9999,6 +10035,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(4, 4, 0)
     {(char *) "virConnectBaselineHypervisorCPU", libvirt_virConnectBaselineHypervisorCPU, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(4, 4, 0) */
+#if LIBVIR_CHECK_VERSION(4, 5, 0)
+    {(char *) "virDomainGetLaunchSecurityInfo", libvirt_virDomainGetLaunchSecurityInfo, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
     {NULL, NULL, 0, NULL}
 };
 

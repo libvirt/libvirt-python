@@ -728,5 +728,11 @@
       <arg name='xmlCPUs' type='const char **' info='array of XML descriptions of CPUs'/>
       <arg name='flags' type='unsigned int' info='bitwise-OR of virConnectBaselineCPUFlags'/>
     </function>
+    <function name='virDomainGetLaunchSecurityInfo' file='python'>
+      <info>Get launch security info for a domain</info>
+      <return type='char *' info='None in case of error, returns a dictionary of params'/>
+      <arg name='domain' type='virDomainPtr' info='pointer to domain object'/>
+      <arg name='flags' type='int' info='unused, always pass 0'/>
+    </function>
   </symbols>
 </api>
