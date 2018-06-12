@@ -384,8 +384,11 @@ libvirt_charPtrUnwrap(PyObject *obj,
 #else
     ret = PyString_AsString(obj);
 #endif
-    if (ret)
+    if (ret) {
         *str = strdup(ret);
+        if (!*str)
+            PyErr_NoMemory();
+    }
 #if PY_MAJOR_VERSION > 2
     Py_DECREF(bytes);
 #endif
