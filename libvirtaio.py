@@ -43,10 +43,13 @@ import warnings
 
 import libvirt
 
-try:
-    from asyncio import ensure_future
-except ImportError:
-    from asyncio import async as ensure_future
+# Python < 3.4.4 doesn't have 'ensure_future', so we have to fall
+# back to 'async'; however, since 'async' is a reserved keyword
+# in Python >= 3.7, we can't perform a straightforward import and
+# we have to resort to getattr() instead
+ensure_future = getattr(asyncio, "ensure_future", None)
+if not ensure_future:
+    ensure_future = getattr(asyncio, "async")
 
 
 class Callback(object):
