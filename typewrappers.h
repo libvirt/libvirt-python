@@ -106,6 +106,15 @@ typedef struct {
 } PyvirNWFilter_Object;
 
 
+#define PyvirNWFilterBinding_Get(v) (((v) == Py_None) ? NULL : \
+        (((PyvirNWFilterBinding_Object *)(v))->obj))
+
+typedef struct {
+    PyObject_HEAD
+    virNWFilterBindingPtr obj;
+} PyvirNWFilterBinding_Object;
+
+
 #define PyvirStream_Get(v) (((v) == Py_None) ? NULL : \
         (((PyvirStream_Object *)(v))->obj))
 
@@ -189,6 +198,7 @@ PyObject * libvirt_virVoidPtrWrap(void* node);
 PyObject * libvirt_virNodeDevicePtrWrap(virNodeDevicePtr node);
 PyObject * libvirt_virSecretPtrWrap(virSecretPtr node);
 PyObject * libvirt_virNWFilterPtrWrap(virNWFilterPtr node);
+PyObject * libvirt_virNWFilterBindingPtrWrap(virNWFilterBindingPtr node);
 PyObject * libvirt_virStreamPtrWrap(virStreamPtr node);
 PyObject * libvirt_virDomainSnapshotPtrWrap(virDomainSnapshotPtr node);
 

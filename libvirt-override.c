@@ -4446,6 +4446,54 @@ libvirt_virConnectListAllNWFilters(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
 
+#if LIBVIR_CHECK_VERSION(4, 5, 0)
+static PyObject *
+libvirt_virConnectListAllNWFilterBindings(PyObject *self ATTRIBUTE_UNUSED,
+                                          PyObject *args)
+{
+    PyObject *pyobj_conn;
+    PyObject *py_retval = NULL;
+    virConnectPtr conn;
+    virNWFilterBindingPtr *bindings = NULL;
+    int c_retval = 0;
+    ssize_t i;
+    unsigned int flags;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virConnectListAllNWFilterBindings",
+                          &pyobj_conn, &flags))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virConnectListAllNWFilterBindings(conn, &bindings, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    if (!(py_retval = PyList_New(c_retval)))
+        goto cleanup;
+
+    for (i = 0; i < c_retval; i++) {
+        VIR_PY_LIST_SET_GOTO(py_retval, i,
+                             libvirt_virNWFilterBindingPtrWrap(bindings[i]), error);
+        /* python steals the pointer */
+        bindings[i] = NULL;
+    }
+
+ cleanup:
+    for (i = 0; i < c_retval; i++)
+        if (bindings[i])
+            virNWFilterBindingFree(bindings[i]);
+    VIR_FREE(bindings);
+    return py_retval;
+
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
+}
+#endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
+
 static PyObject *
 libvirt_virConnectListInterfaces(PyObject *self ATTRIBUTE_UNUSED,
                                  PyObject *args)
@@ -9971,6 +10019,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(0, 10, 2)
     {(char *) "virConnectListAllNWFilters", libvirt_virConnectListAllNWFilters, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(0, 10, 2) */
+#if LIBVIR_CHECK_VERSION(4, 5, 0)
+    {(char *) "virConnectListAllNWFilterBindings", libvirt_virConnectListAllNWFilterBindings, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
     {(char *) "virConnectListInterfaces", libvirt_virConnectListInterfaces, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedInterfaces", libvirt_virConnectListDefinedInterfaces, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 10, 2)

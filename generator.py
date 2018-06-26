@@ -356,6 +356,10 @@ py_types = {
     'virNWFilter *':  ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
     'const virNWFilter *':  ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
 
+    'virNWFilterBindingPtr':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'virNWFilterBinding *':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'const virNWFilterBinding *':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+
     'virStreamPtr':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
     'virStream *':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
     'const virStream *':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
@@ -539,6 +543,7 @@ skip_function = (
     'virConnectListAllInterfaces', # overridden in virConnect.py
     'virConnectListAllNodeDevices', # overridden in virConnect.py
     'virConnectListAllNWFilters', # overridden in virConnect.py
+    'virConnectListAllNWFilterBindings', # overridden in virConnect.py
     'virConnectListAllSecrets', # overridden in virConnect.py
     'virConnectGetAllDomainStats', # overridden in virConnect.py
     'virDomainListGetStats', # overriden in virConnect.py
@@ -572,6 +577,7 @@ skip_function = (
     "virNodeDeviceRef",
     "virSecretRef",
     "virNWFilterRef",
+    "virNWFilterBindingRef",
     "virStoragePoolRef",
     "virStorageVolRef",
     "virStreamRef",
@@ -1010,6 +1016,8 @@ classes_type = {
     "virSecret *": ("._o", "virSecret(self, _obj=%s)", "virSecret"),
     "virNWFilterPtr": ("._o", "virNWFilter(self, _obj=%s)", "virNWFilter"),
     "virNWFilter *": ("._o", "virNWFilter(self, _obj=%s)", "virNWFilter"),
+    "virNWFilterBindingPtr": ("._o", "virNWFilterBinding(self, _obj=%s)", "virNWFilterBinding"),
+    "virNWFilterBinding *": ("._o", "virNWFilterBinding(self, _obj=%s)", "virNWFilterBinding"),
     "virStreamPtr": ("._o", "virStream(self, _obj=%s)", "virStream"),
     "virStream *": ("._o", "virStream(self, _obj=%s)", "virStream"),
     "virConnectPtr": ("._o", "virConnect(_obj=%s)", "virConnect"),
@@ -1021,7 +1029,8 @@ classes_type = {
 primary_classes = ["virDomain", "virNetwork", "virInterface",
                    "virStoragePool", "virStorageVol",
                    "virConnect", "virNodeDevice", "virSecret",
-                   "virNWFilter", "virStream", "virDomainSnapshot"]
+                   "virNWFilter", "virNWFilterBinding",
+                   "virStream", "virDomainSnapshot"]
 
 classes_destructors = {
     "virDomain": "virDomainFree",
@@ -1032,6 +1041,7 @@ classes_destructors = {
     "virNodeDevice" : "virNodeDeviceFree",
     "virSecret": "virSecretFree",
     "virNWFilter": "virNWFilterFree",
+    "virNWFilterBinding": "virNWFilterBindingFree",
     "virDomainSnapshot": "virDomainSnapshotFree",
     # We hand-craft __del__ for this one
     #"virStream": "virStreamFree",
@@ -1058,6 +1068,8 @@ functions_noexcept = {
     'virSecretGetUsageType': True,
     'virSecretGetUsageID': True,
     'virNWFilterGetName': True,
+    'virNWFilterBindingGetFilterName': True,
+    'virNWFilterBindingGetPortDev': True,
 }
 
 function_classes = {}
@@ -1113,6 +1125,15 @@ def nameFixup(name, classe, type, file):
     elif name[0:15] == "virSecretLookup":
         func = name[3:]
         func = func[0:1].lower() + func[1:]
+    elif name[0:27] == "virNWFilterBindingCreateXML":
+        func = name[3:]
+        func = func[0:1].lower() + func[1:]
+    elif name[0:24] == "virNWFilterBindingDefine":
+        func = name[3:]
+        func = func[0:3].lower() + func[3:]
+    elif name[0:24] == "virNWFilterBindingLookup":
+        func = name[3:]
+        func = func[0:3].lower() + func[3:]
     elif name[0:17] == "virNWFilterDefine":
         func = name[3:]
         func = func[0:3].lower() + func[3:]
@@ -1188,6 +1209,12 @@ def nameFixup(name, classe, type, file):
         func = func[0:1].lower() + func[1:]
     elif name[0:9] == 'virSecret':
         func = name[9:]
+        func = func[0:1].lower() + func[1:]
+    elif name[0:21] == 'virNWFilterBindingGet':
+        func = name[21:]
+        func = func[0:1].lower() + func[1:]
+    elif name[0:18] == 'virNWFilterBinding':
+        func = name[18:]
         func = func[0:1].lower() + func[1:]
     elif name[0:14] == 'virNWFilterGet':
         func = name[14:]
@@ -1468,7 +1495,7 @@ def buildWrappers(module):
             classes.write("class %s(object):\n" % (classname))
             if classname in [ "virDomain", "virNetwork", "virInterface", "virStoragePool",
                               "virStorageVol", "virNodeDevice", "virSecret","virStream",
-                              "virNWFilter" ]:
+                              "virNWFilter", "virNWFilterBinding" ]:
                 classes.write("    def __init__(self, conn, _obj=None):\n")
             elif classname in [ 'virDomainSnapshot' ]:
                 classes.write("    def __init__(self, dom, _obj=None):\n")
@@ -1476,7 +1503,7 @@ def buildWrappers(module):
                 classes.write("    def __init__(self, _obj=None):\n")
             if classname in [ "virDomain", "virNetwork", "virInterface",
                               "virNodeDevice", "virSecret", "virStream",
-                              "virNWFilter" ]:
+                              "virNWFilter", "virNWFilterBinding" ]:
                 classes.write("        self._conn = conn\n")
             elif classname in [ "virStorageVol", "virStoragePool" ]:
                 classes.write("        self._conn = conn\n" + \

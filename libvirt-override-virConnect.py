@@ -531,6 +531,18 @@
 
         return retlist
 
+    def listAllNWFilterBindings(self, flags=0):
+        """Returns a list of network filter binding objects"""
+        ret = libvirtmod.virConnectListAllNWFilterBindings(self._o, flags)
+        if ret is None:
+            raise libvirtError("virConnectListAllNWFilterBindings() failed", conn=self)
+
+        retlist = list()
+        for filter_ptr in ret:
+            retlist.append(virNWFilterBinding(self, _obj=filter_ptr))
+
+        return retlist
+
     def listAllSecrets(self, flags=0):
         """Returns a list of secret objects"""
         ret = libvirtmod.virConnectListAllSecrets(self._o, flags)

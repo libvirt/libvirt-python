@@ -543,6 +543,19 @@ libvirt_virNWFilterPtrWrap(virNWFilterPtr node)
 }
 
 PyObject *
+libvirt_virNWFilterBindingPtrWrap(virNWFilterBindingPtr node)
+{
+    PyObject *ret;
+
+    if (node == NULL) {
+        return VIR_PY_NONE;
+    }
+
+    ret = libvirt_buildPyObject(node, "virNWFilterBindingPtr", NULL);
+    return ret;
+}
+
+PyObject *
 libvirt_virStreamPtrWrap(virStreamPtr node)
 {
     PyObject *ret;
