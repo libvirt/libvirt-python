@@ -1127,7 +1127,10 @@ def nameFixup(name, classe, type, file):
         func = func[0:1].lower() + func[1:]
     elif name[0:27] == "virNWFilterBindingCreateXML":
         func = name[3:]
-        func = func[0:1].lower() + func[1:]
+        func = func[0:3].lower() + func[3:]
+    elif name[0:24] == "virNWFilterBindingLookup":
+        func = name[3:]
+        func = func[0:3].lower() + func[3:]
     elif name[0:24] == "virNWFilterBindingDefine":
         func = name[3:]
         func = func[0:3].lower() + func[3:]

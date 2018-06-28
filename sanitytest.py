@@ -260,7 +260,7 @@ for name in sorted(basicklassmap):
                 "LookupByUUIDString", "LookupByVolume" "LookupByName",
                 "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
                 "LookupByMACString", "LookupByUsage", "LookupByVolume",
-                "LookupByTargetPath","LookupSCSIHostByWWN",
+                "LookupByTargetPath","LookupSCSIHostByWWN", "LookupByPortDev",
                 "Restore", "RestoreFlags",
                 "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags"]:
         if klass != "virDomain":
