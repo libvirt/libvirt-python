@@ -11,6 +11,7 @@ env:
   - LIBVIRT=1.2.0 EXT=gz
   - LIBVIRT=2.0.0 EXT=xz
   - LIBVIRT=3.6.0 EXT=xz
+  - LIBVIRT=4.5.0 EXT=xz
 
 install:
   - sudo apt-get -qqy build-dep libvirt libxml2-dev
