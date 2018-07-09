@@ -27,6 +27,10 @@
 typedef ssize_t Py_ssize_t;
 #endif
 
+#if !LIBVIR_CHECK_VERSION(4, 5, 0)
+typedef struct _virNWFilterBinding *virNWFilterBindingPtr;
+#endif
+
 #define PyvirConnect_Get(v) (((v) == Py_None) ? NULL : \
         (((PyvirConnect_Object *)(v))->obj))
 
