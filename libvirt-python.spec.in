@@ -38,7 +38,6 @@ Release: 1%{?dist}%{?extra_release}
 Source0: http://libvirt.org/sources/python/%{name}-%{version}.tar.gz
 Url: http://libvirt.org
 License: LGPLv2+
-Group: Development/Libraries
 BuildRequires: libvirt-devel == %{version}
 %if %{with_python2}
 %if %{py2_versioned_deps}
@@ -77,7 +76,6 @@ of recent versions of Linux (and other OSes).
 Summary: The libvirt virtualization API python2 binding
 Url: http://libvirt.org
 License: LGPLv2+
-Group: Development/Libraries
 %{?python_provide:%python_provide python2-libvirt}
 Provides: libvirt-python = %{version}-%{release}
 Obsoletes: libvirt-python <= 3.6.0-1%{?dist}
@@ -94,7 +92,6 @@ of recent versions of Linux (and other OSes).
 Summary: The libvirt virtualization API python3 binding
 Url: http://libvirt.org
 License: LGPLv2+
-Group: Development/Libraries
 %{?python_provide:%python_provide python3-libvirt}
 Provides: libvirt-python3 = %{version}-%{release}
 Obsoletes: libvirt-python3 <= 3.6.0-1%{?dist}
@@ -145,7 +142,6 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 
 %if %{with_python2}
 %files -n python2-libvirt
-%defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
 %{python_sitearch}/libvirt.py*
 %{python_sitearch}/libvirt_qemu.py*
@@ -156,7 +152,6 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 
 %if %{with_python3}
 %files -n python3-libvirt
-%defattr(-,root,root)
 %doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
