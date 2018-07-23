@@ -55,6 +55,7 @@ BuildRequires: python3-devel
 BuildRequires: python3-nose
 BuildRequires: python3-lxml
 %endif
+BuildRequires: gcc
 
 # Don't want provides for python shared objects
 %if %{with_python2}
