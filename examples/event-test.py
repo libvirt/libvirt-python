@@ -471,11 +471,11 @@ def domEventToString(event):
 
 def domDetailToString(event, detail):
     domEventStrings = (
-        ( "Added", "Updated" ),
-        ( "Removed", ),
+        ( "Added", "Updated", "Renamed", "Snapshot" ),
+        ( "Removed", "Renamed", ),
         ( "Booted", "Migrated", "Restored", "Snapshot", "Wakeup" ),
-        ( "Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error" ),
-        ( "Unpaused", "Migrated", "Snapshot" ),
+        ( "Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error", "Postcopy", "Postcopy failed" ),
+        ( "Unpaused", "Migrated", "Snapshot", "Postcopy" ),
         ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
         ( "Finished", "On guest request", "On host request"),
         ( "Memory", "Disk" ),
