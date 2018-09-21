@@ -663,6 +663,7 @@ def myConnectionCloseCallback(conn, reason, opaque):
         "Error", "End-of-file", "Keepalive", "Client",
         )
     print("myConnectionCloseCallback: %s: %s" % (conn.getURI(), reasonStrings[reason]))
+    global run
     run = False
 
 def usage():
