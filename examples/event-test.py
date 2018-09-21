@@ -499,15 +499,11 @@ def agentLifecycleReasonToString(reason):
     agentReasons = ( "unknown", "domain started", "channel event", )
     return agentReasons[reason]
 
-def myDomainEventCallback1 (conn, dom, event, detail, opaque):
-    print("myDomainEventCallback1 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
-                                                                 domEventToString(event),
-                                                                 domDetailToString(event, detail)))
 
-def myDomainEventCallback2 (conn, dom, event, detail, opaque):
-    print("myDomainEventCallback2 EVENT: Domain %s(%s) %s %s" % (dom.name(), dom.ID(),
-                                                                 domEventToString(event),
-                                                                 domDetailToString(event, detail)))
+def myDomainEventCallback(conn, dom, event, detail, opaque):
+    print("myDomainEventCallback%d EVENT: Domain %s(%s) %s %s" % (
+        opaque, dom.name(), dom.ID(), domEventToString(event), domDetailToString(event, detail)))
+
 
 def myDomainEventRebootCallback(conn, dom, opaque):
     print("myDomainEventRebootCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
@@ -725,9 +721,9 @@ def main():
     vc.registerCloseCallback(myConnectionCloseCallback, None)
 
     #Add 2 lifecycle callbacks to prove this works with more than just one
-    vc.domainEventRegister(myDomainEventCallback1,None)
+    vc.domainEventRegister(myDomainEventCallback, 1)
     domcallbacks = []
-    domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_LIFECYCLE, myDomainEventCallback2, None))
+    domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_LIFECYCLE, myDomainEventCallback, 2))
     domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_REBOOT, myDomainEventRebootCallback, None))
     domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_RTC_CHANGE, myDomainEventRTCChangeCallback, None))
     domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_WATCHDOG, myDomainEventWatchdogCallback, None))
@@ -784,7 +780,7 @@ def main():
     if not run:
         return
 
-    vc.domainEventDeregister(myDomainEventCallback1)
+    vc.domainEventDeregister(myDomainEventCallback)
 
     for id in seccallbacks:
         vc.secretEventDeregisterAny(id)
