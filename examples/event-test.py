@@ -499,6 +499,7 @@ ERROR_EVENTS = Description("None", "Pause", "Report")
 AGENT_STATES = Description("unknown", "connected", "disconnected")
 AGENT_REASONS = Description("unknown", "domain started", "channel event")
 GRAPHICS_PHASES = Description("Connect", "Initialize", "Disconnect")
+DISK_EVENTS = Description("Change missing on start", "Drop missing on start")
 
 
 def myDomainEventCallback(conn, dom, event, detail, opaque):
@@ -543,7 +544,9 @@ def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
 
 def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
     print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
-            dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, reason))
+        dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, DISK_EVENTS[reason]))
+
+
 def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
     print("myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
             dom.name(), dom.ID(), devAlias, reason))
