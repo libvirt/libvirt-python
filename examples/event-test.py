@@ -496,14 +496,8 @@ BLOCK_JOB_TYPES = Description("unknown", "Pull", "Copy", "Commit", "ActiveCommit
 BLOCK_JOB_STATUS = Description("Completed", "Failed", "Canceled", "Ready")
 WATCHDOG_ACTIONS = Description("none", "Pause", "Reset", "Poweroff", "Shutdown", "Debug", "Inject NMI")
 ERROR_EVENTS = Description("None", "Pause", "Report")
-
-def agentLifecycleStateToString(state):
-    agentStates = ( "unknown", "connected", "disconnected", )
-    return agentStates[state]
-
-def agentLifecycleReasonToString(reason):
-    agentReasons = ( "unknown", "domain started", "channel event", )
-    return agentReasons[reason]
+AGENT_STATES = Description("unknown", "connected", "disconnected")
+AGENT_REASONS = Description("unknown", "domain started", "channel event")
 
 
 def myDomainEventCallback(conn, dom, event, detail, opaque):
@@ -572,8 +566,13 @@ def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
 
 def myDomainEventTunableCallback(conn, dom, params, opaque):
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
+
+
 def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
-    print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (dom.name(), dom.ID(), agentLifecycleStateToString(state), agentLifecycleReasonToString(reason)))
+    print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (
+        dom.name(), dom.ID(), AGENT_STATES[state], AGENT_REASONS[reason]))
+
+
 def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
             dom.name(), dom.ID(), dev))
