@@ -30,10 +30,13 @@ import threading
 event_impl = "poll"
 
 do_debug = False
+
+
 def debug(msg):
     global do_debug
     if do_debug:
         print(msg)
+
 
 #
 # This general purpose event loop will support waiting for file handle
@@ -100,7 +103,6 @@ class virEventLoopPoll:
             self.cb(self.timer,
                     self.opaque)
 
-
     def __init__(self):
         self.poll = select.poll()
         self.pipetrick = os.pipe()
@@ -126,9 +128,8 @@ class virEventLoopPoll:
         # with the event loop for input events. When we need to force
         # the main thread out of a poll() sleep, we simple write a
         # single byte of data to the other end of the pipe.
-        debug("Self pipe watch %d write %d" %(self.pipetrick[0], self.pipetrick[1]))
+        debug("Self pipe watch %d write %d" % (self.pipetrick[0], self.pipetrick[1]))
         self.poll.register(self.pipetrick[0], select.POLLIN)
-
 
     # Calculate when the next timeout is due to occur, returning
     # the absolute timestamp for the next timeout, or 0 if there is
@@ -158,7 +159,6 @@ class virEventLoopPoll:
             if h.get_id() == handleID:
                 return h
         return None
-
 
     # This is the heart of the event loop, performing one single
     # iteration. It asks when the next timeout is due, and then
@@ -235,7 +235,6 @@ class virEventLoopPoll:
         finally:
             self.runningPoll = False
 
-
     # Actually run the event loop forever
     def run_loop(self):
         self.quit = False
@@ -246,7 +245,6 @@ class virEventLoopPoll:
         if self.runningPoll and not self.pendingWakeup:
             self.pendingWakeup = True
             os.write(self.pipetrick[1], 'c'.encode("UTF-8"))
-
 
     # Registers a new file handle 'fd', monitoring  for 'events' (libvirt
     # event constants), firing the callback  cb() when an event occurs.
@@ -301,7 +299,7 @@ class virEventLoopPoll:
                 h.set_interval(interval)
                 self.interrupt()
 
-                debug("Update timer %d interval %d"  % (timerID, interval))
+                debug("Update timer %d interval %d" % (timerID, interval))
                 break
 
     # Stop monitoring for events on the file handle
@@ -383,25 +381,31 @@ def virEventAddHandleImpl(fd, events, cb, opaque):
     global eventLoop
     return eventLoop.add_handle(fd, events, cb, opaque)
 
+
 def virEventUpdateHandleImpl(handleID, events):
     global eventLoop
     return eventLoop.update_handle(handleID, events)
+
 
 def virEventRemoveHandleImpl(handleID):
     global eventLoop
     return eventLoop.remove_handle(handleID)
 
+
 def virEventAddTimerImpl(interval, cb, opaque):
     global eventLoop
     return eventLoop.add_timer(interval, cb, opaque)
+
 
 def virEventUpdateTimerImpl(timerID, interval):
     global eventLoop
     return eventLoop.update_timer(timerID, interval)
 
+
 def virEventRemoveTimerImpl(timerID):
     global eventLoop
     return eventLoop.remove_timer(timerID)
+
 
 # This tells libvirt what event loop implementation it
 # should use
@@ -413,19 +417,23 @@ def virEventLoopPollRegister():
                                  virEventUpdateTimerImpl,
                                  virEventRemoveTimerImpl)
 
+
 # Directly run the event loop in the current thread
 def virEventLoopPollRun():
     global eventLoop
     eventLoop.run_loop()
+
 
 def virEventLoopAIORun(loop):
     import asyncio
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
+
 def virEventLoopNativeRun():
     while True:
         libvirt.virEventRunDefaultImpl()
+
 
 # Spawn a background thread to run the event loop
 def virEventLoopPollStart():
@@ -434,6 +442,7 @@ def virEventLoopPollStart():
     eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
     eventLoopThread.setDaemon(True)
     eventLoopThread.start()
+
 
 def virEventLoopAIOStart():
     global eventLoopThread
@@ -444,6 +453,7 @@ def virEventLoopAIOStart():
     eventLoopThread = threading.Thread(target=virEventLoopAIORun, args=(loop,), name="libvirtEventLoop")
     eventLoopThread.setDaemon(True)
     eventLoopThread.start()
+
 
 def virEventLoopNativeStart():
     global eventLoopThread
@@ -509,10 +519,13 @@ def myDomainEventCallback(conn, dom, event, detail, opaque):
 
 
 def myDomainEventRebootCallback(conn, dom, opaque):
-    print("myDomainEventRebootCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
+    print("myDomainEventRebootCallback: Domain %s(%s)" % (
+        dom.name(), dom.ID()))
+
 
 def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque):
-    print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), utcoffset))
+    print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (
+        dom.name(), dom.ID(), utcoffset))
 
 
 def myDomainEventWatchdogCallback(conn, dom, action, opaque):
@@ -521,7 +534,8 @@ def myDomainEventWatchdogCallback(conn, dom, action, opaque):
 
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
-    print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action))
+    print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (
+        dom.name(), dom.ID(), srcpath, devalias, action))
 
 
 def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
@@ -535,7 +549,8 @@ def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authS
 
 
 def myDomainEventControlErrorCallback(conn, dom, opaque):
-    print("myDomainEventControlErrorCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
+    print("myDomainEventControlErrorCallback: Domain %s(%s)" % (
+        dom.name(), dom.ID()))
 
 
 def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
@@ -555,18 +570,27 @@ def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
 
 def myDomainEventPMWakeupCallback(conn, dom, reason, opaque):
     print("myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
-            dom.name(), dom.ID()))
+        dom.name(), dom.ID()))
+
+
 def myDomainEventPMSuspendCallback(conn, dom, reason, opaque):
     print("myDomainEventPMSuspendCallback: Domain %s(%s) system pmsuspend" % (
-            dom.name(), dom.ID()))
+        dom.name(), dom.ID()))
+
+
 def myDomainEventBalloonChangeCallback(conn, dom, actual, opaque):
-    print("myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), actual))
+    print("myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (
+        dom.name(), dom.ID(), actual))
+
+
 def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
     print("myDomainEventPMSuspendDiskCallback: Domain %s(%s) system pmsuspend_disk" % (
-            dom.name(), dom.ID()))
+        dom.name(), dom.ID()))
+
+
 def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
-            dom.name(), dom.ID(), dev))
+        dom.name(), dom.ID(), dev))
 
 
 def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
@@ -575,7 +599,8 @@ def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
 
 
 def myDomainEventTunableCallback(conn, dom, params, opaque):
-    print("myDomainEventTunableCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
+    print("myDomainEventTunableCallback: Domain %s(%s) %s" % (
+        dom.name(), dom.ID(), params))
 
 
 def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
@@ -585,21 +610,33 @@ def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
 
 def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
-            dom.name(), dom.ID(), dev))
+        dom.name(), dom.ID(), dev))
+
+
 def myDomainEventMigrationIteration(conn, dom, iteration, opaque):
     print("myDomainEventMigrationIteration: Domain %s(%s) started migration iteration %d" % (
-            dom.name(), dom.ID(), iteration))
+        dom.name(), dom.ID(), iteration))
+
+
 def myDomainEventJobCompletedCallback(conn, dom, params, opaque):
-    print("myDomainEventJobCompletedCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
+    print("myDomainEventJobCompletedCallback: Domain %s(%s) %s" % (
+        dom.name(), dom.ID(), params))
+
+
 def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceRemovalFailedCallback: Domain %s(%s) failed to remove device: %s" % (
-            dom.name(), dom.ID(), dev))
+        dom.name(), dom.ID(), dev))
+
+
 def myDomainEventMetadataChangeCallback(conn, dom, mtype, nsuri, opaque):
     print("myDomainEventMetadataChangeCallback: Domain %s(%s) changed metadata mtype=%d nsuri=%s" % (
-            dom.name(), dom.ID(), mtype, nsuri))
+        dom.name(), dom.ID(), mtype, nsuri))
+
+
 def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess, opaque):
     print("myDomainEventBlockThresholdCallback: Domain %s(%s) block device %s(%s) threshold %d exceeded by %d" % (
-            dom.name(), dom.ID(), dev, path, threshold, excess))
+        dom.name(), dom.ID(), dev, path, threshold, excess))
+
 
 ##########################################################################
 # Network events
@@ -638,6 +675,7 @@ def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
 def myStoragePoolEventRefreshCallback(conn, pool, opaque):
     print("myStoragePoolEventRefreshCallback: Storage pool %s" % pool.name())
 
+
 ##########################################################################
 # Node device events
 ##########################################################################
@@ -655,6 +693,7 @@ def myNodeDeviceEventLifecycleCallback(conn, dev, event, detail, opaque):
 def myNodeDeviceEventUpdateCallback(conn, dev, opaque):
     print("myNodeDeviceEventUpdateCallback: Node device %s" % dev.name())
 
+
 ##########################################################################
 # Secret events
 ##########################################################################
@@ -671,6 +710,7 @@ def mySecretEventLifecycleCallback(conn, secret, event, detail, opaque):
 
 def mySecretEventValueChanged(conn, secret, opaque):
     print("mySecretEventValueChanged: Secret %s" % secret.UUIDString())
+
 
 ##########################################################################
 # Set up and run the program
@@ -695,12 +735,13 @@ def usage():
     print("   --loop=TYPE, -l   Choose event-loop-implementation (native, poll, asyncio)")
     print("   --timeout=SECS  Quit after SECS seconds running")
 
+
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hdl:", ["help", "debug", "loop=", "timeout="])
     except getopt.GetoptError as err:
         # print help information and exit:
-        print(str(err)) # will print something like "option -a not recognized"
+        print(str(err))  # will print something like "option -a not recognized"
         usage()
         sys.exit(2)
     timeout = None
@@ -736,16 +777,19 @@ def main():
 
     # Close connection on exit (to test cleanup paths)
     old_exitfunc = getattr(sys, 'exitfunc', None)
+
     def exit():
         print("Closing " + vc.getURI())
         if run:
             vc.close()
-        if (old_exitfunc): old_exitfunc()
+        if (old_exitfunc):
+            old_exitfunc()
+
     sys.exitfunc = exit
 
     vc.registerCloseCallback(myConnectionCloseCallback, None)
 
-    #Add 2 lifecycle callbacks to prove this works with more than just one
+    # Add 2 lifecycle callbacks to prove this works with more than just one
     vc.domainEventRegister(myDomainEventCallback, 1)
     domcallbacks = [
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_LIFECYCLE, myDomainEventCallback, 2),
@@ -828,6 +872,7 @@ def main():
 
     # Allow delayed event loop cleanup to run, just for sake of testing
     time.sleep(2)
+
 
 if __name__ == "__main__":
     main()
