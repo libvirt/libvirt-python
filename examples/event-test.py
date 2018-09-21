@@ -667,7 +667,7 @@ def myConnectionCloseCallback(conn, reason, opaque):
     run = False
 
 def usage():
-    print("usage: "+os.path.basename(sys.argv[0])+" [-hdl] [uri]")
+    print("usage: %s [-hdl] [uri]" % (os.path.basename(__file__),))
     print("   uri will default to qemu:///system")
     print("   --help, -h   Print this help message")
     print("   --debug, -d  Print debug output")
