@@ -495,6 +495,7 @@ DOM_EVENTS = Description(
 BLOCK_JOB_TYPES = Description("unknown", "Pull", "Copy", "Commit", "ActiveCommit")
 BLOCK_JOB_STATUS = Description("Completed", "Failed", "Canceled", "Ready")
 WATCHDOG_ACTIONS = Description("none", "Pause", "Reset", "Poweroff", "Shutdown", "Debug", "Inject NMI")
+ERROR_EVENTS = Description("None", "Pause", "Report")
 
 def agentLifecycleStateToString(state):
     agentStates = ( "unknown", "connected", "disconnected", )
@@ -524,8 +525,13 @@ def myDomainEventWatchdogCallback(conn, dom, action, opaque):
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
     print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action))
+
+
 def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
-    print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %d %s" % (dom.name(), dom.ID(), srcpath, devalias, action, reason))
+    print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %d %s" % (
+        dom.name(), dom.ID(), srcpath, devalias, action, ERROR_EVENTS[reason]))
+
+
 def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
     print("myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme))
 def myDomainEventControlErrorCallback(conn, dom, opaque):
