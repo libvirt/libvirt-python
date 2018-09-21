@@ -716,7 +716,8 @@ def main():
     old_exitfunc = getattr(sys, 'exitfunc', None)
     def exit():
         print("Closing " + vc.getURI())
-        vc.close()
+        if run:
+            vc.close()
         if (old_exitfunc): old_exitfunc()
     sys.exitfunc = exit
 
@@ -776,6 +777,11 @@ def main():
     while run and (timeout is None or count < timeout):
         count = count + 1
         time.sleep(1)
+
+    # If the connection was closed, we cannot unregister anything.
+    # Just abort now.
+    if not run:
+        return
 
     vc.domainEventDeregister(myDomainEventCallback1)
 
