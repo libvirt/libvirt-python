@@ -620,20 +620,20 @@ def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
 ##########################################################################
 # Storage pool events
 ##########################################################################
-def storageEventToString(event):
-    storageEventStrings = ( "Defined",
-                            "Undefined",
-                            "Started",
-                            "Stopped",
-                            "Created",
-                            "Deleted",
-    )
-    return storageEventStrings[event]
+STORAGE_EVENTS = Description(
+    ("Defined", ()),
+    ("Undefined", ()),
+    ("Started", ()),
+    ("Stopped", ()),
+    ("Created", ()),
+    ("Deleted", ()),
+)
+
 
 def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
-    print("myStoragePoolEventLifecycleCallback: Storage pool %s %s %d" % (pool.name(),
-                                                                          storageEventToString(event),
-                                                                          detail))
+    print("myStoragePoolEventLifecycleCallback: Storage pool %s %s %s" % (
+        pool.name(), STORAGE_EVENTS[event], STORAGE_EVENTS[event][detail]))
+
 
 def myStoragePoolEventRefreshCallback(conn, pool, opaque):
     print("myStoragePoolEventRefreshCallback: Storage pool %s" % pool.name())
