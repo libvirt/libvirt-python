@@ -207,7 +207,7 @@ class virEventLoopPoll:
                 # the data just continue
                 if fd == self.pipetrick[0]:
                     self.pendingWakeup = False
-                    data = os.read(fd, 1)
+                    os.read(fd, 1)
                     continue
 
                 h = self.get_handle_by_fd(fd)
