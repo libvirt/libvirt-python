@@ -500,6 +500,7 @@ AGENT_STATES = Description("unknown", "connected", "disconnected")
 AGENT_REASONS = Description("unknown", "domain started", "channel event")
 GRAPHICS_PHASES = Description("Connect", "Initialize", "Disconnect")
 DISK_EVENTS = Description("Change missing on start", "Drop missing on start")
+TRAY_EVENTS = Description("Opened", "Closed")
 
 
 def myDomainEventCallback(conn, dom, event, detail, opaque):
@@ -549,7 +550,9 @@ def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias,
 
 def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
     print("myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
-            dom.name(), dom.ID(), devAlias, reason))
+        dom.name(), dom.ID(), devAlias, TRAY_EVENTS[reason]))
+
+
 def myDomainEventPMWakeupCallback(conn, dom, reason, opaque):
     print("myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
             dom.name(), dom.ID()))
