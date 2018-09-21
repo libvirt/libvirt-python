@@ -677,14 +677,15 @@ def mySecretEventValueChanged(conn, secret, opaque):
 ##########################################################################
 
 run = True
+CONNECTION_EVENTS = Description("Error", "End-of-file", "Keepalive", "Client")
+
 
 def myConnectionCloseCallback(conn, reason, opaque):
-    reasonStrings = (
-        "Error", "End-of-file", "Keepalive", "Client",
-        )
-    print("myConnectionCloseCallback: %s: %s" % (conn.getURI(), reasonStrings[reason]))
+    print("myConnectionCloseCallback: %s: %s" % (
+        conn.getURI(), CONNECTION_EVENTS[reason]))
     global run
     run = False
+
 
 def usage():
     print("usage: %s [-hdl] [uri]" % (os.path.basename(__file__),))
