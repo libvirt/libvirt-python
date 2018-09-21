@@ -494,6 +494,7 @@ DOM_EVENTS = Description(
 )
 BLOCK_JOB_TYPES = Description("unknown", "Pull", "Copy", "Commit", "ActiveCommit")
 BLOCK_JOB_STATUS = Description("Completed", "Failed", "Canceled", "Ready")
+WATCHDOG_ACTIONS = Description("none", "Pause", "Reset", "Poweroff", "Shutdown", "Debug", "Inject NMI")
 
 def agentLifecycleStateToString(state):
     agentStates = ( "unknown", "connected", "disconnected", )
@@ -515,8 +516,11 @@ def myDomainEventRebootCallback(conn, dom, opaque):
 def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque):
     print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), utcoffset))
 
+
 def myDomainEventWatchdogCallback(conn, dom, action, opaque):
-    print("myDomainEventWatchdogCallback: Domain %s(%s) %d" % (dom.name(), dom.ID(), action))
+    print("myDomainEventWatchdogCallback: Domain %s(%s) %s" % (
+        dom.name(), dom.ID(), WATCHDOG_ACTIONS[action]))
+
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
     print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (dom.name(), dom.ID(), srcpath, devalias, action))
