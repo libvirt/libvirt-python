@@ -641,16 +641,16 @@ def myStoragePoolEventRefreshCallback(conn, pool, opaque):
 ##########################################################################
 # Node device events
 ##########################################################################
-def nodeDeviceEventToString(event):
-    nodeDeviceEventStrings = ( "Created",
-                               "Deleted",
-    )
-    return nodeDeviceEventStrings[event]
+DEVICE_EVENTS = Description(
+    ("Created", ()),
+    ("Deleted", ()),
+)
+
 
 def myNodeDeviceEventLifecycleCallback(conn, dev, event, detail, opaque):
-    print("myNodeDeviceEventLifecycleCallback: Node device  %s %s %d" % (dev.name(),
-                                                                          nodeDeviceEventToString(event),
-                                                                          detail))
+    print("myNodeDeviceEventLifecycleCallback: Node device  %s %s %s" % (
+        dev.name(), DEVICE_EVENTS[event], DEVICE_EVENTS[event][detail]))
+
 
 def myNodeDeviceEventUpdateCallback(conn, dev, opaque):
     print("myNodeDeviceEventUpdateCallback: Node device %s" % dev.name())
