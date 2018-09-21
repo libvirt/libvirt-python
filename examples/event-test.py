@@ -481,32 +481,18 @@ class Description(object):
         raise TypeError(args)
 
 
-def domEventToString(event):
-    domEventStrings = ( "Defined",
-                     "Undefined",
-                     "Started",
-                     "Suspended",
-                     "Resumed",
-                     "Stopped",
-                     "Shutdown",
-                     "PMSuspended",
-                     "Crashed",
-    )
-    return domEventStrings[event]
+DOM_EVENTS = Description(
+    ("Defined", ("Added", "Updated", "Renamed", "Snapshot")),
+    ("Undefined", ("Removed", "Renamed")),
+    ("Started", ("Booted", "Migrated", "Restored", "Snapshot", "Wakeup")),
+    ("Suspended", ("Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error", "Postcopy", "Postcopy failed")),
+    ("Resumed", ("Unpaused", "Migrated", "Snapshot", "Postcopy")),
+    ("Stopped", ("Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot")),
+    ("Shutdown", ("Finished", "On guest request", "On host request")),
+    ("PMSuspended", ("Memory", "Disk")),
+    ("Crashed", ("Panicked",)),
+)
 
-def domDetailToString(event, detail):
-    domEventStrings = (
-        ( "Added", "Updated", "Renamed", "Snapshot" ),
-        ( "Removed", "Renamed", ),
-        ( "Booted", "Migrated", "Restored", "Snapshot", "Wakeup" ),
-        ( "Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error", "Postcopy", "Postcopy failed" ),
-        ( "Unpaused", "Migrated", "Snapshot", "Postcopy" ),
-        ( "Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot"),
-        ( "Finished", "On guest request", "On host request"),
-        ( "Memory", "Disk" ),
-        ( "Panicked", ),
-        )
-    return domEventStrings[event][detail]
 
 def blockJobTypeToString(type):
     blockJobTypes = ( "unknown", "Pull", "Copy", "Commit", "ActiveCommit", )
@@ -526,8 +512,8 @@ def agentLifecycleReasonToString(reason):
 
 
 def myDomainEventCallback(conn, dom, event, detail, opaque):
-    print("myDomainEventCallback%d EVENT: Domain %s(%s) %s %s" % (
-        opaque, dom.name(), dom.ID(), domEventToString(event), domDetailToString(event, detail)))
+    print("myDomainEventCallback%s EVENT: Domain %s(%s) %s %s" % (
+        opaque, dom.name(), dom.ID(), DOM_EVENTS[event], DOM_EVENTS[event][detail]))
 
 
 def myDomainEventRebootCallback(conn, dom, opaque):
