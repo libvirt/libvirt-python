@@ -492,15 +492,8 @@ DOM_EVENTS = Description(
     ("PMSuspended", ("Memory", "Disk")),
     ("Crashed", ("Panicked",)),
 )
-
-
-def blockJobTypeToString(type):
-    blockJobTypes = ( "unknown", "Pull", "Copy", "Commit", "ActiveCommit", )
-    return blockJobTypes[type]
-
-def blockJobStatusToString(status):
-    blockJobStatus = ( "Completed", "Failed", "Canceled", "Ready", )
-    return blockJobStatus[status]
+BLOCK_JOB_TYPES = Description("unknown", "Pull", "Copy", "Commit", "ActiveCommit")
+BLOCK_JOB_STATUS = Description("Completed", "Failed", "Canceled", "Ready")
 
 def agentLifecycleStateToString(state):
     agentStates = ( "unknown", "connected", "disconnected", )
@@ -533,8 +526,13 @@ def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authS
     print("myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme))
 def myDomainEventControlErrorCallback(conn, dom, opaque):
     print("myDomainEventControlErrorCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
+
+
 def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
-    print("myDomainEventBlockJobCallback: Domain %s(%s) %s on disk %s %s" % (dom.name(), dom.ID(), blockJobTypeToString(type), disk, blockJobStatusToString(status)))
+    print("myDomainEventBlockJobCallback: Domain %s(%s) %s on disk %s %s" % (
+        dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
+
+
 def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
     print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
             dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, reason))
@@ -555,8 +553,13 @@ def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
 def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
             dom.name(), dom.ID(), dev))
+
+
 def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
-    print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (dom.name(), dom.ID(), blockJobTypeToString(type), disk, blockJobStatusToString(status)))
+    print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (
+        dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
+
+
 def myDomainEventTunableCallback(conn, dom, params, opaque):
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (dom.name(), dom.ID(), params))
 def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
