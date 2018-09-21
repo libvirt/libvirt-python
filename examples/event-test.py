@@ -658,16 +658,16 @@ def myNodeDeviceEventUpdateCallback(conn, dev, opaque):
 ##########################################################################
 # Secret events
 ##########################################################################
-def secretEventToString(event):
-    secretEventStrings = ( "Defined",
-                           "Undefined",
-    )
-    return secretEventStrings[event]
+SECRET_EVENTS = Description(
+    ("Defined", ()),
+    ("Undefined", ()),
+)
+
 
 def mySecretEventLifecycleCallback(conn, secret, event, detail, opaque):
-    print("mySecretEventLifecycleCallback: Secret %s %s %d" % (secret.UUIDString(),
-                                                               secretEventToString(event),
-                                                               detail))
+    print("mySecretEventLifecycleCallback: Secret %s %s %s" % (
+        secret.UUIDString(), SECRET_EVENTS[event], SECRET_EVENTS[event][detail]))
+
 
 def mySecretEventValueChanged(conn, secret, opaque):
     print("mySecretEventValueChanged: Secret %s" % secret.UUIDString())
