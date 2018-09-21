@@ -498,6 +498,7 @@ WATCHDOG_ACTIONS = Description("none", "Pause", "Reset", "Poweroff", "Shutdown",
 ERROR_EVENTS = Description("None", "Pause", "Report")
 AGENT_STATES = Description("unknown", "connected", "disconnected")
 AGENT_REASONS = Description("unknown", "domain started", "channel event")
+GRAPHICS_PHASES = Description("Connect", "Initialize", "Disconnect")
 
 
 def myDomainEventCallback(conn, dom, event, detail, opaque):
@@ -527,7 +528,10 @@ def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, rea
 
 
 def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
-    print("myDomainEventGraphicsCallback: Domain %s(%s) %d %s" % (dom.name(), dom.ID(), phase, authScheme))
+    print("myDomainEventGraphicsCallback: Domain %s(%s) %s %s" % (
+        dom.name(), dom.ID(), GRAPHICS_PHASES[phase], authScheme))
+
+
 def myDomainEventControlErrorCallback(conn, dom, opaque):
     print("myDomainEventControlErrorCallback: Domain %s(%s)" % (dom.name(), dom.ID()))
 
