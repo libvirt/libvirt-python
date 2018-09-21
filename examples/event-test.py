@@ -456,6 +456,31 @@ def virEventLoopNativeStart():
 ##########################################################################
 # Everything that now follows is a simple demo of domain lifecycle events
 ##########################################################################
+class Description(object):
+    __slots__ = ('desc', 'args')
+
+    def __init__(self, *args, **kwargs):
+        self.desc = kwargs.get('desc')
+        self.args = args
+
+    def __str__(self):  # type: () -> str
+        return self.desc
+
+    def __getitem__(self, item):  # type: (int) -> str
+        try:
+            data = self.args[item]
+        except IndexError:
+            return self.__class__(desc=str(item))
+
+        if isinstance(data, str):
+            return self.__class__(desc=data)
+        elif isinstance(data, (list, tuple)):
+            desc, args = data
+            return self.__class__(*args, desc=desc)
+
+        raise TypeError(args)
+
+
 def domEventToString(event):
     domEventStrings = ( "Defined",
                      "Undefined",
