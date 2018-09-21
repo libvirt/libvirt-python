@@ -604,27 +604,18 @@ def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess,
 ##########################################################################
 # Network events
 ##########################################################################
-def netEventToString(event):
-    netEventStrings = ( "Defined",
-                     "Undefined",
-                     "Started",
-                     "Stopped",
-    )
-    return netEventStrings[event]
+NET_EVENTS = Description(
+    ("Defined", ("Added",)),
+    ("Undefined", ("Removed",)),
+    ("Started", ("Started",)),
+    ("Stopped", ("Stopped",)),
+)
 
-def netDetailToString(event, detail):
-    netEventStrings = (
-        ( "Added", ),
-        ( "Removed", ),
-        ( "Started", ),
-        ( "Stopped", ),
-    )
-    return netEventStrings[event][detail]
 
 def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
-    print("myNetworkEventLifecycleCallback: Network %s %s %s" % (net.name(),
-                                                                 netEventToString(event),
-                                                                 netDetailToString(event, detail)))
+    print("myNetworkEventLifecycleCallback: Network %s %s %s" % (
+        net.name(), NET_EVENTS[event], NET_EVENTS[event][detail]))
+
 
 ##########################################################################
 # Storage pool events
