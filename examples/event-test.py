@@ -224,7 +224,7 @@ class virEventLoopPoll:
                 want = t.get_last_fired() + interval
                 # Deduct 20ms, since scheduler timeslice
                 # means we could be ever so slightly early
-                if now >= (want-20):
+                if now >= want - 20:
                     debug("Dispatch timer %d now %s want %s" % (t.get_id(), str(now), str(want)))
                     t.set_last_fired(now)
                     t.dispatch()
