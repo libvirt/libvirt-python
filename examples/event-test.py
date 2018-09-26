@@ -33,7 +33,6 @@ do_debug = False
 
 
 def debug(msg):
-    global do_debug
     if do_debug:
         print(msg)
 
@@ -378,32 +377,26 @@ eventLoopThread = None
 # Twisted event framework.
 
 def virEventAddHandleImpl(fd, events, cb, opaque):
-    global eventLoop
     return eventLoop.add_handle(fd, events, cb, opaque)
 
 
 def virEventUpdateHandleImpl(handleID, events):
-    global eventLoop
     return eventLoop.update_handle(handleID, events)
 
 
 def virEventRemoveHandleImpl(handleID):
-    global eventLoop
     return eventLoop.remove_handle(handleID)
 
 
 def virEventAddTimerImpl(interval, cb, opaque):
-    global eventLoop
     return eventLoop.add_timer(interval, cb, opaque)
 
 
 def virEventUpdateTimerImpl(timerID, interval):
-    global eventLoop
     return eventLoop.update_timer(timerID, interval)
 
 
 def virEventRemoveTimerImpl(timerID):
-    global eventLoop
     return eventLoop.remove_timer(timerID)
 
 
@@ -420,7 +413,6 @@ def virEventLoopPollRegister():
 
 # Directly run the event loop in the current thread
 def virEventLoopPollRun():
-    global eventLoop
     eventLoop.run_loop()
 
 
