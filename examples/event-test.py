@@ -539,8 +539,8 @@ def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
 
 
 def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
-    print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %d %s" % (
-        dom.name(), dom.ID(), srcpath, devalias, action, ERROR_EVENTS[reason]))
+    print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %s %s" % (
+        dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action], reason))
 
 
 def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
