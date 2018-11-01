@@ -534,8 +534,8 @@ def myDomainEventWatchdogCallback(conn, dom, action, opaque):
 
 
 def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
-    print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %d" % (
-        dom.name(), dom.ID(), srcpath, devalias, action))
+    print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %s" % (
+        dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action]))
 
 
 def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
