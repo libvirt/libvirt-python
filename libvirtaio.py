@@ -28,6 +28,13 @@ Register the implementation of default loop:
     https://libvirt.org/html/libvirt-libvirt-event.html
 '''
 
+import asyncio
+import itertools
+import logging
+import warnings
+
+import libvirt
+
 __author__ = 'Wojtek Porczyk <woju@invisiblethingslab.com>'
 __license__ = 'LGPL-2.1+'
 __all__ = [
@@ -35,13 +42,6 @@ __all__ = [
     'virEventAsyncIOImpl',
     'virEventRegisterAsyncIOImpl',
 ]
-
-import asyncio
-import itertools
-import logging
-import warnings
-
-import libvirt
 
 # Python < 3.4.4 doesn't have 'ensure_future', so we have to fall
 # back to 'async'; however, since 'async' is a reserved keyword
