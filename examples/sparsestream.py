@@ -4,7 +4,9 @@
 # Authors:
 #   Michal Privoznik <mprivozn@redhat.com>
 
-import libvirt, sys, os
+import libvirt
+import sys
+import os
 
 def bytesWriteHandler(stream, buf, opaque):
     fd = opaque

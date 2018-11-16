@@ -3,9 +3,7 @@
 
 import libvirt
 import sys
-import os
 import libxml2
-import pdb
 
 # Parse the XML description of domU from FNAME
 # and return a tuple (name, xmldesc) where NAME

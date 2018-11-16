@@ -4,7 +4,6 @@
 
 import libvirt
 import sys
-import os
 import libxml2
 import getpass
 

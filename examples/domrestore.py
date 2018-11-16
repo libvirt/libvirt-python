@@ -4,8 +4,6 @@
 import libvirt
 import sys
 import os
-import libxml2
-import pdb
 
 def usage():
    print('Usage: %s DIR' % sys.argv[0])

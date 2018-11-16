@@ -4,8 +4,6 @@
 import libvirt
 import sys
 import os
-import libxml2
-import pdb
 
 def usage():
    print('Usage: %s DIR' % sys.argv[0])
@@ -37,4 +35,4 @@ for id in doms:
     else:
         print("error %d" % ret)
 
-#pdb.set_trace()
+# import pdb; pdb.set_trace()

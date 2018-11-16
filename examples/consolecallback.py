@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 # consolecallback - provide a persistent console that survives guest reboots
 
-import sys, os, logging, libvirt, tty, termios, atexit
+import sys
+import os
+import logging
+import libvirt
+import tty
+import termios
+import atexit
 
 def reset_term():
     termios.tcsetattr(0, termios.TCSADRAIN, attrs)
