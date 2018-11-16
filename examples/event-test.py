@@ -183,7 +183,8 @@ class virEventLoopPoll:
         self.runningPoll = True
 
         for opaque in self.cleanup:
-            libvirt.virEventInvokeFreeCallback(opaque)
+            if hasattr(libvirt, 'virEventInvokeFreeCallback'):
+                libvirt.virEventInvokeFreeCallback(opaque)
         self.cleanup = []
 
         try:
@@ -808,8 +809,9 @@ def main():
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_JOB_COMPLETED, myDomainEventJobCompletedCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, myDomainEventDeviceRemovalFailedCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_METADATA_CHANGE, myDomainEventMetadataChangeCallback, None),
-        vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, myDomainEventBlockThresholdCallback, None),
     ]
+    if hasattr(libvirt, "VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD"):
+        domcallbacks.append(vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, myDomainEventBlockThresholdCallback, None))
 
     netcallbacks = [
         vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None),
