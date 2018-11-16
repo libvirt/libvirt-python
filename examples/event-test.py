@@ -497,7 +497,7 @@ DOM_EVENTS = Description(
     ("Started", ("Booted", "Migrated", "Restored", "Snapshot", "Wakeup")),
     ("Suspended", ("Paused", "Migrated", "IOError", "Watchdog", "Restored", "Snapshot", "API error", "Postcopy", "Postcopy failed")),
     ("Resumed", ("Unpaused", "Migrated", "Snapshot", "Postcopy")),
-    ("Stopped", ("Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot")),
+    ("Stopped", ("Shutdown", "Destroyed", "Crashed", "Migrated", "Saved", "Failed", "Snapshot", "Daemon")),
     ("Shutdown", ("Finished", "On guest request", "On host request")),
     ("PMSuspended", ("Memory", "Disk")),
     ("Crashed", ("Panicked",)),
