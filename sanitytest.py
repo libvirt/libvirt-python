@@ -3,7 +3,6 @@
 import sys
 import lxml
 import lxml.etree
-import string
 
 if len(sys.argv) >= 2:
     # Munge import path to insert build location for libvirt mod
