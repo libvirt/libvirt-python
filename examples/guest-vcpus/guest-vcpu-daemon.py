@@ -9,8 +9,6 @@ import libvirt
 import threading
 from xml.dom import minidom
 import time
-import sys
-import os
 from argparse import ArgumentParser
 
 uri = "qemu:///system"

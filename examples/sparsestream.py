@@ -8,7 +8,8 @@ VOLUME into local FILE while preserving FILE/VOLUME sparseness
 # Authors:
 #   Michal Privoznik <mprivozn@redhat.com>
 
-import libvirt, sys, os
+import libvirt
+import os
 from argparse import ArgumentParser
 
 def bytesWriteHandler(stream: libvirt.virStream, buf: bytes, opaque: int) -> int:

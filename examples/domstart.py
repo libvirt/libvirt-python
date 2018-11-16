@@ -6,9 +6,7 @@ If the domain is not running, create it.
 
 import libvirt
 import sys
-import os
 import libxml2
-import pdb
 from argparse import ArgumentParser
 from typing import Tuple
 

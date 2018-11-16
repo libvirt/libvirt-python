@@ -7,8 +7,6 @@ It is assumed that all files in DIR are images of domU's previously created with
 import libvirt
 import sys
 import os
-import libxml2
-import pdb
 from argparse import ArgumentParser
 
 

@@ -5,9 +5,7 @@ Print information about the domain DOMAIN
 
 import libvirt
 import sys
-import os
 import libxml2
-import pdb
 from argparse import ArgumentParser
 from typing import Any
 
@@ -69,7 +67,7 @@ print_section("Devices")
 devs = ctx.xpathEval("/domain/devices/*")
 for d in devs:
     ctx.setContextNode(d)
-    #pdb.set_trace()
+    # import pdb; pdb.set_trace()
     type = print_xml("Type:", ctx, "@type")
     if type == "file":
         print_xml("Source:", ctx, "source/@file")

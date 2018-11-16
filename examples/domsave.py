@@ -7,8 +7,6 @@ DIR must exist and be writable by this process.
 import libvirt
 import sys
 import os
-import libxml2
-import pdb
 from argparse import ArgumentParser
 
 
@@ -35,4 +33,4 @@ for id in doms:
     else:
         print("error %d" % ret)
 
-#pdb.set_trace()
+# import pdb; pdb.set_trace()

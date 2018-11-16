@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # consolecallback - provide a persistent console that survives guest reboots
 
-import sys, os, logging, libvirt, tty, termios, atexit
+import os
+import logging
+import libvirt
+import tty
+import termios
+import atexit
 from argparse import ArgumentParser
 from typing import Optional  # noqa F401
 

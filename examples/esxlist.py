@@ -6,7 +6,6 @@ List active domains of an ESX host and print some info.
 
 import libvirt
 import sys
-import os
 import libxml2
 import getpass
 from argparse import ArgumentParser
