@@ -3,6 +3,11 @@
 # generate python wrappers from the XML API description
 #
 
+import os
+import re
+import sys
+import xml.sax
+
 functions = {}
 lxc_functions = {}
 qemu_functions = {}
@@ -12,10 +17,6 @@ qemu_enums = {}  # { enumType: { enumConstant: enumValue } }
 event_ids = []
 params = []  # [ (paramName, paramValue)... ]
 
-import os
-import sys
-import string
-import re
 
 quiet = True
 
@@ -25,9 +26,6 @@ quiet = True
 #  libvirt API description
 #
 #######################################################################
-import os
-import xml.sax
-
 debug = 0
 onlyOverrides = False
 
