@@ -57,7 +57,6 @@ def parse(data):
 
 class docParser(xml.sax.handler.ContentHandler):
     def __init__(self):
-        self._methodname = None
         self._data = []
         self.in_function = 0
 
@@ -65,19 +64,7 @@ class docParser(xml.sax.handler.ContentHandler):
         self.endElement = self.end
         self.characters = self.data
 
-    def close(self):
-        if debug:
-            print("close")
-
-    def getmethodname(self):
-        return self._methodname
-
     def data(self, text):
-        if debug:
-            print("data %s" % text)
-        self._data.append(text)
-
-    def cdata(self, text):
         if debug:
             print("data %s" % text)
         self._data.append(text)
