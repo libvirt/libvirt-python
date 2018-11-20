@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import xml.sax
+from contextlib import closing
 
 functions = {}
 lxc_functions = {}
@@ -47,12 +48,11 @@ libvirt_headers = [
 ]
 
 
-def getparser():
-    # Attach parser to an unmarshalling object. return both objects.
+def parse(data):
     target = docParser()
-    parser = xml.sax.make_parser()
-    parser.setContentHandler(target)
-    return parser, target
+    with closing(xml.sax.make_parser()) as parser:
+        parser.setContentHandler(target)
+        parser.parse(data)
 
 
 class docParser(xml.sax.handler.ContentHandler):
@@ -907,9 +907,7 @@ def buildStubs(module, api_xml):
         with open(api_xml) as stream:
             data = stream.read()
         onlyOverrides = False
-        (parser, target) = getparser()
-        parser.feed(data)
-        parser.close()
+        parse(data)
     except IOError as msg:
         print(api_xml, ":", msg)
         sys.exit(1)
@@ -925,9 +923,7 @@ def buildStubs(module, api_xml):
         with open(override_api_xml) as stream:
             data = stream.read()
         onlyOverrides = True
-        (parser, target) = getparser()
-        parser.feed(data)
-        parser.close()
+        parse(data)
     except IOError as msg:
         print(override_api_xml, ":", msg)
 
