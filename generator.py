@@ -1698,7 +1698,7 @@ def buildWrappers(module):
                             cached.append(line)
                         else:
                             classes.write(line)
-                if not shouldSkip(cached):
+                if cached is not None and not shouldSkip(cached):
                     classes.writelines(cached)
                 classes.write("\n")
                 extra.close()
