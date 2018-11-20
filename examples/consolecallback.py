@@ -9,8 +9,10 @@ import tty
 import termios
 import atexit
 
+
 def reset_term():
     termios.tcsetattr(0, termios.TCSADRAIN, attrs)
+
 
 def error_handler(unused, error):
     # The console stream errors on VM shutdown; we don't care
@@ -18,6 +20,7 @@ def error_handler(unused, error):
         error[1] == libvirt.VIR_FROM_STREAMS):
         return
     logging.warn(error)
+
 
 class Console(object):
     def __init__(self, uri, uuid):
@@ -33,6 +36,7 @@ class Console(object):
         logging.info("%s initial state %d, reason %d",
                      self.uuid, self.state[0], self.state[1])
 
+
 def check_console(console):
     if (console.state[0] == libvirt.VIR_DOMAIN_RUNNING or
         console.state[0] == libvirt.VIR_DOMAIN_PAUSED):
@@ -47,6 +51,7 @@ def check_console(console):
 
     return console.run_console
 
+
 def stdin_callback(watch, fd, events, console):
     readbuf = os.read(fd, 1024)
     if readbuf.startswith(b""):
@@ -54,6 +59,7 @@ def stdin_callback(watch, fd, events, console):
         return
     if console.stream:
         console.stream.send(readbuf)
+
 
 def stream_callback(stream, events, console):
     try:
@@ -63,7 +69,8 @@ def stream_callback(stream, events, console):
         return
     os.write(0, received_data)
 
-def lifecycle_callback (connection, domain, event, detail, console):
+
+def lifecycle_callback(connection, domain, event, detail, console):
     console.state = console.domain.state(0)
     logging.info("%s transitioned to state %d, reason %d",
                  console.uuid, console.state[0], console.state[1])

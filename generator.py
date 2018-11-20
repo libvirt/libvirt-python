@@ -11,13 +11,13 @@ import xml.sax
 functions = {}
 lxc_functions = {}
 qemu_functions = {}
-enums = {} # { enumType: { enumConstant: enumValue } }
-lxc_enums = {} # { enumType: { enumConstant: enumValue } }
-qemu_enums = {} # { enumType: { enumConstant: enumValue } }
+enums = {}  # { enumType: { enumConstant: enumValue } }
+lxc_enums = {}  # { enumType: { enumConstant: enumValue } }
+qemu_enums = {}  # { enumType: { enumConstant: enumValue } }
 event_ids = []
-params = [] # [ (paramName, paramValue)... ]
+params = []  # [ (paramName, paramValue)... ]
 
-quiet=True
+quiet = True
 
 #######################################################################
 #
@@ -45,12 +45,14 @@ libvirt_headers = [
     "libvirt-stream",
 ]
 
+
 def getparser():
     # Attach parser to an unmarshalling object. return both objects.
     target = docParser()
     parser = xml.sax.make_parser()
     parser.setContentHandler(target)
     return parser, target
+
 
 class docParser(xml.sax.handler.ContentHandler):
     def __init__(self):
@@ -91,13 +93,13 @@ class docParser(xml.sax.handler.ContentHandler):
             self.function_descr = None
             self.function_return = None
             self.function_file = None
-            self.function_module= None
+            self.function_module = None
             if 'name' in attrs.keys():
                 self.function = attrs['name']
             if 'file' in attrs.keys():
                 self.function_file = attrs['file']
             if 'module' in attrs.keys():
-                self.function_module= attrs['module']
+                self.function_module = attrs['module']
         elif tag == 'cond':
             self._data = []
         elif tag == 'info':
@@ -129,11 +131,11 @@ class docParser(xml.sax.handler.ContentHandler):
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
             if attrs['file'] in libvirt_headers + ["virerror", "virterror"]:
-                enum(attrs['type'],attrs['name'],attrs['value'])
+                enum(attrs['type'], attrs['name'], attrs['value'])
             elif attrs['file'] == "libvirt-lxc":
-                lxc_enum(attrs['type'],attrs['name'],attrs['value'])
+                lxc_enum(attrs['type'], attrs['name'], attrs['value'])
             elif attrs['file'] == "libvirt-qemu":
-                qemu_enum(attrs['type'],attrs['name'],attrs['value'])
+                qemu_enum(attrs['type'], attrs['name'], attrs['value'])
         elif tag == "macro":
             if "string" in attrs.keys():
                 params.append((attrs['name'], attrs['string']))
@@ -145,21 +147,21 @@ class docParser(xml.sax.handler.ContentHandler):
             # functions come from source files, hence 'virerror.c'
             if self.function is not None:
                 if self.function_module in libvirt_headers + \
-                            ["event", "virevent", "virerror", "virterror"]:
+                        ["event", "virevent", "virerror", "virterror"]:
                     function(self.function, self.function_descr,
                              self.function_return, self.function_args,
                              self.function_file, self.function_module,
                              self.function_cond)
                 elif self.function_module == "libvirt-lxc":
                     lxc_function(self.function, self.function_descr,
-                             self.function_return, self.function_args,
-                             self.function_file, self.function_module,
-                             self.function_cond)
+                                 self.function_return, self.function_args,
+                                 self.function_file, self.function_module,
+                                 self.function_cond)
                 elif self.function_module == "libvirt-qemu":
                     qemu_function(self.function, self.function_descr,
-                             self.function_return, self.function_args,
-                             self.function_file, self.function_module,
-                             self.function_cond)
+                                  self.function_return, self.function_args,
+                                  self.function_file, self.function_module,
+                                  self.function_cond)
                 elif self.function_file == "python":
                     function(self.function, self.function_descr,
                              self.function_return, self.function_args,
@@ -167,9 +169,9 @@ class docParser(xml.sax.handler.ContentHandler):
                              self.function_cond)
                 elif self.function_file == "python-lxc":
                     lxc_function(self.function, self.function_descr,
-                                  self.function_return, self.function_args,
-                                  self.function_file, self.function_module,
-                                  self.function_cond)
+                                 self.function_return, self.function_args,
+                                 self.function_file, self.function_module,
+                                 self.function_cond)
                 elif self.function_file == "python-qemu":
                     qemu_function(self.function, self.function_descr,
                                   self.function_return, self.function_args,
@@ -208,11 +210,13 @@ def function(name, desc, ret, args, file, module, cond):
         name = "virConnectListDomainsID"
     functions[name] = (desc, ret, args, file, module, cond)
 
+
 def qemu_function(name, desc, ret, args, file, module, cond):
     global onlyOverrides
     if onlyOverrides and name not in qemu_functions:
         return
     qemu_functions[name] = (desc, ret, args, file, module, cond)
+
 
 def lxc_function(name, desc, ret, args, file, module, cond):
     global onlyOverrides
@@ -220,11 +224,12 @@ def lxc_function(name, desc, ret, args, file, module, cond):
         return
     lxc_functions[name] = (desc, ret, args, file, module, cond)
 
+
 def enum(type, name, value):
     if type not in enums:
         enums[type] = {}
     if (name.startswith('VIR_DOMAIN_EVENT_ID_') or
-        name.startswith('VIR_NETWORK_EVENT_ID_')):
+            name.startswith('VIR_NETWORK_EVENT_ID_')):
         event_ids.append(name)
     if value == 'VIR_TYPED_PARAM_INT':
         value = 1
@@ -248,12 +253,14 @@ def enum(type, name, value):
         return
     enums[type][name] = value
 
+
 def lxc_enum(type, name, value):
     if type not in lxc_enums:
         lxc_enums[type] = {}
     if onlyOverrides and name not in lxc_enums[type]:
         return
     lxc_enums[type][name] = value
+
 
 def qemu_enum(type, name, value):
     if type not in qemu_enums:
@@ -286,18 +293,18 @@ lxc_functions_skipped = []
 qemu_functions_skipped = []
 
 skipped_types = {
-#    'int *': "usually a return type",
-     'virConnectDomainEventCallback': "No function types in python",
-     'virConnectDomainEventGenericCallback': "No function types in python",
-     'virConnectDomainEventRTCChangeCallback': "No function types in python",
-     'virConnectDomainEventWatchdogCallback': "No function types in python",
-     'virConnectDomainEventIOErrorCallback': "No function types in python",
-     'virConnectDomainEventGraphicsCallback': "No function types in python",
-     'virConnectDomainQemuMonitorEventCallback': "No function types in python",
-     'virStreamEventCallback': "No function types in python",
-     'virEventHandleCallback': "No function types in python",
-     'virEventTimeoutCallback': "No function types in python",
-     'virDomainBlockJobInfoPtr': "Not implemented yet",
+    # 'int *': "usually a return type",
+    'virConnectDomainEventCallback': "No function types in python",
+    'virConnectDomainEventGenericCallback': "No function types in python",
+    'virConnectDomainEventRTCChangeCallback': "No function types in python",
+    'virConnectDomainEventWatchdogCallback': "No function types in python",
+    'virConnectDomainEventIOErrorCallback': "No function types in python",
+    'virConnectDomainEventGraphicsCallback': "No function types in python",
+    'virConnectDomainQemuMonitorEventCallback': "No function types in python",
+    'virStreamEventCallback': "No function types in python",
+    'virEventHandleCallback': "No function types in python",
+    'virEventTimeoutCallback': "No function types in python",
+    'virDomainBlockJobInfoPtr': "Not implemented yet",
 }
 
 #######################################################################
@@ -309,73 +316,73 @@ skipped_types = {
 
 py_types = {
     'void': (None, None, None, None),
-    'int':  ('i', None, "int", "int"),
-    'long':  ('l', None, "long", "long"),
-    'double':  ('d', None, "double", "double"),
-    'unsigned int':  ('I', None, "int", "int"),
-    'unsigned long':  ('l', None, "long", "long"),
-    'long long':  ('L', None, "longlong", "long long"),
-    'unsigned long long':  ('L', None, "longlong", "long long"),
-    'unsigned char *':  ('z', None, "charPtr", "char *"),
-    'char *':  ('z', None, "charPtr", "char *"),
-    'const char *':  ('z', None, "constcharPtr", "const char *"),
+    'int': ('i', None, "int", "int"),
+    'long': ('l', None, "long", "long"),
+    'double': ('d', None, "double", "double"),
+    'unsigned int': ('I', None, "int", "int"),
+    'unsigned long': ('l', None, "long", "long"),
+    'long long': ('L', None, "longlong", "long long"),
+    'unsigned long long': ('L', None, "longlong", "long long"),
+    'unsigned char *': ('z', None, "charPtr", "char *"),
+    'char *': ('z', None, "charPtr", "char *"),
+    'const char *': ('z', None, "constcharPtr", "const char *"),
     'size_t': ('n', None, "size_t", "size_t"),
 
-    'virDomainPtr':  ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
-    'virDomain *':  ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
-    'const virDomain *':  ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
+    'virDomainPtr': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
+    'virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
+    'const virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
 
-    'virNetworkPtr':  ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
-    'virNetwork *':  ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
-    'const virNetwork *':  ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
+    'virNetworkPtr': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
+    'virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
+    'const virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
 
-    'virNetworkPortPtr':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
-    'virNetworkPort *':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
-    'const virNetworkPort *':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'virNetworkPortPtr': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'const virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
 
-    'virInterfacePtr':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
-    'virInterface *':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
-    'const virInterface *':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
+    'virInterfacePtr': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
+    'virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
+    'const virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
 
-    'virStoragePoolPtr':  ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
-    'virStoragePool *':  ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
-    'const virStoragePool *':  ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
+    'virStoragePoolPtr': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
+    'virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
+    'const virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
 
-    'virStorageVolPtr':  ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
-    'virStorageVol *':  ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
-    'const virStorageVol *':  ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
+    'virStorageVolPtr': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
+    'virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
+    'const virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
 
-    'virConnectPtr':  ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
-    'virConnect *':  ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
-    'const virConnect *':  ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
+    'virConnectPtr': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
+    'virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
+    'const virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
 
-    'virNodeDevicePtr':  ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
-    'virNodeDevice *':  ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
-    'const virNodeDevice *':  ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
+    'virNodeDevicePtr': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
+    'virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
+    'const virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
 
-    'virSecretPtr':  ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
-    'virSecret *':  ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
-    'const virSecret *':  ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
+    'virSecretPtr': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
+    'virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
+    'const virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
 
-    'virNWFilterPtr':  ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
-    'virNWFilter *':  ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
-    'const virNWFilter *':  ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
+    'virNWFilterPtr': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
+    'virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
+    'const virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
 
-    'virNWFilterBindingPtr':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
-    'virNWFilterBinding *':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
-    'const virNWFilterBinding *':  ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'virNWFilterBindingPtr': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'const virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
 
-    'virStreamPtr':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
-    'virStream *':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
-    'const virStream *':  ('O', "virStream", "virStreamPtr", "virStreamPtr"),
+    'virStreamPtr': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
+    'virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
+    'const virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
 
-    'virDomainCheckpointPtr':  ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
-    'virDomainCheckpoint *':  ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
-    'const virDomainCheckpoint *':  ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
+    'virDomainCheckpointPtr': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
+    'virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
+    'const virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
 
-    'virDomainSnapshotPtr':  ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-    'virDomainSnapshot *':  ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-    'const virDomainSnapshot *':  ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
+    'virDomainSnapshotPtr': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
+    'virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
+    'const virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
 }
 
 unknown_types = {}
@@ -528,66 +535,66 @@ qemu_skip_impl = (
 # or C code is generated. Generally should not be used for any more
 # functions than those already listed
 skip_function = (
-    'virConnectListDomains', # Python API is called virConnectListDomainsID for unknown reasons
-    'virConnSetErrorFunc', # Not used in Python API  XXX is this a bug ?
-    'virResetError', # Not used in Python API  XXX is this a bug ?
-    'virGetVersion', # Python C code is manually written
-    'virSetErrorFunc', # Python API is called virRegisterErrorHandler for unknown reasons
-    'virConnCopyLastError', # Python API is called virConnGetLastError instead
-    'virCopyLastError', # Python API is called virGetLastError instead
-    'virConnectOpenAuth', # Python C code is manually written
-    'virDefaultErrorFunc', # Python virErrorFuncHandler impl calls this from C
+    'virConnectListDomains',  # Python API is called virConnectListDomainsID for unknown reasons
+    'virConnSetErrorFunc',  # Not used in Python API  XXX is this a bug ?
+    'virResetError',  # Not used in Python API  XXX is this a bug ?
+    'virGetVersion',  # Python C code is manually written
+    'virSetErrorFunc',  # Python API is called virRegisterErrorHandler for unknown reasons
+    'virConnCopyLastError',  # Python API is called virConnGetLastError instead
+    'virCopyLastError',  # Python API is called virGetLastError instead
+    'virConnectOpenAuth',  # Python C code is manually written
+    'virDefaultErrorFunc',  # Python virErrorFuncHandler impl calls this from C
     'virConnectDomainEventRegister',   # overridden in virConnect.py
-    'virConnectDomainEventDeregister', # overridden in virConnect.py
+    'virConnectDomainEventDeregister',  # overridden in virConnect.py
     'virConnectDomainEventRegisterAny',   # overridden in virConnect.py
-    'virConnectDomainEventDeregisterAny', # overridden in virConnect.py
+    'virConnectDomainEventDeregisterAny',  # overridden in virConnect.py
     'virConnectNetworkEventRegisterAny',   # overridden in virConnect.py
-    'virConnectNetworkEventDeregisterAny', # overridden in virConnect.py
+    'virConnectNetworkEventDeregisterAny',  # overridden in virConnect.py
     'virConnectStoragePoolEventRegisterAny',   # overridden in virConnect.py
-    'virConnectStoragePoolEventDeregisterAny', # overridden in virConnect.py
+    'virConnectStoragePoolEventDeregisterAny',  # overridden in virConnect.py
     'virConnectNodeDeviceEventRegisterAny',   # overridden in virConnect.py
-    'virConnectNodeDeviceEventDeregisterAny', # overridden in virConnect.py
+    'virConnectNodeDeviceEventDeregisterAny',  # overridden in virConnect.py
     'virConnectSecretEventRegisterAny',   # overridden in virConnect.py
-    'virConnectSecretEventDeregisterAny', # overridden in virConnect.py
-    'virSaveLastError', # We have our own python error wrapper
-    'virFreeError', # Only needed if we use virSaveLastError
-    'virConnectListAllDomains', # overridden in virConnect.py
-    'virDomainListAllCheckpoints', # overridden in virDomain.py
-    'virDomainCheckpointListAllChildren', # overridden in virDomainCheckpoint.py
-    'virDomainListAllSnapshots', # overridden in virDomain.py
-    'virDomainSnapshotListAllChildren', # overridden in virDomainSnapshot.py
-    'virConnectListAllStoragePools', # overridden in virConnect.py
-    'virStoragePoolListAllVolumes', # overridden in virStoragePool.py
-    'virConnectListAllNetworks', # overridden in virConnect.py
-    'virNetworkListAllPorts', # overridden in virConnect.py
-    'virConnectListAllInterfaces', # overridden in virConnect.py
-    'virConnectListAllNodeDevices', # overridden in virConnect.py
-    'virConnectListAllNWFilters', # overridden in virConnect.py
-    'virConnectListAllNWFilterBindings', # overridden in virConnect.py
-    'virConnectListAllSecrets', # overridden in virConnect.py
-    'virConnectGetAllDomainStats', # overridden in virConnect.py
-    'virDomainListGetStats', # overridden in virConnect.py
+    'virConnectSecretEventDeregisterAny',  # overridden in virConnect.py
+    'virSaveLastError',  # We have our own python error wrapper
+    'virFreeError',  # Only needed if we use virSaveLastError
+    'virConnectListAllDomains',  # overridden in virConnect.py
+    'virDomainListAllCheckpoints',  # overridden in virDomain.py
+    'virDomainCheckpointListAllChildren',  # overridden in virDomainCheckpoint.py
+    'virDomainListAllSnapshots',  # overridden in virDomain.py
+    'virDomainSnapshotListAllChildren',  # overridden in virDomainSnapshot.py
+    'virConnectListAllStoragePools',  # overridden in virConnect.py
+    'virStoragePoolListAllVolumes',  # overridden in virStoragePool.py
+    'virConnectListAllNetworks',  # overridden in virConnect.py
+    'virNetworkListAllPorts',  # overridden in virConnect.py
+    'virConnectListAllInterfaces',  # overridden in virConnect.py
+    'virConnectListAllNodeDevices',  # overridden in virConnect.py
+    'virConnectListAllNWFilters',  # overridden in virConnect.py
+    'virConnectListAllNWFilterBindings',  # overridden in virConnect.py
+    'virConnectListAllSecrets',  # overridden in virConnect.py
+    'virConnectGetAllDomainStats',  # overridden in virConnect.py
+    'virDomainListGetStats',  # overridden in virConnect.py
 
-    'virStreamRecvAll', # Pure python libvirt-override-virStream.py
-    'virStreamSendAll', # Pure python libvirt-override-virStream.py
-    'virStreamRecv', # overridden in libvirt-override-virStream.py
-    'virStreamSend', # overridden in libvirt-override-virStream.py
-    'virStreamRecvHole', # overridden in libvirt-override-virStream.py
-    'virStreamSendHole', # overridden in libvirt-override-virStream.py
-    'virStreamRecvFlags', # overridden in libvirt-override-virStream.py
-    'virStreamSparseRecvAll', # overridden in libvirt-override-virStream.py
-    'virStreamSparseSendAll', # overridden in libvirt-override-virStream.py
+    'virStreamRecvAll',  # Pure python libvirt-override-virStream.py
+    'virStreamSendAll',  # Pure python libvirt-override-virStream.py
+    'virStreamRecv',  # overridden in libvirt-override-virStream.py
+    'virStreamSend',  # overridden in libvirt-override-virStream.py
+    'virStreamRecvHole',  # overridden in libvirt-override-virStream.py
+    'virStreamSendHole',  # overridden in libvirt-override-virStream.py
+    'virStreamRecvFlags',  # overridden in libvirt-override-virStream.py
+    'virStreamSparseRecvAll',  # overridden in libvirt-override-virStream.py
+    'virStreamSparseSendAll',  # overridden in libvirt-override-virStream.py
 
-    'virConnectUnregisterCloseCallback', # overridden in virConnect.py
-    'virConnectRegisterCloseCallback', # overridden in virConnect.py
+    'virConnectUnregisterCloseCallback',  # overridden in virConnect.py
+    'virConnectRegisterCloseCallback',  # overridden in virConnect.py
 
-    'virDomainCreateXMLWithFiles', # overridden in virConnect.py
-    'virDomainCreateWithFiles', # overridden in virDomain.py
+    'virDomainCreateXMLWithFiles',  # overridden in virConnect.py
+    'virDomainCreateWithFiles',  # overridden in virDomain.py
 
-    'virDomainFSFreeze', # overridden in virDomain.py
-    'virDomainFSThaw', # overridden in virDomain.py
-    'virDomainGetTime', # overridden in virDomain.py
-    'virDomainSetTime', # overridden in virDomain.py
+    'virDomainFSFreeze',  # overridden in virDomain.py
+    'virDomainFSThaw',  # overridden in virDomain.py
+    'virDomainGetTime',  # overridden in virDomain.py
+    'virDomainSetTime',  # overridden in virDomain.py
 
     # 'Ref' functions have no use for bindings users.
     "virConnectRef",
@@ -641,27 +648,27 @@ skip_function = (
     "virTypedParamsGetUInt",
     "virTypedParamsGetULLong",
 
-    'virNetworkDHCPLeaseFree', # only useful in C, python code uses list
-    'virDomainStatsRecordListFree', # only useful in C, python uses dict
-    'virDomainFSInfoFree', # only useful in C, python code uses list
-    'virDomainIOThreadInfoFree', # only useful in C, python code uses list
-    'virDomainInterfaceFree', # only useful in C, python code uses list
+    'virNetworkDHCPLeaseFree',  # only useful in C, python code uses list
+    'virDomainStatsRecordListFree',  # only useful in C, python uses dict
+    'virDomainFSInfoFree',  # only useful in C, python code uses list
+    'virDomainIOThreadInfoFree',  # only useful in C, python code uses list
+    'virDomainInterfaceFree',  # only useful in C, python code uses list
 )
 
 lxc_skip_function = (
-  "virDomainLxcEnterNamespace",
-  "virDomainLxcEnterSecurityLabel",
+    "virDomainLxcEnterNamespace",
+    "virDomainLxcEnterSecurityLabel",
 )
 qemu_skip_function = (
-    #"virDomainQemuAttach",
-    'virConnectDomainQemuMonitorEventRegister', # overridden in -qemu.py
-    'virConnectDomainQemuMonitorEventDeregister', # overridden in -qemu.py
+    # "virDomainQemuAttach",
+    'virConnectDomainQemuMonitorEventRegister',  # overridden in -qemu.py
+    'virConnectDomainQemuMonitorEventDeregister',  # overridden in -qemu.py
 )
 
 # Generate C code, but skip python impl
 function_skip_python_impl = (
-    "virStreamFree", # Needed in custom virStream __del__, but free shouldn't
-                     # be exposed in bindings
+    "virStreamFree",  # Needed in custom virStream __del__, but free shouldn't
+                      # be exposed in bindings
 )
 
 lxc_function_skip_python_impl = ()
@@ -670,6 +677,7 @@ qemu_function_skip_python_impl = ()
 function_skip_index_one = (
     "virDomainRevertToSnapshot",
 )
+
 
 def print_function_wrapper(module, name, output, export, include):
     global py_types
@@ -711,12 +719,12 @@ def print_function_wrapper(module, name, output, export, include):
             return 1
 
     c_call = ""
-    format=""
-    format_args=""
-    c_args=""
-    c_return=""
-    c_convert=""
-    num_bufs=0
+    format = ""
+    format_args = ""
+    c_args = ""
+    c_return = ""
+    c_convert = ""
+    num_bufs = 0
     for arg in args:
         # This should be correct
         if arg[1][0:6] == "const ":
@@ -730,8 +738,8 @@ def print_function_wrapper(module, name, output, export, include):
                 format_args = format_args + ", &pyobj_%s" % (arg[0])
                 c_args = c_args + "    PyObject *pyobj_%s;\n" % (arg[0])
                 c_convert = c_convert + \
-                   "    %s = (%s) Py%s_Get(pyobj_%s);\n" % (arg[0],
-                   arg[1], t, arg[0])
+                    "    %s = (%s) Py%s_Get(pyobj_%s);\n" % (
+                        arg[0], arg[1], t, arg[0])
             else:
                 format_args = format_args + ", &%s" % (arg[0])
             if f == 't#':
@@ -757,9 +765,9 @@ def print_function_wrapper(module, name, output, export, include):
         if file == "python_accessor":
             if args[1][1] == "char *":
                 c_call = "\n    VIR_FREE(%s->%s);\n" % (
-                                 args[0][0], args[1][0])
-                c_call = c_call + "    %s->%s = (%s)strdup((const xmlChar *)%s);\n" % (args[0][0],
-                                 args[1][0], args[1][1], args[1][0])
+                    args[0][0], args[1][0])
+                c_call = c_call + "    %s->%s = (%s)strdup((const xmlChar *)%s);\n" % (
+                    args[0][0], args[1][0], args[1][1], args[1][0])
             else:
                 c_call = "\n    %s->%s = %s;\n" % (args[0][0], args[1][0],
                                                    args[1][0])
@@ -773,7 +781,7 @@ def print_function_wrapper(module, name, output, export, include):
             c_call = "\n    c_retval = %s->%s;\n" % (args[0][0], ret[2])
         else:
             c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
-        ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n,c)
+        ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n, c)
         if n == "charPtr":
             ret_convert = ret_convert + "    free(c_retval);\n"
         ret_convert = ret_convert + "    return py_retval;\n"
@@ -866,6 +874,7 @@ def print_function_wrapper(module, name, output, export, include):
             return 0
     return 1
 
+
 def print_c_pointer(classname, output, export, include):
     output.write("PyObject *\n")
     output.write("libvirt_%s_pointer(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)\n" % classname)
@@ -886,6 +895,7 @@ def print_c_pointer(classname, output, export, include):
 
     export.write("    { (char *)\"%s_pointer\", libvirt_%s_pointer, METH_VARARGS, NULL },\n" %
                  (classname, classname))
+
 
 def buildStubs(module, api_xml):
     global py_types
@@ -914,7 +924,7 @@ def buildStubs(module, api_xml):
         data = f.read()
         f.close()
         onlyOverrides = False
-        (parser, target)  = getparser()
+        (parser, target) = getparser()
         parser.feed(data)
         parser.close()
     except IOError as msg:
@@ -933,7 +943,7 @@ def buildStubs(module, api_xml):
         data = f.read()
         f.close()
         onlyOverrides = True
-        (parser, target)  = getparser()
+        (parser, target) = getparser()
         parser.feed(data)
         parser.close()
     except IOError as msg:
@@ -1008,6 +1018,7 @@ def buildStubs(module, api_xml):
         return -1
     return 0
 
+
 #######################################################################
 #
 #  This part writes part of the Python front-end classes based on
@@ -1063,18 +1074,18 @@ classes_destructors = {
     "virInterface": "virInterfaceFree",
     "virStoragePool": "virStoragePoolFree",
     "virStorageVol": "virStorageVolFree",
-    "virNodeDevice" : "virNodeDeviceFree",
+    "virNodeDevice": "virNodeDeviceFree",
     "virSecret": "virSecretFree",
     "virNWFilter": "virNWFilterFree",
     "virNWFilterBinding": "virNWFilterBindingFree",
     "virDomainCheckpoint": "virDomainCheckpointFree",
     "virDomainSnapshot": "virDomainSnapshotFree",
     # We hand-craft __del__ for this one
-    #"virStream": "virStreamFree",
+    # "virStream": "virStreamFree",
 }
 
 class_skip_connect_impl = {
-    "virConnect" : True,
+    "virConnect": True,
 }
 
 class_domain_impl = {
@@ -1114,15 +1125,17 @@ functions_int_exception_test = {
 }
 functions_int_default_test = "%s == -1"
 
-def is_integral_type (name):
+def is_integral_type(name):
     return re.search ("^(unsigned)? ?(int|long)$", name) is not None
+
 
 def is_optional_arg(info):
     return re.search("^\(?optional\)?", info) is not None
 
-def is_python_noninteger_type (name):
 
+def is_python_noninteger_type(name):
     return name[-1:] == "*"
+
 
 def nameFixup(name, classe, type, file):
     # avoid a disastrous clash
@@ -1331,28 +1344,30 @@ def functionSortKey(info):
     (index, func, name, ret, args, filename, mod) = info
     return func, filename
 
+
 def writeDoc(module, name, args, indent, output):
-     if module == "libvirt":
-         funcs = functions
-     elif module == "libvirt-lxc":
-         funcs = lxc_functions
-     elif module == "libvirt-qemu":
-         funcs = qemu_functions
-     if funcs[name][0] is None or funcs[name][0] == "":
-         return
-     val = funcs[name][0]
-     val = val.replace("NULL", "None")
-     output.write(indent)
-     output.write('"""')
-     i = val.find("\n")
-     while i >= 0:
-         str = val[0:i+1]
-         val = val[i+1:]
-         output.write(str)
-         i = val.find("\n")
-         output.write(indent)
-     output.write(val)
-     output.write(' """\n')
+    if module == "libvirt":
+        funcs = functions
+    elif module == "libvirt-lxc":
+        funcs = lxc_functions
+    elif module == "libvirt-qemu":
+        funcs = qemu_functions
+    if funcs[name][0] is None or funcs[name][0] == "":
+        return
+    val = funcs[name][0]
+    val = val.replace("NULL", "None")
+    output.write(indent)
+    output.write('"""')
+    i = val.find("\n")
+    while i >= 0:
+        str = val[0:i + 1]
+        val = val[i + 1:]
+        output.write(str)
+        i = val.find("\n")
+        output.write(indent)
+    output.write(val)
+    output.write(' """\n')
+
 
 def buildWrappers(module):
     global ctypes
@@ -1413,7 +1428,7 @@ def buildWrappers(module):
                 function_classes[classe].append(info)
                 break
             elif name[0:3] == "vir" and len(args) >= 2 and args[1][1] == type \
-                and file != "python_accessor" and name not in function_skip_index_one:
+                    and file != "python_accessor" and name not in function_skip_index_one:
                 found = 1
                 func = nameFixup(name, classe, type, file)
                 info = (1, func, name, ret, args, file, mod)
@@ -1509,8 +1524,8 @@ def buildWrappers(module):
                         classes.write("    if ret is None:return None\n")
                     else:
                         classes.write(
-                     "    if ret is None:raise libvirtError('%s() failed')\n" %
-                                      (name))
+                            "    if ret is None:raise libvirtError('%s() failed')\n" %
+                            (name))
 
                     classes.write("    return ")
                     classes.write(classes_type[ret[0]][1] % ("ret"))
@@ -1519,22 +1534,22 @@ def buildWrappers(module):
                 # For functions returning an integral type there are
                 # several things that we can do, depending on the
                 # contents of functions_int_*:
-                elif is_integral_type (ret[0]):
+                elif is_integral_type(ret[0]):
                     if name not in functions_noexcept:
                         if name in functions_int_exception_test:
                             test = functions_int_exception_test[name]
                         else:
                             test = functions_int_default_test
-                        classes.write (("    if " + test +
-                                        ": raise libvirtError ('%s() failed')\n") %
-                                       ("ret", name))
+                        classes.write(("    if " + test +
+                                       ": raise libvirtError ('%s() failed')\n") %
+                                      ("ret", name))
                     classes.write("    return ret\n")
 
-                elif is_python_noninteger_type (ret[0]):
+                elif is_python_noninteger_type(ret[0]):
                     if name not in functions_noexcept:
-                        classes.write (("    if %s is None" +
-                                        ": raise libvirtError ('%s() failed')\n") %
-                                       ("ret", name))
+                        classes.write(("    if %s is None" +
+                                       ": raise libvirtError ('%s() failed')\n") %
+                                      ("ret", name))
                     classes.write("    return ret\n")
 
                 else:
@@ -1553,41 +1568,41 @@ def buildWrappers(module):
                 classes.write("    # methods. This corresponds to the size of payload\n")
                 classes.write("    # of a stream packet.\n")
                 classes.write("    streamBufSize = 262120\n\n")
-            if classname in [ "virDomain", "virNetwork", "virInterface", "virStoragePool",
-                              "virStorageVol", "virNodeDevice", "virSecret","virStream",
-                              "virNWFilter", "virNWFilterBinding" ]:
+            if classname in ["virDomain", "virNetwork", "virInterface", "virStoragePool",
+                             "virStorageVol", "virNodeDevice", "virSecret", "virStream",
+                             "virNWFilter", "virNWFilterBinding"]:
                 classes.write("    def __init__(self, conn, _obj=None):\n")
-            elif classname in [ "virDomainCheckpoint", "virDomainSnapshot" ]:
+            elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                 classes.write("    def __init__(self, dom, _obj=None):\n")
-            elif classname in [ "virNetworkPort" ]:
+            elif classname in ["virNetworkPort"]:
                 classes.write("    def __init__(self, net, _obj=None):\n")
             else:
                 classes.write("    def __init__(self, _obj=None):\n")
-            if classname in [ "virDomain", "virNetwork", "virInterface",
-                              "virNodeDevice", "virSecret", "virStream",
-                              "virNWFilter", "virNWFilterBinding" ]:
+            if classname in ["virDomain", "virNetwork", "virInterface",
+                             "virNodeDevice", "virSecret", "virStream",
+                             "virNWFilter", "virNWFilterBinding"]:
                 classes.write("        self._conn = conn\n")
-            elif classname in [ "virStorageVol", "virStoragePool" ]:
+            elif classname in ["virStorageVol", "virStoragePool"]:
                 classes.write("        self._conn = conn\n"
                               "        if not isinstance(conn, virConnect):\n"
                               "            self._conn = conn._conn\n")
-            elif classname in [ "virDomainCheckpoint", "virDomainSnapshot" ]:
+            elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
-            elif classname in [ "virNetworkPort" ]:
+            elif classname in ["virNetworkPort"]:
                 classes.write("        self._net = net\n")
                 classes.write("        self._conn = net.connect()\n")
             classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
             classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
             classes.write("        self._o = _obj\n\n")
-            destruct=None
+            destruct = None
             if classname in classes_destructors:
                 classes.write("    def __del__(self):\n")
                 classes.write("        if self._o is not None:\n")
                 classes.write("            libvirtmod.%s(self._o)\n" %
                               classes_destructors[classname])
                 classes.write("        self._o = None\n\n")
-                destruct=classes_destructors[classname]
+                destruct = classes_destructors[classname]
 
             if classname not in class_skip_connect_impl:
                 # Build python safe 'connect' method
@@ -1634,9 +1649,9 @@ def buildWrappers(module):
                         classes.write(", %s" % arg[0])
                     if arg[0] == "flags" or is_optional_arg(arg[2]):
                         if is_integral_type(arg[1]):
-                           classes.write("=0")
+                            classes.write("=0")
                         else:
-                           classes.write("=None")
+                            classes.write("=None")
                     n = n + 1
                 classes.write("):\n")
                 writeDoc(module, name, args, '        ', classes)
@@ -1684,36 +1699,36 @@ def buildWrappers(module):
                         else:
                             if classname == "virConnect":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', conn=self)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', conn=self)\n" %
+                                    (name))
                             elif classname == "virDomain":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', dom=self)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', dom=self)\n" %
+                                    (name))
                             elif classname == "virNetwork":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
+                                    (name))
                             elif classname == "virInterface":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
+                                    (name))
                             elif classname == "virStoragePool":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', pool=self)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', pool=self)\n" %
+                                    (name))
                             elif classname == "virStorageVol":
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', vol=self)\n" %
-                                              (name))
-                            elif classname in [ "virDomainCheckpoint", "virDomainSnapshot"]:
+                                    "        if ret is None:raise libvirtError('%s() failed', vol=self)\n" %
+                                    (name))
+                            elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed', dom=self._dom)\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed', dom=self._dom)\n" %
+                                    (name))
                             else:
                                 classes.write(
-                     "        if ret is None:raise libvirtError('%s() failed')\n" %
-                                              (name))
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
+                                    (name))
 
                         #
                         # generate the returned class wrapper for the object
@@ -1730,75 +1745,75 @@ def buildWrappers(module):
                     # For functions returning an integral type there
                     # are several things that we can do, depending on
                     # the contents of functions_int_*:
-                    elif is_integral_type (ret[0]):
+                    elif is_integral_type(ret[0]):
                         if name not in functions_noexcept:
                             if name in functions_int_exception_test:
                                 test = functions_int_exception_test[name]
                             else:
                                 test = functions_int_default_test
                             if classname == "virConnect":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', conn=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', conn=self)\n") %
+                                              ("ret", name))
                             elif classname == "virDomain":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', dom=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', dom=self)\n") %
+                                              ("ret", name))
                             elif classname == "virNetwork":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', net=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                              ("ret", name))
                             elif classname == "virInterface":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', net=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                              ("ret", name))
                             elif classname == "virStoragePool":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', pool=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', pool=self)\n") %
+                                              ("ret", name))
                             elif classname == "virStorageVol":
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed', vol=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed', vol=self)\n") %
+                                              ("ret", name))
                             else:
-                                classes.write (("        if " + test +
-                                                ": raise libvirtError ('%s() failed')\n") %
-                                               ("ret", name))
+                                classes.write(("        if " + test +
+                                               ": raise libvirtError('%s() failed')\n") %
+                                              ("ret", name))
 
-                        classes.write ("        return ret\n")
+                        classes.write("        return ret\n")
 
-                    elif is_python_noninteger_type (ret[0]):
+                    elif is_python_noninteger_type(ret[0]):
                         if name not in functions_noexcept:
                             if classname == "virConnect":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', conn=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', conn=self)\n") %
+                                              ("ret", name))
                             elif classname == "virDomain":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', dom=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', dom=self)\n") %
+                                              ("ret", name))
                             elif classname == "virNetwork":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', net=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                              ("ret", name))
                             elif classname == "virInterface":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', net=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                              ("ret", name))
                             elif classname == "virStoragePool":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', pool=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', pool=self)\n") %
+                                              ("ret", name))
                             elif classname == "virStorageVol":
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed', vol=self)\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed', vol=self)\n") %
+                                              ("ret", name))
                             else:
-                                classes.write (("        if %s is None" +
-                                                ": raise libvirtError ('%s() failed')\n") %
-                                               ("ret", name))
+                                classes.write(("        if %s is None" +
+                                               ": raise libvirtError('%s() failed')\n") %
+                                              ("ret", name))
 
-                        classes.write ("        return ret\n")
+                        classes.write("        return ret\n")
                     else:
                         classes.write("        return ret\n")
 
@@ -1806,11 +1821,10 @@ def buildWrappers(module):
             # Append "<classname>.py" to class def, iff it exists
             try:
                 extra = open("libvirt-override-" + classname + ".py", "r")
-                classes.write ("    #\n")
-                classes.write ("    # %s methods from %s.py (hand coded)\n" % (classname,classname))
-                classes.write ("    #\n")
+                classes.write("    #\n")
+                classes.write("    # %s methods from %s.py (hand coded)\n" % (classname, classname))
+                classes.write("    #\n")
                 cached = None
-
 
                 # Since we compile with older libvirt, we don't want to pull
                 # in manually written python methods which call C methods
@@ -1831,7 +1845,7 @@ def buildWrappers(module):
                 for line in extra.readlines():
                     offset = line.find(" def ")
                     if offset != -1:
-                        name = line[offset+5:]
+                        name = line[offset + 5:]
                         offset = name.find("(")
                         name = name[0:offset]
                         if cached is not None:
@@ -1867,7 +1881,7 @@ def buildWrappers(module):
 
     # Resolve only one level of reference
     def resolveEnum(enum, data):
-        for name,val in enum.items():
+        for name, val in enum.items():
             try:
                 int(val)
             except ValueError:
@@ -1877,19 +1891,19 @@ def buildWrappers(module):
     enumvals = list(enums.items())
     # convert list of dicts to one dict
     enumData = {}
-    for type,enum in enumvals:
+    for type, enum in enumvals:
         enumData.update(enum)
 
     if enumvals is not None:
         enumvals.sort()
-    for type,enum in enumvals:
+    for type, enum in enumvals:
         classes.write("# %s\n" % type)
         items = list(resolveEnum(enum, enumData).items())
         items.sort(key=enumsSortKey)
         if items[-1][0].endswith('_LAST'):
             del items[-1]
-        for name,value in items:
-            classes.write("%s = %s\n" % (name,value))
+        for name, value in items:
+            classes.write("%s = %s\n" % (name, value))
         classes.write("\n")
 
     classes.write("# typed parameter names\n")
@@ -1897,6 +1911,7 @@ def buildWrappers(module):
         classes.write("%s = \"%s\"\n" % (name, value))
 
     classes.close()
+
 
 def qemuBuildWrappers(module):
     global qemu_functions
@@ -2000,12 +2015,12 @@ def qemuBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in sorted(qemu_enums.items()):
+    for type, enum in sorted(qemu_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
         items.sort(key=lambda i: (int(i[1]), i[0]))
-        for name,value in items:
-            fd.write("%s = %s\n" % (name,value))
+        for name, value in items:
+            fd.write("%s = %s\n" % (name, value))
         fd.write("\n")
 
     fd.close()
@@ -2111,12 +2126,12 @@ def lxcBuildWrappers(module):
     #
     # Generate enum constants
     #
-    for type,enum in sorted(lxc_enums.items()):
+    for type, enum in sorted(lxc_enums.items()):
         fd.write("# %s\n" % type)
         items = list(enum.items())
         items.sort(key=lambda i: (int(i[1]), i[0]))
-        for name,value in items:
-            fd.write("%s = %s\n" % (name,value))
+        for name, value in items:
+            fd.write("%s = %s\n" % (name, value))
         fd.write("\n")
 
     fd.close()

@@ -6,9 +6,9 @@ import sys
 import os
 
 def usage():
-   print('Usage: %s DIR' % sys.argv[0])
-   print('       Save all currently running domU\'s into DIR')
-   print('       DIR must exist and be writable by this process')
+    print('Usage: %s DIR' % sys.argv[0])
+    print('       Save all currently running domU\'s into DIR')
+    print('       DIR must exist and be writable by this process')
 
 if len(sys.argv) != 2:
     usage()

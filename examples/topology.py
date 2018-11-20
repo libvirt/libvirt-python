@@ -30,13 +30,17 @@ total_cpus = cells.getElementsByTagName('cpu').length
 socketIds = []
 siblingsIds = []
 
-socketIds = [ proc.getAttribute('socket_id')
-              for proc in cells.getElementsByTagName('cpu')
-              if proc.getAttribute('socket_id') not in socketIds ]
+socketIds = [
+    proc.getAttribute('socket_id')
+    for proc in cells.getElementsByTagName('cpu')
+    if proc.getAttribute('socket_id') not in socketIds
+]
 
-siblingsIds = [ proc.getAttribute('siblings')
-                for proc in cells.getElementsByTagName('cpu')
-                if proc.getAttribute('siblings') not in siblingsIds ]
+siblingsIds = [
+    proc.getAttribute('siblings')
+    for proc in cells.getElementsByTagName('cpu')
+    if proc.getAttribute('siblings') not in siblingsIds
+]
 
 print("Host topology")
 print("NUMA nodes:", cells.getAttribute('num'))

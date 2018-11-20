@@ -32,17 +32,23 @@ except libvirt.libvirtError:
 caps = minidom.parseString(capsXML)
 cells = caps.getElementsByTagName("cells")[0]
 
-nodesIDs = [ int(proc.getAttribute("id"))
-             for proc in cells.getElementsByTagName("cell") ]
+nodesIDs = [
+    int(proc.getAttribute("id"))
+    for proc in cells.getElementsByTagName("cell")
+]
 
-nodesMem = [ conn.getMemoryStats(int(proc))
-             for proc in nodesIDs]
+nodesMem = [
+    conn.getMemoryStats(int(proc))
+    for proc in nodesIDs
+]
 
 doms = conn.listAllDomains(libvirt.VIR_CONNECT_LIST_DOMAINS_ACTIVE)
 
-domsStrict = [ proc
-               for proc in doms
-               if proc.numaParameters()["numa_mode"] == libvirt.VIR_DOMAIN_NUMATUNE_MEM_STRICT ]
+domsStrict = [
+    proc
+    for proc in doms
+    if proc.numaParameters()["numa_mode"] == libvirt.VIR_DOMAIN_NUMATUNE_MEM_STRICT
+]
 
 domsStrictCfg = {}
 for dom in domsStrict:

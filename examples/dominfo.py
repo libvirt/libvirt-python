@@ -6,8 +6,8 @@ import sys
 import libxml2
 
 def usage():
-   print('Usage: %s DOMAIN' % sys.argv[0])
-   print('       Print information about the domain DOMAIN')
+    print('Usage: %s DOMAIN' % sys.argv[0])
+    print('       Print information about the domain DOMAIN')
 
 def print_section(title):
     print("\n%s" % title)
@@ -19,7 +19,7 @@ def print_entry(key, value):
 def print_xml(key, ctx, path):
     res = ctx.xpathEval(path)
     if res is None or len(res) == 0:
-        value="Unknown"
+        value = "Unknown"
     else:
         value = res[0].content
     print_entry(key, value)

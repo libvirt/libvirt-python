@@ -78,6 +78,7 @@ class Callback(object):
         self.impl.log.debug('callback %d close(), scheduling ff', self.iden)
         self.impl.schedule_ff_callback(self.iden, self.opaque)
 
+
 #
 # file descriptors
 #
@@ -114,8 +115,8 @@ class Descriptor(object):
 
         # For the edge case of empty callbacks, any() returns False.
         if any(callback.event & ~(
-                    libvirt.VIR_EVENT_HANDLE_READABLE |
-                    libvirt.VIR_EVENT_HANDLE_WRITABLE)
+            libvirt.VIR_EVENT_HANDLE_READABLE |
+            libvirt.VIR_EVENT_HANDLE_WRITABLE)
                 for callback in self.callbacks.values()):
             warnings.warn(
                 'The only event supported are VIR_EVENT_HANDLE_READABLE '
@@ -161,6 +162,7 @@ class Descriptor(object):
         self.update()
         return callback
 
+
 class DescriptorDict(dict):
     '''Descriptors collection
 
@@ -174,6 +176,7 @@ class DescriptorDict(dict):
         descriptor = Descriptor(self.impl, fd)
         self[fd] = descriptor
         return descriptor
+
 
 class FDCallback(Callback):
     '''Callback for file descriptor (watcher)
@@ -196,6 +199,7 @@ class FDCallback(Callback):
         '''Update the callback and fix descriptor's watchers'''
         self.event = event
         self.descriptor.update()
+
 
 #
 # timeouts
@@ -242,7 +246,7 @@ class TimeoutCallback(Callback):
         if self.timeout >= 0 and self._task is None:
             self.impl.log.debug('timer %r start', self.iden)
             self._task = ensure_future(self._timer(),
-                loop=self.impl.loop)
+                                       loop=self.impl.loop)
 
         elif self.timeout < 0 and self._task is not None:
             self.impl.log.debug('timer %r stop', self.iden)
@@ -253,6 +257,7 @@ class TimeoutCallback(Callback):
         '''Stop the timer and call ff callback'''
         self.update(timeout=-1)
         super(TimeoutCallback, self).close()
+
 
 #
 # main implementation
@@ -298,7 +303,7 @@ class virEventAsyncIOImpl(object):
         # pylint: disable=bad-whitespace
         self.log.debug('register()')
         libvirt.virEventRegisterImpl(
-            self._add_handle,  self._update_handle,  self._remove_handle,
+            self._add_handle, self._update_handle, self._remove_handle,
             self._add_timeout, self._update_timeout, self._remove_timeout)
         return self
 
@@ -350,11 +355,11 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventAddHandleFuncFunc
         '''
         callback = FDCallback(self, cb, opaque,
-                descriptor=self.descriptors[fd], event=event)
+                              descriptor=self.descriptors[fd], event=event)
         assert callback.iden not in self.callbacks
 
         self.log.debug('add_handle(fd=%d, event=%d, cb=..., opaque=...) = %d',
-                fd, event, callback.iden)
+                       fd, event, callback.iden)
         self.callbacks[callback.iden] = callback
         self.descriptors[fd].add_handle(callback)
         self._pending_inc()
@@ -410,7 +415,7 @@ class virEventAsyncIOImpl(object):
         assert callback.iden not in self.callbacks
 
         self.log.debug('add_timeout(timeout=%d, cb=..., opaque=...) = %d',
-                timeout, callback.iden)
+                       timeout, callback.iden)
         self.callbacks[callback.iden] = callback
         callback.update(timeout=timeout)
         self._pending_inc()
@@ -448,9 +453,12 @@ class virEventAsyncIOImpl(object):
 
 
 _current_impl = None
+
+
 def getCurrentImpl():
     '''Return the current implementation, or None if not yet registered'''
     return _current_impl
+
 
 def virEventRegisterAsyncIOImpl(loop=None):
     '''Arrange for libvirt's callbacks to be dispatched via asyncio event loop

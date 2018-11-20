@@ -5,9 +5,11 @@ import libvirt
 import sys
 import time
 
+
 def usage():
     print("Usage: %s [URI] NETWORK" % sys.argv[0])
     print("        Print leases info for a given virtual network")
+
 
 uri = None
 network = None
@@ -39,6 +41,7 @@ if not leases:
     print("Failed to get leases for %s" % net.name())
     sys.exit(0)
 
+
 def toIPAddrType(addrType):
     if addrType == libvirt.VIR_IP_ADDR_TYPE_IPV4:
         return "ipv4"
@@ -46,13 +49,14 @@ def toIPAddrType(addrType):
         return "ipv6"
     return "Unknown"
 
+
 print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format("Expiry Time",
                                                       "MAC address",
                                                       "Protocol",
                                                       "IP address",
                                                       "Hostname",
                                                       "Client ID or DUID"))
-print("-"*115)
+print("-" * 115)
 
 for lease in leases:
     print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format(

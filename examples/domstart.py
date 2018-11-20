@@ -18,11 +18,11 @@ def read_domain(fname):
     return (name, xmldesc)
 
 def usage():
-   print('Usage: %s domain.xml' % sys.argv[0])
-   print('       Check that the domain described by DOMAIN.XML is running')
-   print('       If the domain is not running, create it')
-   print('       DOMAIN.XML must be a XML description of the domain')
-   print('       in libvirt\'s XML format')
+    print('Usage: %s domain.xml' % sys.argv[0])
+    print('       Check that the domain described by DOMAIN.XML is running')
+    print('       If the domain is not running, create it')
+    print('       DOMAIN.XML must be a XML description of the domain')
+    print('       in libvirt\'s XML format')
 
 if len(sys.argv) != 2:
     usage()

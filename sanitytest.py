@@ -95,7 +95,7 @@ for n in set:
 # Phase 2: Identify all classes and methods in the 'libvirt' python module
 gotenums = []
 gottypes = []
-gotfunctions = { "libvirt": [] }
+gotfunctions = {"libvirt": []}
 
 for name in dir(libvirt):
     if name[0] == '_':

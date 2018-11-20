@@ -6,10 +6,10 @@ import sys
 import os
 
 def usage():
-   print('Usage: %s DIR' % sys.argv[0])
-   print('       Restore all the domains contained in DIR')
-   print('       It is assumed that all files in DIR are')
-   print('       images of domU\'s previously created with save')
+    print('Usage: %s DIR' % sys.argv[0])
+    print('       Restore all the domains contained in DIR')
+    print('       It is assumed that all files in DIR are')
+    print('       images of domU\'s previously created with save')
 
 if len(sys.argv) != 2:
     usage()
