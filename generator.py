@@ -990,8 +990,8 @@ def buildStubs(module, api_xml):
 
     if unknown_types:
         print("Missing type converters: ")
-        for type in list(unknown_types.keys()):
-            print("%s:%d " % (type, len(unknown_types[type])))
+        for type, count in unknown_types.items():
+            print("%s:%d " % (type, len(count)))
 
     for f in funcs_failed:
         print("ERROR: failed %s" % f)
@@ -1374,15 +1374,13 @@ def buildWrappers(module):
     for classe in primary_classes:
         classes_list.append(classe)
         classes_processed[classe] = ()
-        for type in list(classes_type.keys()):
-            tinfo = classes_type[type]
+        for type, tinfo in classes_type.items():
             if tinfo[2] == classe:
                 ctypes.append(type)
                 ctypes_processed[type] = ()
-    for type in list(classes_type.keys()):
+    for type, tinfo in classes_type.items():
         if type in ctypes_processed:
             continue
-        tinfo = classes_type[type]
         if tinfo[2] not in classes_processed:
             classes_list.append(tinfo[2])
             classes_processed[tinfo[2]] = ()
@@ -1390,9 +1388,8 @@ def buildWrappers(module):
         ctypes.append(type)
         ctypes_processed[type] = ()
 
-    for name in list(functions.keys()):
+    for name, (desc, ret, args, file, mod, cond) in functions.items():
         found = 0
-        (desc, ret, args, file, mod, cond) = functions[name]
         for type in ctypes:
             classe = classes_type[type][2]
 
@@ -1852,9 +1849,8 @@ def qemuBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in sorted(qemu_functions.keys()):
+    for name, (desc, ret, args, file, mod, cond) in sorted(qemu_functions.items()):
         func = nameFixup(name, 'None', None, None)
-        (desc, ret, args, file, mod, cond) = qemu_functions[name]
         fd.write("def %s(" % func)
         for n, arg in enumerate(args):
             if n != 0:
@@ -1957,9 +1953,8 @@ def lxcBuildWrappers(module):
     #
     # Generate functions directly, no classes
     #
-    for name in sorted(lxc_functions.keys()):
+    for name, (desc, ret, args, file, mod, cond) in sorted(lxc_functions.items()):
         func = nameFixup(name, 'None', None, None)
-        (desc, ret, args, file, mod, cond) = lxc_functions[name]
         fd.write("def %s(" % func)
         for n, arg in enumerate(args):
             if n != 0:
