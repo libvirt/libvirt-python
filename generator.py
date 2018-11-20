@@ -726,26 +726,26 @@ def print_function_wrapper(module, name, output, export, include):
         # This should be correct
         if arg[1][0:6] == "const ":
             arg[1] = arg[1][6:]
-        c_args = c_args + "    %s %s;\n" % (arg[1], arg[0])
+        c_args += "    %s %s;\n" % (arg[1], arg[0])
         if arg[1] in py_types:
             (f, t, n, c) = py_types[arg[1]]
             if f is not None:
-                format = format + f
+                format += f
             if t is not None:
-                format_args = format_args + ", &pyobj_%s" % (arg[0])
-                c_args = c_args + "    PyObject *pyobj_%s;\n" % (arg[0])
-                c_convert = c_convert + \
+                format_args += ", &pyobj_%s" % (arg[0])
+                c_args += "    PyObject *pyobj_%s;\n" % (arg[0])
+                c_convert += \
                     "    %s = (%s) Py%s_Get(pyobj_%s);\n" % (
                         arg[0], arg[1], t, arg[0])
             else:
-                format_args = format_args + ", &%s" % (arg[0])
+                format_args += ", &%s" % (arg[0])
             if f == 't#':
-                format_args = format_args + ", &py_buffsize%d" % num_bufs
-                c_args = c_args + "    int py_buffsize%d;\n" % num_bufs
-                num_bufs = num_bufs + 1
+                format_args += ", &py_buffsize%d" % num_bufs
+                c_args += "    int py_buffsize%d;\n" % num_bufs
+                num_bufs += 1
             if c_call != "":
-                c_call = c_call + ", "
-            c_call = c_call + "%s" % (arg[0])
+                c_call += ", "
+            c_call += "%s" % (arg[0])
         else:
             if arg[1] in skipped_types:
                 return 0
@@ -756,14 +756,14 @@ def print_function_wrapper(module, name, output, export, include):
                 unknown_types[arg[1]] = [name]
             return -1
     if format != "":
-        format = format + ":%s" % (name)
+        format += ":%s" % (name)
 
     if ret[0] == 'void':
         if file == "python_accessor":
             if args[1][1] == "char *":
                 c_call = "\n    VIR_FREE(%s->%s);\n" % (
                     args[0][0], args[1][0])
-                c_call = c_call + "    %s->%s = (%s)strdup((const xmlChar *)%s);\n" % (
+                c_call += "    %s->%s = (%s)strdup((const xmlChar *)%s);\n" % (
                     args[0][0], args[1][0], args[1][1], args[1][0])
             else:
                 c_call = "\n    %s->%s = %s;\n" % (args[0][0], args[1][0],
@@ -780,8 +780,8 @@ def print_function_wrapper(module, name, output, export, include):
             c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
         ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n, c)
         if n == "charPtr":
-            ret_convert = ret_convert + "    free(c_retval);\n"
-        ret_convert = ret_convert + "    return py_retval;\n"
+            ret_convert += "    free(c_retval);\n"
+        ret_convert += "    return py_retval;\n"
     else:
         if ret[0] in skipped_types:
             return 0
