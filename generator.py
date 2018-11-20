@@ -1339,28 +1339,24 @@ def buildWrappers(module):
         ctypes_processed[type] = ()
 
     for name, (desc, ret, args, file, mod, cond) in functions.items():
-        found = 0
         for type in ctypes:
             classe = classes_type[type][2]
 
             if name[0:3] == "vir" and len(args) >= 1 and args[0][1] == type:
-                found = 1
                 func = nameFixup(name, classe, type, file)
                 info = (0, func, name, ret, args, file, mod)
                 function_classes[classe].append(info)
                 break
             elif name[0:3] == "vir" and len(args) >= 2 and args[1][1] == type \
                     and file != "python_accessor" and name not in function_skip_index_one:
-                found = 1
                 func = nameFixup(name, classe, type, file)
                 info = (1, func, name, ret, args, file, mod)
                 function_classes[classe].append(info)
                 break
-        if found == 1:
-            continue
-        func = nameFixup(name, "None", file, file)
-        info = (0, func, name, ret, args, file, mod)
-        function_classes['None'].append(info)
+        else:
+            func = nameFixup(name, "None", file, file)
+            info = (0, func, name, ret, args, file, mod)
+            function_classes['None'].append(info)
 
     classes_file = "build/%s.py" % module
     extra_file = "%s-override.py" % module
