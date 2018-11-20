@@ -58,7 +58,7 @@ def parse(data):
 class docParser(xml.sax.handler.ContentHandler):
     def __init__(self):
         self._data = []
-        self.in_function = 0
+        self.in_function = False
 
     def characters(self, text):
         if debug:
@@ -70,7 +70,7 @@ class docParser(xml.sax.handler.ContentHandler):
             print("start %s, %s" % (tag, attrs))
         if tag == 'function':
             self._data = []
-            self.in_function = 1
+            self.in_function = True
             self.function = None
             self.function_cond = None
             self.function_args = []
@@ -89,7 +89,7 @@ class docParser(xml.sax.handler.ContentHandler):
         elif tag == 'info':
             self._data = []
         elif tag == 'arg':
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_arg_name = None
                 self.function_arg_type = None
                 self.function_arg_info = None
@@ -102,7 +102,7 @@ class docParser(xml.sax.handler.ContentHandler):
                 if 'info' in attrs:
                     self.function_arg_info = attrs['info']
         elif tag == 'return':
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_return_type = None
                 self.function_return_info = None
                 self.function_return_field = None
@@ -161,24 +161,24 @@ class docParser(xml.sax.handler.ContentHandler):
                                   self.function_return, self.function_args,
                                   self.function_file, self.function_module,
                                   self.function_cond)
-                self.in_function = 0
+                self.in_function = False
         elif tag == 'arg':
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_args.append([self.function_arg_name,
                                            self.function_arg_type,
                                            self.function_arg_info])
         elif tag == 'return':
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_return = [self.function_return_type,
                                         self.function_return_info,
                                         self.function_return_field]
         elif tag == 'info':
             str = ''.join(self._data)
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_descr = str
         elif tag == 'cond':
             str = ''.join(self._data)
-            if self.in_function == 1:
+            if self.in_function:
                 self.function_cond = str
 
 
