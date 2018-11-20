@@ -958,7 +958,7 @@ def buildStubs(module, api_xml):
     wrapper.write("#include \"typewrappers.h\"\n")
     wrapper.write("#include \"build/" + module + ".h\"\n\n")
 
-    for function in sorted(funcs.keys()):
+    for function in sorted(funcs):
         # Skip the functions which are not for the module
         ret = print_function_wrapper(module, function, wrapper, export, include)
         if ret < 0:
