@@ -199,7 +199,6 @@ class docParser(xml.sax.handler.ContentHandler):
 
 
 def function(name, desc, ret, args, file, module, cond):
-    global onlyOverrides
     if onlyOverrides and name not in functions:
         return
     if name == "virConnectListDomains":
@@ -208,14 +207,12 @@ def function(name, desc, ret, args, file, module, cond):
 
 
 def qemu_function(name, desc, ret, args, file, module, cond):
-    global onlyOverrides
     if onlyOverrides and name not in qemu_functions:
         return
     qemu_functions[name] = (desc, ret, args, file, module, cond)
 
 
 def lxc_function(name, desc, ret, args, file, module, cond):
-    global onlyOverrides
     if onlyOverrides and name not in lxc_functions:
         return
     lxc_functions[name] = (desc, ret, args, file, module, cond)
@@ -676,14 +673,6 @@ function_skip_index_one = (
 
 
 def print_function_wrapper(module, name, output, export, include):
-    global py_types
-    global unknown_types
-    global functions
-    global lxc_functions
-    global qemu_functions
-    global skipped_modules
-    global function_skip_python_impl
-
     try:
         if module == "libvirt":
             (desc, ret, args, file, mod, cond) = functions[name]
@@ -894,8 +883,6 @@ def print_c_pointer(classname, output, export, include):
 
 
 def buildStubs(module, api_xml):
-    global py_types
-    global unknown_types
     global onlyOverrides
 
     if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
@@ -1366,17 +1353,6 @@ def writeDoc(module, name, args, indent, output):
 
 
 def buildWrappers(module):
-    global ctypes
-    global py_types
-    global unknown_types
-    global functions
-    global function_classes
-    global classes_type
-    global classes_list
-    global primary_classes
-    global classes_destructors
-    global functions_noexcept
-
     if not module == "libvirt":
         print("ERROR: Unknown module type: %s" % module)
         return None
@@ -1815,8 +1791,6 @@ def buildWrappers(module):
 
 
 def qemuBuildWrappers(module):
-    global qemu_functions
-
     if not module == "libvirt-qemu":
         print("ERROR: only libvirt-qemu is supported")
         return None
@@ -1924,8 +1898,6 @@ def qemuBuildWrappers(module):
 
 
 def lxcBuildWrappers(module):
-    global lxc_functions
-
     if not module == "libvirt-lxc":
         print("ERROR: only libvirt-lxc is supported")
         return None
