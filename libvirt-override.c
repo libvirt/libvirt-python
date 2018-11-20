@@ -1679,6 +1679,57 @@ libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
 
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
 
+#if LIBVIR_CHECK_VERSION(4, 10, 4)
+
+static virPyTypedParamsHint virPyDomainSetIOThreadParams[] = {
+    { VIR_DOMAIN_IOTHREAD_POLL_MAX_NS, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_IOTHREAD_POLL_GROW, VIR_TYPED_PARAM_UINT },
+    { VIR_DOMAIN_IOTHREAD_POLL_SHRINK, VIR_TYPED_PARAM_ULLONG },
+};
+
+static PyObject *
+libvirt_virDomainSetIOThreadParams(PyObject *self ATTRIBUTE_UNUSED,
+                                   PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *pyobj_dict = NULL;
+
+    virDomainPtr dom;
+    int iothread_val;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OiOI:virDomainSetIOThreadParams",
+                          &pyobj_dom, &iothread_val, &pyobj_dict, &flags))
+        return NULL;
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSetIOThreadParams,
+                                   VIR_N_ELEMENTS(virPyDomainSetIOThreadParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError, "IOThread polling params must be "
+                     "a dictionary");
+        return NULL;
+    }
+
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainSetIOThreadParams(dom, iothread_val,
+                                          params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    virTypedParamsFree(params, nparams);
+
+    return libvirt_intWrap(c_retval);
+}
+#endif /* LIBVIR_CHECK_VERSION(4, 10, 0) */
+
 /************************************************************************
  *									*
  *		Global error handler at the Python level		*
@@ -9988,6 +10039,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetIOThreadInfo", libvirt_virDomainGetIOThreadInfo, METH_VARARGS, NULL},
     {(char *) "virDomainPinIOThread", libvirt_virDomainPinIOThread, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
+#if LIBVIR_CHECK_VERSION(4, 10, 4)
+    {(char *) "virDomainSetIOThreadParams", libvirt_virDomainSetIOThreadParams, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(4, 10, 0) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
     {(char *) "virConnectListDefinedStoragePools", libvirt_virConnectListDefinedStoragePools, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 10, 2)

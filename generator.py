@@ -440,6 +440,7 @@ skip_impl = (
     'virDomainPinEmulator',
     'virDomainGetIOThreadInfo',
     'virDomainPinIOThread',
+    'virDomainSetIOThreadParams',
     'virSecretGetValue',
     'virSecretSetValue',
     'virSecretGetUUID',
