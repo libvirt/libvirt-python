@@ -60,16 +60,12 @@ class docParser(xml.sax.handler.ContentHandler):
         self._data = []
         self.in_function = 0
 
-        self.startElement = self.start
-        self.endElement = self.end
-        self.characters = self.data
-
-    def data(self, text):
+    def characters(self, text):
         if debug:
             print("data %s" % text)
         self._data.append(text)
 
-    def start(self, tag, attrs):
+    def startElement(self, tag, attrs):
         if debug:
             print("start %s, %s" % (tag, attrs))
         if tag == 'function':
@@ -128,7 +124,7 @@ class docParser(xml.sax.handler.ContentHandler):
             if "string" in attrs:
                 params.append((attrs['name'], attrs['string']))
 
-    def end(self, tag):
+    def endElement(self, tag):
         if debug:
             print("end %s" % tag)
         if tag == 'function':
@@ -891,10 +887,9 @@ def buildStubs(module, api_xml):
         funcs_skipped = qemu_functions_skipped
 
     try:
-        with open(api_xml) as stream:
-            data = stream.read()
         onlyOverrides = False
-        parse(data)
+        with open(api_xml) as stream:
+            parse(stream)
     except IOError as msg:
         print(api_xml, ":", msg)
         sys.exit(1)
@@ -907,10 +902,9 @@ def buildStubs(module, api_xml):
     py_types['pythonObject'] = ('O', "pythonObject", "pythonObject", "pythonObject")
 
     try:
-        with open(override_api_xml) as stream:
-            data = stream.read()
         onlyOverrides = True
-        parse(data)
+        with open(override_api_xml) as stream:
+            parse(stream)
     except IOError as msg:
         print(override_api_xml, ":", msg)
 
