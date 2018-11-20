@@ -1394,9 +1394,8 @@ def buildWrappers(module):
 
     if "None" in function_classes:
         flist = function_classes["None"]
-        flist.sort(key=functionSortKey)
         oldfile = ""
-        for info in flist:
+        for info in sorted(flist, key=functionSortKey):
             (index, func, name, ret, args, file, mod) = info
             if file != oldfile:
                 classes.write("#\n# Functions from module %s\n#\n\n" % file)
@@ -1546,9 +1545,8 @@ def buildWrappers(module):
                           classname)
 
             flist = function_classes[classname]
-            flist.sort(key=functionSortKey)
             oldfile = ""
-            for info in flist:
+            for info in sorted(flist, key=functionSortKey):
                 (index, func, name, ret, args, file, mod) = info
                 #
                 # Do not provide as method the destructors for the class
@@ -1731,12 +1729,9 @@ def buildWrappers(module):
     for type, enum in enumvals:
         enumData.update(enum)
 
-    if enumvals is not None:
-        enumvals.sort()
-    for type, enum in enumvals:
+    for type, enum in sorted(enumvals):
         classes.write("# %s\n" % type)
-        items = list(resolveEnum(enum, enumData).items())
-        items.sort(key=enumsSortKey)
+        items = sorted(resolveEnum(enum, enumData).items(), key=enumsSortKey)
         if items[-1][0].endswith('_LAST'):
             del items[-1]
         for name, value in items:
@@ -1848,9 +1843,7 @@ def qemuBuildWrappers(module):
     #
     for type, enum in sorted(qemu_enums.items()):
         fd.write("# %s\n" % type)
-        items = list(enum.items())
-        items.sort(key=lambda i: (int(i[1]), i[0]))
-        for name, value in items:
+        for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
             fd.write("%s = %s\n" % (name, value))
         fd.write("\n")
 
@@ -1953,9 +1946,7 @@ def lxcBuildWrappers(module):
     #
     for type, enum in sorted(lxc_enums.items()):
         fd.write("# %s\n" % type)
-        items = list(enum.items())
-        items.sort(key=lambda i: (int(i[1]), i[0]))
-        for name, value in items:
+        for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
             fd.write("%s = %s\n" % (name, value))
         fd.write("\n")
 
