@@ -975,15 +975,15 @@ def buildStubs(module, api_xml):
         # Skip the functions which are not for the module
         ret = print_function_wrapper(module, function, wrapper, export, include)
         if ret < 0:
-            failed = failed + 1
+            failed += 1
             funcs_failed.append(function)
             del funcs[function]
         if ret == 0:
-            skipped = skipped + 1
+            skipped += 1
             funcs_skipped.append(function)
             del funcs[function]
         if ret == 1:
-            nb_wrap = nb_wrap + 1
+            nb_wrap += 1
 
     if module == "libvirt":
         # Write C pointer conversion functions.
