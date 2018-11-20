@@ -71,9 +71,9 @@ class docParser(xml.sax.handler.ContentHandler):
         if tag == 'function':
             self._data = []
             self.in_function = True
-            self.function_cond = None
+            self.function_cond = ''
             self.function_args = []
-            self.function_descr = None
+            self.function_descr = ''
             self.function_return = None
             self.function = attrs.get('name', '')
             self.function_file = attrs.get('file', '')
@@ -111,7 +111,8 @@ class docParser(xml.sax.handler.ContentHandler):
             print("end %s" % tag)
         if tag == 'function':
             # functions come from source files, hence 'virerror.c'
-            if self.function is not None:
+            if self.function:
+                assert self.function_return
                 if self.function_module in libvirt_headers + \
                         ["event", "virevent", "virerror", "virterror"]:
                     function(self.function, self.function_descr,
@@ -683,9 +684,9 @@ def print_function_wrapper(module, name, output, export, include):
         c_args += "    %s %s;\n" % (arg[1], arg[0])
         if arg[1] in py_types:
             (f, t, n, c) = py_types[arg[1]]
-            if f is not None:
+            if f:
                 format += f
-            if t is not None:
+            if t:
                 format_args += ", &pyobj_%s" % (arg[0])
                 c_args += "    PyObject *pyobj_%s;\n" % (arg[0])
                 c_convert += \
@@ -728,7 +729,7 @@ def print_function_wrapper(module, name, output, export, include):
     elif ret[0] in py_types:
         (f, t, n, c) = py_types[ret[0]]
         c_return = "    %s c_retval;\n" % (ret[0])
-        if file == "python_accessor" and ret[2] is not None:
+        if file == "python_accessor" and ret[2]:
             c_call = "\n    c_retval = %s->%s;\n" % (args[0][0], ret[2])
         else:
             c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
@@ -746,7 +747,7 @@ def print_function_wrapper(module, name, output, export, include):
             unknown_types[ret[0]] = [name]
         return -1
 
-    if cond is not None and cond != "":
+    if cond:
         include.write("#if %s\n" % cond)
         export.write("#if %s\n" % cond)
         output.write("#if %s\n" % cond)
@@ -767,14 +768,14 @@ def print_function_wrapper(module, name, output, export, include):
 
     if file == "python":
         # Those have been manually generated
-        if cond is not None and cond != "":
+        if cond:
             include.write("#endif\n")
             export.write("#endif\n")
             output.write("#endif\n")
         return 1
-    if file == "python_accessor" and ret[0] != "void" and ret[2] is None:
+    if file == "python_accessor" and ret[0] != "void" and not ret[2]:
         # Those have been manually generated
-        if cond is not None and cond != "":
+        if cond:
             include.write("#endif\n")
             export.write("#endif\n")
             output.write("#endif\n")
@@ -809,7 +810,7 @@ def print_function_wrapper(module, name, output, export, include):
     output.write("    LIBVIRT_END_ALLOW_THREADS;\n")
     output.write(ret_convert)
     output.write("}\n\n")
-    if cond is not None and cond != "":
+    if cond:
         include.write("#endif /* %s */\n" % cond)
         export.write("#endif /* %s */\n" % cond)
         output.write("#endif /* %s */\n" % cond)
@@ -1295,7 +1296,7 @@ def writeDoc(module, name, args, indent, output):
         funcs = lxc_functions
     elif module == "libvirt-qemu":
         funcs = qemu_functions
-    if funcs[name][0] is None or funcs[name][0] == "":
+    if not funcs[name][0]:
         return
     val = funcs[name][0]
     val = val.replace("NULL", "None")
