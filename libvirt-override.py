@@ -4,22 +4,39 @@
 
 # On cygwin, the DLL is called cygvirtmod.dll
 try:
-    import libvirtmod
+    import libvirtmod  # type: ignore
 except ImportError as lib_e:
     try:
-        import cygvirtmod as libvirtmod
+        import cygvirtmod as libvirtmod  # type: ignore
     except ImportError as cyg_e:
         if "No module named" in str(cyg_e):
             raise lib_e
 
+from types import TracebackType
+from typing import Any, Callable, Dict, List, Optional, overload, Tuple, Type, TypeVar, Union
+_T = TypeVar('_T')
+_EventCB = Callable[[int, int, int, _T], None]
+_EventAddHandleFunc = Callable[[int, int, _EventCB, _T], int]
+_EventUpdateHandleFunc = Callable[[int, int], None]
+_EventRemoveHandleFunc = Callable[[int], int]
+_TimerCB = Callable[[int, _T], None]
+_EventAddTimeoutFunc = Callable[[int, _TimerCB, _T], int]
+_EventUpdateTimeoutFunc = Callable[[int, int], None]
+_EventRemoveTimeoutFunc = Callable[[int], int]
+_DomainCB = Callable[['virConnect', 'virDomain', int, int, _T], Optional[int]]
+_BlkioParameter = Dict[str, Any]
+_MemoryParameter = Dict[str, Any]
+_SchedParameter = Dict[str, Any]
+_TypedParameter = Dict[str, Any]
+
 
 # The root of all libvirt errors.
 class libvirtError(Exception):
-    def __init__(self, defmsg):
+    def __init__(self, defmsg: str) -> None:
 
         # Never call virConnGetLastError().
         # virGetLastError() is now thread local
-        err = libvirtmod.virGetLastError()
+        err = libvirtmod.virGetLastError()  # type: Optional[Tuple[int, int, str, int, str, Optional[str], Optional[str], int, int]]
         if err is None:
             msg = defmsg
         else:
@@ -29,47 +46,47 @@ class libvirtError(Exception):
 
         self.err = err
 
-    def get_error_code(self):
+    def get_error_code(self) -> Optional[int]:
         if self.err is None:
             return None
         return self.err[0]
 
-    def get_error_domain(self):
+    def get_error_domain(self) -> Optional[int]:
         if self.err is None:
             return None
         return self.err[1]
 
-    def get_error_message(self):
+    def get_error_message(self) -> Optional[str]:
         if self.err is None:
             return None
         return self.err[2]
 
-    def get_error_level(self):
+    def get_error_level(self) -> Optional[int]:
         if self.err is None:
             return None
         return self.err[3]
 
-    def get_str1(self):
+    def get_str1(self) -> Optional[str]:
         if self.err is None:
             return None
         return self.err[4]
 
-    def get_str2(self):
+    def get_str2(self) -> Optional[str]:
         if self.err is None:
             return None
         return self.err[5]
 
-    def get_str3(self):
+    def get_str3(self) -> Optional[str]:
         if self.err is None:
             return None
         return self.err[6]
 
-    def get_int1(self):
+    def get_int1(self) -> Optional[int]:
         if self.err is None:
             return None
         return self.err[7]
 
-    def get_int2(self):
+    def get_int2(self) -> Optional[int]:
         if self.err is None:
             return None
         return self.err[8]
@@ -78,7 +95,7 @@ class libvirtError(Exception):
 #
 # register the libvirt global error handler
 #
-def registerErrorHandler(f, ctx):
+def registerErrorHandler(f: Callable[[_T, List], None], ctx: _T) -> int:
     """Register a Python function for error reporting.
        The function is called back as f(ctx, error), with error
        being a list of information about the error being raised.
@@ -86,7 +103,35 @@ def registerErrorHandler(f, ctx):
     return libvirtmod.virRegisterErrorHandler(f, ctx)
 
 
-def openAuth(uri, auth, flags=0):
+def openAuth(uri: str, auth: List, flags: int = 0) -> 'virConnect':
+    # TODO: The C code rquires a List and there is not *Mutable*Tuple for a better description such as
+    # auth: Tuple[List[int], Callable[[List[MutableTuple[int, str, str, str, Any]], _T], int], _T]
+    """
+    This function should be called first to get a connection to the
+    Hypervisor. If necessary, authentication will be performed fetching
+    credentials via the callback.
+
+    See :py:func:`open` for notes about environment variables which can
+    have an effect on opening drivers and freeing the connection resources.
+
+    :param str uri: (Optional) connection URI, see https://libvirt.org/uri.html
+    :param auth: a list that contains 3 items:
+        - a list of supported credential types
+        - a callable that takes 2 arguments (credentials, user-data) and returns 0 on succcess and -1 on errors.
+            The credentials argument is a list of credentials that libvirt (actually
+            the ESX driver) would like to request. An element of this list is itself a
+            list containing 5 items (4 inputs, 1 output):
+                - the credential type, e.g. :py:const:`libvirt.VIR_CRED_AUTHNAME`
+                - a prompt to be displayed to the user
+                - a challenge, the ESX driver sets this to the hostname to allow automatic
+                    distinction between requests for ESX and vCenter credentials
+                - a default result for the request
+                - a place to store the actual result for the request
+        - user data that will be passed to the callable as second argument
+    :param int flags: bitwise-OR of virConnectFlags
+    :returns: a :py:class:`virConnect` instance on success.
+    :raises libvirtError: on errors.
+    """
     ret = libvirtmod.virConnectOpenAuth(uri, auth, flags)
     if ret is None:
         raise libvirtError('virConnectOpenAuth() failed')
@@ -96,7 +141,7 @@ def openAuth(uri, auth, flags=0):
 #
 # Return library version.
 #
-def getVersion(name=None):
+def getVersion(name: Optional[str] = None) -> int:
     """If no name parameter is passed (or name is None) then the
     version of the libvirt library is returned as an integer.
 
@@ -120,7 +165,11 @@ def getVersion(name=None):
 #
 # Invoke an EventHandle callback
 #
-def _eventInvokeHandleCallback(watch, fd, event, opaque, opaquecompat=None):
+@overload
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Tuple[_EventCB, _T], opaquecompat: None = None) -> None: ...  # noqa E704
+@overload  # noqa F811
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: _EventCB, opaquecompat: _T = None) -> None: ...  # noqa E704
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Union[Tuple[_EventCB, _T], _EventCB], opaquecompat: Optional[_T] = None) -> None:  # noqa F811
     """
     Invoke the Event Impl Handle Callback in C
     """
@@ -141,7 +190,7 @@ def _eventInvokeHandleCallback(watch, fd, event, opaque, opaquecompat=None):
 #
 # Invoke an EventTimeout callback
 #
-def _eventInvokeTimeoutCallback(timer, opaque, opaquecompat=None):
+def _eventInvokeTimeoutCallback(timer: int, opaque: Union[Tuple[_TimerCB, _T], _TimerCB], opaquecompat: Optional[_T] = None) -> None:
     """
     Invoke the Event Impl Timeout Callback in C
     """
@@ -159,7 +208,7 @@ def _eventInvokeTimeoutCallback(timer, opaque, opaquecompat=None):
     libvirtmod.virEventInvokeTimeoutCallback(timer, callback, opaque)
 
 
-def _dispatchEventHandleCallback(watch, fd, events, cbData):
+def _dispatchEventHandleCallback(watch: int, fd: int, events: int, cbData: Dict[str, Any]) -> int:
     cb = cbData["cb"]
     opaque = cbData["opaque"]
 
@@ -167,7 +216,7 @@ def _dispatchEventHandleCallback(watch, fd, events, cbData):
     return 0
 
 
-def _dispatchEventTimeoutCallback(timer, cbData):
+def _dispatchEventTimeoutCallback(timer: int, cbData: Dict[str, Any]) -> int:
     cb = cbData["cb"]
     opaque = cbData["opaque"]
 
@@ -175,7 +224,7 @@ def _dispatchEventTimeoutCallback(timer, cbData):
     return 0
 
 
-def virEventAddHandle(fd, events, cb, opaque):
+def virEventAddHandle(fd: int, events: int, cb: _EventCB, opaque: _T) -> int:
     """
     register a callback for monitoring file handle events
 
@@ -197,7 +246,7 @@ def virEventAddHandle(fd, events, cb, opaque):
     return ret
 
 
-def virEventAddTimeout(timeout, cb, opaque):
+def virEventAddTimeout(timeout: int, cb: _TimerCB, opaque: _T) -> int:
     """
     register a callback for a timer event
 
@@ -223,7 +272,7 @@ def virEventAddTimeout(timeout, cb, opaque):
 # a caller for the ff callbacks for custom event loop implementations
 #
 
-def virEventInvokeFreeCallback(opaque):
+def virEventInvokeFreeCallback(opaque: Any) -> None:
     """
     Execute callback which frees the opaque buffer
 
