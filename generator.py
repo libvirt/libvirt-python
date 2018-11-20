@@ -2157,7 +2157,7 @@ def lxcBuildWrappers(module):
     fd.close()
 
 
-quiet = 0
+quiet = False
 if not os.path.exists("build"):
     os.mkdir("build")
 
