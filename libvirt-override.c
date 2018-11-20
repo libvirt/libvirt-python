@@ -1679,7 +1679,7 @@ libvirt_virDomainPinIOThread(PyObject *self ATTRIBUTE_UNUSED,
 
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
 
-#if LIBVIR_CHECK_VERSION(4, 10, 4)
+#if LIBVIR_CHECK_VERSION(4, 10, 0)
 
 static virPyTypedParamsHint virPyDomainSetIOThreadParams[] = {
     { VIR_DOMAIN_IOTHREAD_POLL_MAX_NS, VIR_TYPED_PARAM_ULLONG },
@@ -10039,7 +10039,7 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetIOThreadInfo", libvirt_virDomainGetIOThreadInfo, METH_VARARGS, NULL},
     {(char *) "virDomainPinIOThread", libvirt_virDomainPinIOThread, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 14) */
-#if LIBVIR_CHECK_VERSION(4, 10, 4)
+#if LIBVIR_CHECK_VERSION(4, 10, 0)
     {(char *) "virDomainSetIOThreadParams", libvirt_virDomainSetIOThreadParams, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(4, 10, 0) */
     {(char *) "virConnectListStoragePools", libvirt_virConnectListStoragePools, METH_VARARGS, NULL},
