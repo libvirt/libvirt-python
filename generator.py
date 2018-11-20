@@ -147,14 +147,14 @@ class docParser(xml.sax.handler.ContentHandler):
                 self.in_function = False
         elif tag == 'arg':
             if self.in_function:
-                self.function_args.append([self.function_arg_name,
+                self.function_args.append((self.function_arg_name,
                                            self.function_arg_type,
-                                           self.function_arg_info])
+                                           self.function_arg_info))
         elif tag == 'return':
             if self.in_function:
-                self.function_return = [self.function_return_type,
+                self.function_return = (self.function_return_type,
                                         self.function_return_info,
-                                        self.function_return_field]
+                                        self.function_return_field)
         elif tag == 'info':
             str = ''.join(self._data)
             if self.in_function:
@@ -713,7 +713,8 @@ def print_function_wrapper(module, name, output, export, include):
     if format != "":
         format += ":%s" % (name)
 
-    if ret[0] == 'void':
+    r_type, r_info, r_field = ret
+    if r_type == 'void':
         if file == "python_accessor":
             if args[1][1] == "char *":
                 c_call = "\n    VIR_FREE(%s->%s);\n" % (
@@ -1401,39 +1402,41 @@ def buildWrappers(module):
                 classes.write("#\n# Functions from module %s\n#\n\n" % file)
                 oldfile = file
             classes.write("def %s(" % func)
-            for n, arg in enumerate(args):
+            for n, (a_name, a_type, a_info) in enumerate(args):
                 if n != 0:
                     classes.write(", ")
-                classes.write("%s" % arg[0])
-                if arg[0] == "flags" or is_optional_arg(arg[2]):
-                    if is_integral_type(arg[1]):
+                classes.write("%s" % a_name)
+                if a_name == "flags" or is_optional_arg(a_info):
+                    if is_integral_type(a_type):
                         classes.write("=0")
                     else:
                         classes.write("=None")
             classes.write("):\n")
             writeDoc(module, name, args, '    ', classes)
 
-            for arg in args:
-                if arg[1] in classes_type:
+            for a_name, a_type, a_info in args:
+                if a_type in classes_type:
                     classes.write("    if %s is None: %s__o = None\n" %
-                                  (arg[0], arg[0]))
+                                  (a_name, a_name))
                     classes.write("    else: %s__o = %s%s\n" %
-                                  (arg[0], arg[0], classes_type[arg[1]][0]))
-            if ret[0] != "void":
+                                  (a_name, a_name, classes_type[a_type][0]))
+
+            r_type, r_info, r_field = ret
+            if r_type != "void":
                 classes.write("    ret = ")
             else:
                 classes.write("    ")
             classes.write("libvirtmod.%s(" % name)
-            for n, arg in enumerate(args):
+            for n, (a_name, a_type, a_info) in enumerate(args):
                 if n != 0:
                     classes.write(", ")
-                classes.write("%s" % arg[0])
-                if arg[1] in classes_type:
+                classes.write("%s" % a_name)
+                if a_type in classes_type:
                     classes.write("__o")
             classes.write(")\n")
 
-            if ret[0] != "void":
-                if ret[0] in classes_type:
+            if r_type != "void":
+                if r_type in classes_type:
                     #
                     # Raise an exception
                     #
@@ -1444,7 +1447,6 @@ def buildWrappers(module):
                             "    if ret is None:raise libvirtError('%s() failed')\n" %
                             (name))
 
-                    r_type, r_info, r_field = ret
                     tinfo = classes_type[r_type]
                     classes.write("    return ")
                     classes.write(tinfo[1] % {"o": "ret"})
@@ -1453,7 +1455,7 @@ def buildWrappers(module):
                 # For functions returning an integral type there are
                 # several things that we can do, depending on the
                 # contents of functions_int_*:
-                elif is_integral_type(ret[0]):
+                elif is_integral_type(r_type):
                     if name not in functions_noexcept:
                         test = functions_int_exception_test.get(name, functions_int_default_test) % ("ret",)
                         classes.write(
@@ -1461,7 +1463,7 @@ def buildWrappers(module):
                             (test, name))
                     classes.write("    return ret\n")
 
-                elif is_python_noninteger_type(ret[0]):
+                elif is_python_noninteger_type(r_type):
                     if name not in functions_noexcept:
                         classes.write(
                             "    if ret is None: raise libvirtError ('%s() failed')\n" %
@@ -1564,47 +1566,48 @@ def buildWrappers(module):
                         classes.write("    #\n\n")
                 oldfile = file
                 classes.write("    def %s(self" % func)
-                for n, arg in enumerate(args):
+                for n, (a_name, a_type, a_info) in enumerate(args):
                     if n != index:
-                        classes.write(", %s" % arg[0])
-                    if arg[0] == "flags" or is_optional_arg(arg[2]):
-                        if is_integral_type(arg[1]):
+                        classes.write(", %s" % a_name)
+                    if a_name == "flags" or is_optional_arg(a_info):
+                        if is_integral_type(a_type):
                             classes.write("=0")
                         else:
                             classes.write("=None")
                 classes.write("):\n")
                 writeDoc(module, name, args, '        ', classes)
-                for n, arg in enumerate(args):
-                    if arg[1] in classes_type:
+                for n, (a_name, a_type, a_info) in enumerate(args):
+                    if a_type in classes_type:
                         if n != index:
                             classes.write("        if %s is None: %s__o = None\n" %
-                                          (arg[0], arg[0]))
+                                          (a_name, a_name))
                             classes.write("        else: %s__o = %s%s\n" %
-                                          (arg[0], arg[0], classes_type[arg[1]][0]))
-                if ret[0] != "void":
+                                          (a_name, a_name, classes_type[a_type][0]))
+                r_type, r_info, r_field = ret
+                if r_type != "void":
                     classes.write("        ret = ")
                 else:
                     classes.write("        ")
                 classes.write("libvirtmod.%s(" % name)
-                for n, arg in enumerate(args):
+                for n, (a_name, a_type, a_info) in enumerate(args):
                     if n != 0:
                         classes.write(", ")
                     if n != index:
-                        classes.write("%s" % arg[0])
-                        if arg[1] in classes_type:
+                        classes.write("%s" % a_name)
+                        if a_type in classes_type:
                             classes.write("__o")
                     else:
                         classes.write("self")
-                        if arg[1] in classes_type:
-                            classes.write(classes_type[arg[1]][0])
+                        if a_type in classes_type:
+                            classes.write(classes_type[a_type][0])
                 classes.write(")\n")
 
                 if name == "virConnectClose":
                     classes.write("        self._o = None\n")
 
                 # For functions returning object types:
-                if ret[0] != "void":
-                    if ret[0] in classes_type:
+                if r_type != "void":
+                    if r_type in classes_type:
                         #
                         # Raise an exception
                         #
@@ -1619,7 +1622,6 @@ def buildWrappers(module):
                         #
                         # generate the returned class wrapper for the object
                         #
-                        r_type, r_info, r_field = ret
                         tinfo = classes_type[r_type]
                         classes.write("        __tmp = ")
                         classes.write(tinfo[1] % {"o": "ret", "p": PARENTS[tinfo[3]]})
@@ -1633,7 +1635,7 @@ def buildWrappers(module):
                     # For functions returning an integral type there
                     # are several things that we can do, depending on
                     # the contents of functions_int_*:
-                    elif is_integral_type(ret[0]):
+                    elif is_integral_type(r_type):
                         if name not in functions_noexcept:
                             test = functions_int_exception_test.get(name, functions_int_default_test) % ("ret",)
                             classes.write(
@@ -1642,7 +1644,7 @@ def buildWrappers(module):
 
                         classes.write("        return ret\n")
 
-                    elif is_python_noninteger_type(ret[0]):
+                    elif is_python_noninteger_type(r_type):
                         if name not in functions_noexcept:
                             classes.write(
                                 "        if ret is None: raise libvirtError('%s() failed')\n" %
@@ -1801,14 +1803,15 @@ def qemuBuildWrappers(module):
     for name, (desc, ret, args, file, mod, cond) in sorted(qemu_functions.items()):
         func = nameFixup(name, 'None', None, None)
         fd.write("def %s(" % func)
-        for n, arg in enumerate(args):
+        for n, (a_name, a_type, a_info) in enumerate(args):
             if n != 0:
                 fd.write(", ")
-            fd.write("%s" % arg[0])
+            fd.write("%s" % a_name)
         fd.write("):\n")
         writeDoc(module, name, args, '    ', fd)
 
-        if ret[0] != "void":
+        r_type, r_info, r_field = ret
+        if r_type != "void":
             fd.write("    ret = ")
         else:
             fd.write("    ")
@@ -1816,23 +1819,23 @@ def qemuBuildWrappers(module):
 
         conn = None
 
-        for n, arg in enumerate(args):
-            if arg[1] == "virConnectPtr":
-                conn = arg[0]
+        for n, (a_name, a_type, a_info) in enumerate(args):
+            if a_type == "virConnectPtr":
+                conn = a_name
 
             if n != 0:
                 fd.write(", ")
-            if arg[1] in ["virDomainPtr", "virConnectPtr"]:
+            if a_type in ["virDomainPtr", "virConnectPtr"]:
                 # FIXME: This might have problem if the function
                 # has multiple args which are objects.
-                fd.write("%s.%s" % (arg[0], "_o"))
+                fd.write("%s.%s" % (a_name, "_o"))
             else:
-                fd.write("%s" % arg[0])
+                fd.write("%s" % a_name)
         fd.write(")\n")
 
-        if ret[0] != "void":
+        if r_type != "void":
             fd.write("    if ret is None: raise libvirt.libvirtError('%s() failed')\n" % (name,))
-            if ret[0] == "virDomainPtr":
+            if r_type == "virDomainPtr":
                 fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
                 fd.write("    return __tmp\n")
             else:
@@ -1905,14 +1908,15 @@ def lxcBuildWrappers(module):
     for name, (desc, ret, args, file, mod, cond) in sorted(lxc_functions.items()):
         func = nameFixup(name, 'None', None, None)
         fd.write("def %s(" % func)
-        for n, arg in enumerate(args):
+        for n, (a_name, a_type, a_info) in enumerate(args):
             if n != 0:
                 fd.write(", ")
-            fd.write("%s" % arg[0])
+            fd.write("%s" % a_name)
         fd.write("):\n")
         writeDoc(module, name, args, '    ', fd)
 
-        if ret[0] != "void":
+        r_type, r_info, r_field = ret
+        if r_type != "void":
             fd.write("    ret = ")
         else:
             fd.write("    ")
@@ -1920,23 +1924,23 @@ def lxcBuildWrappers(module):
 
         conn = None
 
-        for n, arg in enumerate(args):
-            if arg[1] == "virConnectPtr":
-                conn = arg[0]
+        for n, (a_name, a_type, a_info) in enumerate(args):
+            if a_type == "virConnectPtr":
+                conn = a_name
 
             if n != 0:
                 fd.write(", ")
-            if arg[1] in ["virDomainPtr", "virConnectPtr"]:
+            if a_type in ["virDomainPtr", "virConnectPtr"]:
                 # FIXME: This might have problem if the function
                 # has multiple args which are objects.
-                fd.write("%s.%s" % (arg[0], "_o"))
+                fd.write("%s.%s" % (a_name, "_o"))
             else:
-                fd.write("%s" % arg[0])
+                fd.write("%s" % a_name)
         fd.write(")\n")
 
-        if ret[0] != "void":
+        if r_type != "void":
             fd.write("    if ret is None: raise libvirt.libvirtError('%s() failed')\n" % (name,))
-            if ret[0] == "virDomainPtr":
+            if r_type == "virDomainPtr":
                 fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
                 fd.write("    return __tmp\n")
             else:
