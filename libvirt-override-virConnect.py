@@ -47,7 +47,6 @@
         try:
             for cb, opaque in self.domainEventCallbacks.items():
                 cb(self, virDomain(self, _obj=dom), event, detail, opaque)
-            return 0
         except AttributeError:
             pass
 
@@ -124,7 +123,6 @@
             opaque = cbData["opaque"]
 
             cb(self, virDomain(self, _obj=dom), disk, type, status, opaque)
-            return 0
         except AttributeError:
             pass
 
