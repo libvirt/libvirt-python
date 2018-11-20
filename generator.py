@@ -1149,7 +1149,6 @@ def is_python_noninteger_type(name):
 def nameFixup(name, classe, type, file):
     # avoid a disastrous clash
     listname = classe + "List"
-    ll = len(listname)
     l = len(classe)
     if name[0:l] == listname:
         func = name[l:]
@@ -1839,7 +1838,6 @@ def buildWrappers(module):
                 classes.write("\n")
             # Append "<classname>.py" to class def, iff it exists
             try:
-                wantfuncs = []
                 extra = open("libvirt-override-" + classname + ".py", "r")
                 classes.write("    #\n")
                 classes.write("    # %s methods from %s.py (hand coded)\n" % (classname, classname))
