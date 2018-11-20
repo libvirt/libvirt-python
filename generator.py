@@ -1575,8 +1575,8 @@ def buildWrappers(module):
                               "virNWFilter", "virNWFilterBinding" ]:
                 classes.write("        self._conn = conn\n")
             elif classname in [ "virStorageVol", "virStoragePool" ]:
-                classes.write("        self._conn = conn\n" + \
-                              "        if not isinstance(conn, virConnect):\n" + \
+                classes.write("        self._conn = conn\n"
+                              "        if not isinstance(conn, virConnect):\n"
                               "            self._conn = conn._conn\n")
             elif classname in [ "virDomainCheckpoint", "virDomainSnapshot" ]:
                 classes.write("        self._dom = dom\n")
