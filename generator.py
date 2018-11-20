@@ -934,8 +934,7 @@ def buildStubs(module, api_xml):
         (parser, target) = getparser()
         parser.feed(data)
         parser.close()
-    except IOError:
-        msg = sys.exc_info()[1]
+    except IOError as msg:
         print(api_xml, ":", msg)
         sys.exit(1)
 
@@ -954,8 +953,7 @@ def buildStubs(module, api_xml):
         (parser, target) = getparser()
         parser.feed(data)
         parser.close()
-    except IOError:
-        msg = sys.exc_info()[1]
+    except IOError as msg:
         print(override_api_xml, ":", msg)
 
     if not quiet:
@@ -1963,17 +1961,13 @@ def qemuBuildWrappers(module):
     fd.write("# Automatically written part of python bindings for libvirt\n")
     fd.write("#\n")
 
-    fd.write("import sys\n")
-
     fd.write("try:\n")
     fd.write("    import libvirtmod_qemu\n")
-    fd.write("except ImportError:\n")
-    fd.write("    lib_e = sys.exc_info()[1]\n")
+    fd.write("except ImportError as lib_e:\n")
     fd.write("    try:\n")
     fd.write("        import cygvirtmod_qemu as libvirtmod_qemu\n")
-    fd.write("    except ImportError:\n")
-    fd.write("        cyg_e = sys.exc_info()[1]\n")
-    fd.write("        if str(cyg_e).count(\"No module named\"):\n")
+    fd.write("    except ImportError as cyg_e:\n")
+    fd.write("        if \"No module named\" in str(cyg_e):\n")
     fd.write("            raise lib_e\n\n")
 
     fd.write("import libvirt\n\n")
@@ -2088,17 +2082,13 @@ def lxcBuildWrappers(module):
     if extra is not None:
         extra.close()
 
-    fd.write("import sys\n")
-
     fd.write("try:\n")
     fd.write("    import libvirtmod_lxc\n")
-    fd.write("except ImportError:\n")
-    fd.write("    lib_e = sys.exc_info()[1]\n")
+    fd.write("except ImportError as lib_e:\n")
     fd.write("    try:\n")
     fd.write("        import cygvirtmod_lxc as libvirtmod_lxc\n")
-    fd.write("    except ImportError:\n")
-    fd.write("        cyg_e = sys.exc_info()[1]\n")
-    fd.write("        if str(cyg_e).count(\"No module named\"):\n")
+    fd.write("    except ImportError as cyg_e:\n")
+    fd.write("        if \"No module named\" in str(cyg_e):\n")
     fd.write("            raise lib_e\n\n")
 
     fd.write("import libvirt\n\n")
