@@ -1479,8 +1479,7 @@ def buildWrappers(module):
                 classes.write("#\n# Functions from module %s\n#\n\n" % file)
                 oldfile = file
             classes.write("def %s(" % func)
-            n = 0
-            for arg in args:
+            for n, arg in enumerate(args):
                 if n != 0:
                     classes.write(", ")
                 classes.write("%s" % arg[0])
@@ -1489,7 +1488,6 @@ def buildWrappers(module):
                         classes.write("=0")
                     else:
                         classes.write("=None")
-                n = n + 1
             classes.write("):\n")
             writeDoc(module, name, args, '    ', classes)
 
@@ -1504,14 +1502,12 @@ def buildWrappers(module):
             else:
                 classes.write("    ")
             classes.write("libvirtmod.%s(" % name)
-            n = 0
-            for arg in args:
+            for n, arg in enumerate(args):
                 if n != 0:
                     classes.write(", ")
                 classes.write("%s" % arg[0])
                 if arg[1] in classes_type:
                     classes.write("__o")
-                n = n + 1
             classes.write(")\n")
 
             if ret[0] != "void":
@@ -1646,8 +1642,7 @@ def buildWrappers(module):
                         classes.write("    #\n\n")
                 oldfile = file
                 classes.write("    def %s(self" % func)
-                n = 0
-                for arg in args:
+                for n, arg in enumerate(args):
                     if n != index:
                         classes.write(", %s" % arg[0])
                     if arg[0] == "flags" or is_optional_arg(arg[2]):
@@ -1655,25 +1650,21 @@ def buildWrappers(module):
                             classes.write("=0")
                         else:
                             classes.write("=None")
-                    n = n + 1
                 classes.write("):\n")
                 writeDoc(module, name, args, '        ', classes)
-                n = 0
-                for arg in args:
+                for n, arg in enumerate(args):
                     if arg[1] in classes_type:
                         if n != index:
                             classes.write("        if %s is None: %s__o = None\n" %
                                           (arg[0], arg[0]))
                             classes.write("        else: %s__o = %s%s\n" %
                                           (arg[0], arg[0], classes_type[arg[1]][0]))
-                    n = n + 1
                 if ret[0] != "void":
                     classes.write("        ret = ")
                 else:
                     classes.write("        ")
-                n = 0
                 classes.write("libvirtmod.%s(" % name)
-                for arg in args:
+                for n, arg in enumerate(args):
                     if n != 0:
                         classes.write(", ")
                     if n != index:
@@ -1684,7 +1675,6 @@ def buildWrappers(module):
                         classes.write("self")
                         if arg[1] in classes_type:
                             classes.write(classes_type[arg[1]][0])
-                    n = n + 1
                 classes.write(")\n")
 
                 if name == "virConnectClose":
@@ -1892,12 +1882,10 @@ def qemuBuildWrappers(module):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = qemu_functions[name]
         fd.write("def %s(" % func)
-        n = 0
-        for arg in args:
+        for n, arg in enumerate(args):
             if n != 0:
                 fd.write(", ")
             fd.write("%s" % arg[0])
-            n = n + 1
         fd.write("):\n")
         writeDoc(module, name, args, '    ', fd)
 
@@ -1906,11 +1894,10 @@ def qemuBuildWrappers(module):
         else:
             fd.write("    ")
         fd.write("libvirtmod_qemu.%s(" % name)
-        n = 0
 
         conn = None
 
-        for arg in args:
+        for n, arg in enumerate(args):
             if arg[1] == "virConnectPtr":
                 conn = arg[0]
 
@@ -1922,7 +1909,6 @@ def qemuBuildWrappers(module):
                 fd.write("%s.%s" % (arg[0], "_o"))
             else:
                 fd.write("%s" % arg[0])
-            n = n + 1
         fd.write(")\n")
 
         if ret[0] != "void":
@@ -2003,12 +1989,10 @@ def lxcBuildWrappers(module):
         func = nameFixup(name, 'None', None, None)
         (desc, ret, args, file, mod, cond) = lxc_functions[name]
         fd.write("def %s(" % func)
-        n = 0
-        for arg in args:
+        for n, arg in enumerate(args):
             if n != 0:
                 fd.write(", ")
             fd.write("%s" % arg[0])
-            n = n + 1
         fd.write("):\n")
         writeDoc(module, name, args, '    ', fd)
 
@@ -2017,11 +2001,10 @@ def lxcBuildWrappers(module):
         else:
             fd.write("    ")
         fd.write("libvirtmod_lxc.%s(" % name)
-        n = 0
 
         conn = None
 
-        for arg in args:
+        for n, arg in enumerate(args):
             if arg[1] == "virConnectPtr":
                 conn = arg[0]
 
@@ -2033,7 +2016,6 @@ def lxcBuildWrappers(module):
                 fd.write("%s.%s" % (arg[0], "_o"))
             else:
                 fd.write("%s" % arg[0])
-            n = n + 1
         fd.write(")\n")
 
         if ret[0] != "void":
