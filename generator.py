@@ -1121,7 +1121,7 @@ functions_int_exception_test = {
 functions_int_default_test = "%s == -1"
 
 def is_integral_type (name):
-    return not re.search ("^(unsigned)? ?(int|long)$", name) is None
+    return re.search ("^(unsigned)? ?(int|long)$", name) is not None
 
 def is_optional_arg(info):
     return re.search("^\(?optional\)?", info) is not None
@@ -1420,7 +1420,7 @@ def buildWrappers(module):
                 function_classes[classe].append(info)
                 break
             elif name[0:3] == "vir" and len(args) >= 2 and args[1][1] == type \
-                and file != "python_accessor" and not name in function_skip_index_one:
+                and file != "python_accessor" and name not in function_skip_index_one:
                 found = 1
                 func = nameFixup(name, classe, type, file)
                 info = (1, func, name, ret, args, file, mod)
