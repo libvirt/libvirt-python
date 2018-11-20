@@ -105,6 +105,8 @@ for name in dir(libvirt):
     # in Exception class type reporting.
     if type(thing) in (int, long):
         gotenums.append(name)
+    elif getattr(thing, "__module__", "") == "typing":
+        continue
     elif type(thing) == type or name == "libvirtError":
         gottypes.append(name)
         gotfunctions[name] = []
