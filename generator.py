@@ -903,9 +903,8 @@ def buildStubs(module, api_xml):
         funcs_skipped = qemu_functions_skipped
 
     try:
-        f = open(api_xml)
-        data = f.read()
-        f.close()
+        with open(api_xml) as stream:
+            data = stream.read()
         onlyOverrides = False
         (parser, target) = getparser()
         parser.feed(data)
@@ -922,9 +921,8 @@ def buildStubs(module, api_xml):
     py_types['pythonObject'] = ('O', "pythonObject", "pythonObject", "pythonObject")
 
     try:
-        f = open(override_api_xml)
-        data = f.read()
-        f.close()
+        with open(override_api_xml) as stream:
+            data = stream.read()
         onlyOverrides = True
         (parser, target) = getparser()
         parser.feed(data)
