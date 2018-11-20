@@ -190,15 +190,11 @@ class docParser(xml.sax.handler.ContentHandler):
                                         self.function_return_info,
                                         self.function_return_field]
         elif tag == 'info':
-            str = ''
-            for c in self._data:
-                str = str + c
+            str = ''.join(self._data)
             if self.in_function == 1:
                 self.function_descr = str
         elif tag == 'cond':
-            str = ''
-            for c in self._data:
-                str = str + c
+            str = ''.join(self._data)
             if self.in_function == 1:
                 self.function_cond = str
 
