@@ -95,11 +95,11 @@ class docParser(xml.sax.handler.ContentHandler):
             self.function_return = None
             self.function_file = None
             self.function_module = None
-            if 'name' in attrs.keys():
+            if 'name' in attrs:
                 self.function = attrs['name']
-            if 'file' in attrs.keys():
+            if 'file' in attrs:
                 self.function_file = attrs['file']
-            if 'module' in attrs.keys():
+            if 'module' in attrs:
                 self.function_module = attrs['module']
         elif tag == 'cond':
             self._data = []
@@ -110,24 +110,24 @@ class docParser(xml.sax.handler.ContentHandler):
                 self.function_arg_name = None
                 self.function_arg_type = None
                 self.function_arg_info = None
-                if 'name' in attrs.keys():
+                if 'name' in attrs:
                     self.function_arg_name = attrs['name']
                     if self.function_arg_name == 'from':
                         self.function_arg_name = 'frm'
-                if 'type' in attrs.keys():
+                if 'type' in attrs:
                     self.function_arg_type = attrs['type']
-                if 'info' in attrs.keys():
+                if 'info' in attrs:
                     self.function_arg_info = attrs['info']
         elif tag == 'return':
             if self.in_function == 1:
                 self.function_return_type = None
                 self.function_return_info = None
                 self.function_return_field = None
-                if 'type' in attrs.keys():
+                if 'type' in attrs:
                     self.function_return_type = attrs['type']
-                if 'info' in attrs.keys():
+                if 'info' in attrs:
                     self.function_return_info = attrs['info']
-                if 'field' in attrs.keys():
+                if 'field' in attrs:
                     self.function_return_field = attrs['field']
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
@@ -138,7 +138,7 @@ class docParser(xml.sax.handler.ContentHandler):
             elif attrs['file'] == "libvirt-qemu":
                 qemu_enum(attrs['type'], attrs['name'], attrs['value'])
         elif tag == "macro":
-            if "string" in attrs.keys():
+            if "string" in attrs:
                 params.append((attrs['name'], attrs['string']))
 
     def end(self, tag):
