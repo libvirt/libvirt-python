@@ -698,7 +698,7 @@ def print_function_wrapper(module, name, output, export, include):
                 format_args += ", &py_buffsize%d" % num_bufs
                 c_args += "    int py_buffsize%d;\n" % num_bufs
                 num_bufs += 1
-            if c_call != "":
+            if c_call:
                 c_call += ", "
             c_call += "%s" % (a_name)
         else:
@@ -710,7 +710,7 @@ def print_function_wrapper(module, name, output, export, include):
             else:
                 unknown_types[a_type] = [name]
             return -1
-    if format != "":
+    if format:
         format += ":%s" % (name)
 
     r_type, r_info, r_field = ret
@@ -795,15 +795,15 @@ def print_function_wrapper(module, name, output, export, include):
     output.write(") {\n")
     if r_type != 'void':
         output.write("    PyObject *py_retval;\n")
-    if c_return != "":
+    if c_return:
         output.write(c_return)
-    if c_args != "":
+    if c_args:
         output.write(c_args)
-    if format != "":
+    if format:
         output.write("\n    if (!PyArg_ParseTuple(args, (char *)\"%s\"%s))\n" %
                      (format, format_args))
         output.write("        return NULL;\n")
-    if c_convert != "":
+    if c_convert:
         output.write(c_convert + "\n")
 
     output.write("    LIBVIRT_BEGIN_ALLOW_THREADS;")
@@ -957,7 +957,7 @@ def buildStubs(module, api_xml):
 
     if failed > 0:
         return -1
-    if len(unknown_types) > 0:
+    if unknown_types:
         return -1
     return 0
 
@@ -1377,7 +1377,7 @@ def buildWrappers(module):
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
     classes.write("#\n")
-    if extra is not None:
+    if extra:
         classes.writelines(extra.readlines())
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
@@ -1385,7 +1385,7 @@ def buildWrappers(module):
     classes.write("# Automatically written part of python bindings for libvirt\n")
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
-    if extra is not None:
+    if extra:
         extra.close()
 
     if "None" in function_classes:
@@ -1679,7 +1679,7 @@ def buildWrappers(module):
                         name = line[offset + 5:]
                         offset = name.find("(")
                         name = name[0:offset]
-                        if cached is not None:
+                        if cached:
                             if not shouldSkip(cached):
                                 classes.writelines(cached)
                         if name == "__del__":
@@ -1688,7 +1688,7 @@ def buildWrappers(module):
                         else:
                             cached = [line]
                     else:
-                        if cached is not None:
+                        if cached:
                             cached.append(line)
                         else:
                             classes.write(line)
@@ -1779,10 +1779,10 @@ def qemuBuildWrappers(module):
     fd.write("import libvirt\n\n")
     fd.write("# WARNING WARNING WARNING WARNING\n")
     fd.write("#\n")
-    if extra is not None:
+    if extra:
         fd.writelines(extra.readlines())
     fd.write("#\n")
-    if extra is not None:
+    if extra:
         extra.close()
 
     fd.write("# WARNING WARNING WARNING WARNING\n")
@@ -1869,7 +1869,7 @@ def lxcBuildWrappers(module):
     fd.write("#\n")
     fd.write("# WARNING WARNING WARNING WARNING\n")
     fd.write("#\n")
-    if extra is not None:
+    if extra:
         fd.writelines(extra.readlines())
     fd.write("#\n")
     fd.write("# WARNING WARNING WARNING WARNING\n")
@@ -1877,7 +1877,7 @@ def lxcBuildWrappers(module):
     fd.write("# Automatically written part of python bindings for libvirt\n")
     fd.write("#\n")
     fd.write("# WARNING WARNING WARNING WARNING\n")
-    if extra is not None:
+    if extra:
         extra.close()
 
     fd.write("try:\n")
