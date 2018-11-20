@@ -8784,6 +8784,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
     c_retval = virDomainBlockCopy(dom, disk, destxml, params, nparams, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
+    virTypedParamsFree(params, nparams);
     return libvirt_intWrap(c_retval);
 }
 
