@@ -97,13 +97,15 @@ except libvirt.libvirtError:
     print("Failed to open connection to %s" % args.hostname)
     exit(1)
 
-state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
-                libvirt.VIR_DOMAIN_BLOCKED  : "idle",
-                libvirt.VIR_DOMAIN_PAUSED   : "paused",
-                libvirt.VIR_DOMAIN_SHUTDOWN : "in shutdown",
-                libvirt.VIR_DOMAIN_SHUTOFF  : "shut off",
-                libvirt.VIR_DOMAIN_CRASHED  : "crashed",
-                libvirt.VIR_DOMAIN_NOSTATE  : "no state" }
+state_names = {
+    libvirt.VIR_DOMAIN_RUNNING: "running",
+    libvirt.VIR_DOMAIN_BLOCKED: "idle",
+    libvirt.VIR_DOMAIN_PAUSED: "paused",
+    libvirt.VIR_DOMAIN_SHUTDOWN: "in shutdown",
+    libvirt.VIR_DOMAIN_SHUTOFF: "shut off",
+    libvirt.VIR_DOMAIN_CRASHED: "crashed",
+    libvirt.VIR_DOMAIN_NOSTATE: "no state",
+}
 
 for id in conn.listDomainsID():
     domain = conn.lookupByID(id)

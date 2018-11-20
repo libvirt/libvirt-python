@@ -15,6 +15,7 @@ uri = "qemu:///system"
 customXMLuri = "guest-cpu.python.libvirt.org"
 connectRetryTimeout = 5
 
+
 class workerData:
     def __init__(self):
         self.doms = list()
@@ -61,21 +62,24 @@ def virEventLoopNativeRun():
     while True:
         libvirt.virEventRunDefaultImpl()
 
+
 def handleAgentLifecycleEvent(conn, dom, state, reason, opaque):
     if state == libvirt.VIR_CONNECT_DOMAIN_EVENT_AGENT_LIFECYCLE_STATE_CONNECTED:
         opaque.addDomainNotify(dom)
+
 
 def handleConnectClose(conn, reason, opaque):
     print('Disconnected from ' + uri)
     opaque.closeConnectNotify()
 
+
 def handleLibvirtLibraryError(opaque, error):
     pass
 
+
 def processAgentConnect(dom):
     try:
-        cpus = dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, customXMLuri,
-                libvirt.VIR_DOMAIN_AFFECT_LIVE)
+        cpus = dom.metadata(libvirt.VIR_DOMAIN_METADATA_ELEMENT, customXMLuri, libvirt.VIR_DOMAIN_AFFECT_LIVE)
         doc = minidom.parseString(cpus)
         ncpus = int(doc.getElementsByTagName('ncpus')[0].getAttribute('count'))
     except Exception:
@@ -86,6 +90,7 @@ def processAgentConnect(dom):
         print("set vcpu count for domain " + dom.name() + " to " + str(ncpus))
     except Exception:
         print("failed to set vcpu count for domain " + dom.name())
+
 
 def work():
     data = workerData()
@@ -118,6 +123,7 @@ def work():
 
         data.waitNotify()
 
+
 def main():
     libvirt.virEventRegisterDefaultImpl()
     libvirt.registerErrorHandler(handleLibvirtLibraryError, None)
@@ -131,7 +137,8 @@ def main():
     eventLoop.start()
 
     while True:
-       time.sleep(1)
+        time.sleep(1)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=__doc__)

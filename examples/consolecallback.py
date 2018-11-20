@@ -10,15 +10,17 @@ import atexit
 from argparse import ArgumentParser
 from typing import Optional  # noqa F401
 
+
 def reset_term() -> None:
     termios.tcsetattr(0, termios.TCSADRAIN, attrs)
 
+
 def error_handler(unused, error) -> None:
     # The console stream errors on VM shutdown; we don't care
-    if (error[0] == libvirt.VIR_ERR_RPC and
-        error[1] == libvirt.VIR_FROM_STREAMS):
+    if error[0] == libvirt.VIR_ERR_RPC and error[1] == libvirt.VIR_FROM_STREAMS:
         return
     logging.warn(error)
+
 
 class Console(object):
     def __init__(self, uri: str, uuid: str) -> None:
@@ -34,9 +36,9 @@ class Console(object):
         logging.info("%s initial state %d, reason %d",
                      self.uuid, self.state[0], self.state[1])
 
+
 def check_console(console: Console) -> bool:
-    if (console.state[0] == libvirt.VIR_DOMAIN_RUNNING or
-        console.state[0] == libvirt.VIR_DOMAIN_PAUSED):
+    if (console.state[0] == libvirt.VIR_DOMAIN_RUNNING or console.state[0] == libvirt.VIR_DOMAIN_PAUSED):
         if console.stream is None:
             console.stream = console.connection.newStream(libvirt.VIR_STREAM_NONBLOCK)
             console.domain.openConsole(None, console.stream, 0)
@@ -48,6 +50,7 @@ def check_console(console: Console) -> bool:
 
     return console.run_console
 
+
 def stdin_callback(watch: int, fd: int, events: int, console: Console) -> None:
     readbuf = os.read(fd, 1024)
     if readbuf.startswith(b""):
@@ -55,6 +58,7 @@ def stdin_callback(watch: int, fd: int, events: int, console: Console) -> None:
         return
     if console.stream:
         console.stream.send(readbuf)
+
 
 def stream_callback(stream: libvirt.virStream, events: int, console: Console) -> None:
     try:
@@ -64,10 +68,12 @@ def stream_callback(stream: libvirt.virStream, events: int, console: Console) ->
         return
     os.write(0, received_data)
 
+
 def lifecycle_callback(connection: libvirt.virConnect, domain: libvirt.virDomain, event: int, detail: int, console: Console) -> None:
     console.state = console.domain.state(0)
     logging.info("%s transitioned to state %d, reason %d",
                  console.uuid, console.state[0], console.state[1])
+
 
 # main
 parser = ArgumentParser(epilog="Example: %(prog)s 'qemu:///system' '32ad945f-7e78-c33a-e96d-39f25e025d81'")

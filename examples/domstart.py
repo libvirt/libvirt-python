@@ -9,6 +9,7 @@ import libxml2
 from argparse import ArgumentParser
 from typing import Tuple
 
+
 # Parse the XML description of domU from FNAME
 # and return a tuple (name, xmldesc) where NAME
 # is the name of the domain, and xmldesc is the contetn of FNAME

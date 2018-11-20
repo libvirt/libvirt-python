@@ -30,6 +30,7 @@ if not leases:
     print("Failed to get leases for %s" % net.name())
     exit(0)
 
+
 def toIPAddrType(addrType: int) -> str:
     if addrType == libvirt.VIR_IP_ADDR_TYPE_IPV4:
         return "ipv4"
@@ -37,13 +38,14 @@ def toIPAddrType(addrType: int) -> str:
         return "ipv6"
     return "Unknown"
 
+
 print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format("Expiry Time",
                                                       "MAC address",
                                                       "Protocol",
                                                       "IP address",
                                                       "Hostname",
                                                       "Client ID or DUID"))
-print("-"*115)
+print("-" * 115)
 
 for lease in leases:
     print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format(

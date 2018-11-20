@@ -24,7 +24,7 @@ def print_dom_ifaces(dom: libvirt.virDomain) -> None:
     for (name, val) in ifaces.items():
         if val['addrs']:
             for addr in val['addrs']:
-                print (" {0:10} {1:19} {2:12} {3}/{4}".format(
+                print(" {0:10} {1:19} {2:12} {3}/{4}".format(
                     name,
                     val['hwaddr'],
                     IPTYPE[addr['type']],
