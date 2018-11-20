@@ -915,7 +915,7 @@ def buildStubs(module, api_xml):
         print(api_xml, ":", msg)
         sys.exit(1)
 
-    n = len(list(funcs.keys()))
+    n = len(funcs)
     if not quiet:
         print("Found %d functions in %s" % ((n), api_xml))
 
@@ -936,7 +936,7 @@ def buildStubs(module, api_xml):
     if not quiet:
         # XXX: This is not right, same function already in @functions
         # will be overwritten.
-        print("Found %d functions in %s" % ((len(list(funcs.keys())) - n), override_api_xml))
+        print("Found %d functions in %s" % (len(funcs) - n, override_api_xml))
     nb_wrap = 0
     failed = 0
     skipped = 0
