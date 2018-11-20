@@ -1099,9 +1099,9 @@ functions_noexcept = {
     'virNWFilterBindingGetPortDev': True,
 }
 
-function_classes = {}
-
-function_classes["None"] = []
+function_classes = {
+    "None": []
+}  # type: Dict[str, List[Any]]
 
 # Functions returning an integral type which need special rules to
 # check for errors and raise exceptions.
