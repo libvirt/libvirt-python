@@ -3,17 +3,13 @@
 #
 
 # On cygwin, the DLL is called cygvirtmod.dll
-import sys
-
 try:
     import libvirtmod
-except ImportError:
-    lib_e = sys.exc_info()[1]
+except ImportError as lib_e:
     try:
         import cygvirtmod as libvirtmod
-    except ImportError:
-        cyg_e = sys.exc_info()[1]
-        if str(cyg_e).count("No module named"):
+    except ImportError as cyg_e:
+        if "No module named" in str(cyg_e):
             raise lib_e
 
 
