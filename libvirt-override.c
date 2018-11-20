@@ -7861,6 +7861,11 @@ libvirt_virDomainMigrate3(PyObject *self ATTRIBUTE_UNUSED,
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
     dconn = (virConnectPtr) PyvirConnect_Get(pyobj_dconn);
 
+    if (!PyDict_Check(dict)) {
+        PyErr_Format(PyExc_TypeError, "migration params must be a dictionary");
+        return NULL;
+    }
+
     if (virPyDictToTypedParams(dict, &params, &nparams,
                                virPyDomainMigrate3Params,
                                VIR_N_ELEMENTS(virPyDomainMigrate3Params)) < 0) {
@@ -7893,6 +7898,11 @@ libvirt_virDomainMigrateToURI3(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if (!PyDict_Check(dict)) {
+        PyErr_Format(PyExc_TypeError, "migration params must be a dictionary");
+        return NULL;
+    }
 
     if (virPyDictToTypedParams(dict, &params, &nparams,
                                virPyDomainMigrate3Params,
@@ -8776,6 +8786,9 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
                                    VIR_N_ELEMENTS(virPyDomainBlockCopyParams)) < 0) {
             return NULL;
         }
+    } else {
+        PyErr_Format(PyExc_TypeError, "block params must be a dictionary");
+        return NULL;
     }
 
     dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
