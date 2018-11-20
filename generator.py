@@ -698,7 +698,7 @@ def print_function_wrapper(module, name, output, export, include):
             (desc, ret, args, file, mod, cond) = qemu_functions[name]
     except Exception:
         print("failed to get function %s infos" % name)
-        return
+        return -1
 
     if module == "libvirt":
         if name in skip_function:
@@ -905,7 +905,7 @@ def buildStubs(module, api_xml):
 
     if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
         print("ERROR: Unknown module type: %s" % module)
-        return None
+        return -1
 
     if module == "libvirt":
         funcs = functions
