@@ -766,7 +766,7 @@ def print_function_wrapper(module, name, output, export, include):
         if file == "python_accessor":
             if args[1][1] == "char *":
                 c_call = "\n    VIR_FREE(%s->%s);\n" % (
-                                 args[0][0], args[1][0], args[0][0], args[1][0])
+                                 args[0][0], args[1][0])
                 c_call = c_call + "    %s->%s = (%s)strdup((const xmlChar *)%s);\n" % (args[0][0],
                                  args[1][0], args[1][1], args[1][0])
             else:
