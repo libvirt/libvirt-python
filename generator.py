@@ -1357,8 +1357,8 @@ def buildWrappers(module):
         print("ERROR: Unknown module type: %s" % module)
         return None
 
-    for type in list(classes_type.keys()):
-        function_classes[classes_type[type][2]] = []
+    for tinfo in classes_type.values():
+        function_classes[tinfo[2]] = []
 
     #
     # Build the list of C types to look for ordered to start
