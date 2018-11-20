@@ -3,7 +3,7 @@
             if self.cb:
                 libvirtmod.virStreamEventRemoveCallback(self._o)
         except AttributeError:
-           pass
+            pass
 
         if self._o is not None:
             libvirtmod.virStreamFree(self._o)
@@ -21,9 +21,10 @@
 
     def eventAddCallback(self, events, cb, opaque):
         self.cb = cb
-        cbData = {"stream": self, "cb" : cb, "opaque" : opaque}
+        cbData = {"stream": self, "cb": cb, "opaque": opaque}
         ret = libvirtmod.virStreamEventAddCallback(self._o, events, cbData)
-        if ret == -1: raise libvirtError ('virStreamEventAddCallback() failed')
+        if ret == -1:
+            raise libvirtError('virStreamEventAddCallback() failed')
 
     def recvAll(self, handler, opaque):
         """Receive the entire data stream, sending the data to the
@@ -105,7 +106,8 @@
         the request would block, integer -2 is returned.
         """
         ret = libvirtmod.virStreamRecv(self._o, nbytes)
-        if ret is None: raise libvirtError ('virStreamRecv() failed')
+        if ret is None:
+            raise libvirtError('virStreamRecv() failed')
         return ret
 
     def send(self, data):
@@ -123,20 +125,22 @@
         subsequent call.
         """
         ret = libvirtmod.virStreamSend(self._o, data)
-        if ret == -1: raise libvirtError ('virStreamSend() failed')
+        if ret == -1:
+            raise libvirtError('virStreamSend() failed')
         return ret
 
-    def recvHole(self, flags = 0):
+    def recvHole(self, flags=0):
         """This method is used to determine the length in bytes
         of the empty space to be created in a stream's target
         file when uploading or downloading sparsely populated
         files. This is the counterpart to sendHole.
         """
         ret = libvirtmod.virStreamRecvHole(self._o, flags)
-        if ret is None: raise libvirtError ('virStreamRecvHole() failed')
+        if ret is None:
+            raise libvirtError('virStreamRecvHole() failed')
         return ret
 
-    def sendHole(self, length, flags = 0):
+    def sendHole(self, length, flags=0):
         """Rather than transmitting empty file space, this method
         directs the stream target to create length bytes of empty
         space.  This method would be used when uploading or
@@ -144,10 +148,11 @@
         needless copy of empty file space.
         """
         ret = libvirtmod.virStreamSendHole(self._o, length, flags)
-        if ret == -1: raise libvirtError('virStreamSendHole() failed')
+        if ret == -1:
+            raise libvirtError('virStreamSendHole() failed')
         return ret
 
-    def recvFlags(self, nbytes, flags = 0):
+    def recvFlags(self, nbytes, flags=0):
         """Reads a series of bytes from the stream. This method may
         block the calling application for an arbitrary amount
         of time. This is just like recv except it has flags
@@ -162,7 +167,8 @@
         the request would block, integer -2 is returned.
         """
         ret = libvirtmod.virStreamRecvFlags(self._o, nbytes, flags)
-        if ret is None: raise libvirtError ('virStreamRecvFlags() failed')
+        if ret is None:
+            raise libvirtError('virStreamRecvFlags() failed')
         return ret
 
     def sparseRecvAll(self, handler, holeHandler, opaque):

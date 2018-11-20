@@ -22,6 +22,7 @@ def get_libvirt_api_xml_path():
         sys.exit(proc.returncode)
     return stdout.splitlines()[0]
 
+
 # Path to the libvirt API XML file
 if len(sys.argv) >= 3:
     xml = sys.argv[2]
@@ -96,7 +97,7 @@ for n in set:
 # Phase 2: Identify all classes and methods in the 'libvirt' python module
 gotenums = []
 gottypes = []
-gotfunctions = { "libvirt": [] }
+gotfunctions = {"libvirt": []}
 
 for name in dir(libvirt):
     if name[0] == '_':
@@ -188,7 +189,6 @@ for cname in wantfunctions:
         name.endswith("Callback")):
         continue
 
-
     # virEvent APIs go into main 'libvirt' namespace not any class
     if name[0:8] == "virEvent":
         if name[-4:] == "Func":
@@ -231,7 +231,6 @@ for name in sorted(basicklassmap):
         else:
             continue
 
-
     # All the error handling methods need special handling
     if klass == "libvirt":
         if func in ["CopyLastError", "DefaultErrorFunc",
@@ -264,7 +263,7 @@ for name in sorted(basicklassmap):
                 "LookupByUUIDString", "LookupByVolume" "LookupByName",
                 "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
                 "LookupByMACString", "LookupByUsage", "LookupByVolume",
-                "LookupByTargetPath","LookupSCSIHostByWWN", "LookupByPortDev",
+                "LookupByTargetPath", "LookupSCSIHostByWWN", "LookupByPortDev",
                 "Restore", "RestoreFlags",
                 "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags"]:
         if klass != "virDomain":
@@ -386,7 +385,7 @@ for name in sorted(finalklassmap):
     # These exist in C and exist in python, but we've got
     # a pure-python impl so don't check them
     if name in ["virStreamRecvAll", "virStreamSendAll",
-            "virStreamSparseRecvAll", "virStreamSparseSendAll"]:
+                "virStreamSparseRecvAll", "virStreamSparseSendAll"]:
         continue
 
     try:

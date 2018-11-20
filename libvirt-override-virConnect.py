@@ -1,11 +1,11 @@
     def __del__(self):
         try:
-           for cb,opaque in self.domainEventCallbacks.items():
-               del self.domainEventCallbacks[cb]
-           del self.domainEventCallbacks
-           libvirtmod.virConnectDomainEventDeregister(self._o, self)
+            for cb, opaque in self.domainEventCallbacks.items():
+                del self.domainEventCallbacks[cb]
+            del self.domainEventCallbacks
+            libvirtmod.virConnectDomainEventDeregister(self._o, self)
         except AttributeError:
-           pass
+            pass
 
         if self._o is not None:
             libvirtmod.virConnectClose(self._o)
@@ -25,7 +25,8 @@
             if len(self.domainEventCallbacks) == 0:
                 del self.domainEventCallbacks
                 ret = libvirtmod.virConnectDomainEventDeregister(self._o, self)
-                if ret == -1: raise libvirtError ('virConnectDomainEventDeregister() failed', conn=self)
+                if ret == -1:
+                    raise libvirtError('virConnectDomainEventDeregister() failed', conn=self)
         except AttributeError:
             pass
 
@@ -35,15 +36,16 @@
         try:
             self.domainEventCallbacks[cb] = opaque
         except AttributeError:
-            self.domainEventCallbacks = {cb:opaque}
+            self.domainEventCallbacks = {cb: opaque}
             ret = libvirtmod.virConnectDomainEventRegister(self._o, self)
-            if ret == -1: raise libvirtError ('virConnectDomainEventRegister() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectDomainEventRegister() failed', conn=self)
 
     def _dispatchDomainEventCallbacks(self, dom, event, detail):
         """Dispatches events to python user domain event callbacks
         """
         try:
-            for cb,opaque in self.domainEventCallbacks.items():
+            for cb, opaque in self.domainEventCallbacks.items():
                 cb(self, virDomain(self, _obj=dom), event, detail, opaque)
             return 0
         except AttributeError:
@@ -73,7 +75,7 @@
         cb = cbData["cb"]
         opaque = cbData["opaque"]
 
-        cb(self, virDomain(self, _obj=dom), offset ,opaque)
+        cb(self, virDomain(self, _obj=dom), offset, opaque)
         return 0
 
     def _dispatchDomainEventWatchdogCallback(self, dom, action, cbData):
@@ -108,8 +110,8 @@
         return 0
 
     def _dispatchDomainEventGraphicsCallback(self, dom, phase, localAddr,
-                                            remoteAddr, authScheme, subject,
-                                            cbData):
+                                             remoteAddr, authScheme, subject,
+                                             cbData):
         """Dispatches events to python user domain graphics event callbacks
         """
         cb = cbData["cb"]
@@ -272,7 +274,8 @@
            domain callback will disable delivery of this event type """
         try:
             ret = libvirtmod.virConnectDomainEventDeregisterAny(self._o, callbackID)
-            if ret == -1: raise libvirtError ('virConnectDomainEventDeregisterAny() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectDomainEventDeregisterAny() failed', conn=self)
             del self.domainEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -291,7 +294,8 @@
            network callback will disable delivery of this event type"""
         try:
             ret = libvirtmod.virConnectNetworkEventDeregisterAny(self._o, callbackID)
-            if ret == -1: raise libvirtError ('virConnectNetworkEventDeregisterAny() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectNetworkEventDeregisterAny() failed', conn=self)
             del self.networkEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -301,13 +305,13 @@
            callback will enable delivery of the events"""
         if not hasattr(self, 'networkEventCallbackID'):
             self.networkEventCallbackID = {}
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         if net is None:
             ret = libvirtmod.virConnectNetworkEventRegisterAny(self._o, None, eventID, cbData)
         else:
             ret = libvirtmod.virConnectNetworkEventRegisterAny(self._o, net._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectNetworkEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectNetworkEventRegisterAny() failed', conn=self)
         self.networkEventCallbackID[ret] = opaque
         return ret
 
@@ -316,13 +320,13 @@
            callback will enable delivery of the events """
         if not hasattr(self, 'domainEventCallbackID'):
             self.domainEventCallbackID = {}
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         if dom is None:
             ret = libvirtmod.virConnectDomainEventRegisterAny(self._o, None, eventID, cbData)
         else:
             ret = libvirtmod.virConnectDomainEventRegisterAny(self._o, dom._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectDomainEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectDomainEventRegisterAny() failed', conn=self)
         self.domainEventCallbackID[ret] = opaque
         return ret
 
@@ -351,7 +355,8 @@
            storage pool callback will disable delivery of this event type"""
         try:
             ret = libvirtmod.virConnectStoragePoolEventDeregisterAny(self._o, callbackID)
-            if ret == -1: raise libvirtError ('virConnectStoragePoolEventDeregisterAny() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectStoragePoolEventDeregisterAny() failed', conn=self)
             del self.storagePoolEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -361,13 +366,13 @@
            callback will enable delivery of the events"""
         if not hasattr(self, 'storagePoolEventCallbackID'):
             self.storagePoolEventCallbackID = {}
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         if pool is None:
             ret = libvirtmod.virConnectStoragePoolEventRegisterAny(self._o, None, eventID, cbData)
         else:
             ret = libvirtmod.virConnectStoragePoolEventRegisterAny(self._o, pool._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectStoragePoolEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectStoragePoolEventRegisterAny() failed', conn=self)
         self.storagePoolEventCallbackID[ret] = opaque
         return ret
 
@@ -396,7 +401,8 @@
            node device callback will disable delivery of this event type"""
         try:
             ret = libvirtmod.virConnectNodeDeviceEventDeregisterAny(self._o, callbackID)
-            if ret == -1: raise libvirtError ('virConnectNodeDeviceEventDeregisterAny() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectNodeDeviceEventDeregisterAny() failed', conn=self)
             del self.nodeDeviceEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -406,13 +412,13 @@
            callback will enable delivery of the events"""
         if not hasattr(self, 'nodeDeviceEventCallbackID'):
             self.nodeDeviceEventCallbackID = {}
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         if dev is None:
             ret = libvirtmod.virConnectNodeDeviceEventRegisterAny(self._o, None, eventID, cbData)
         else:
             ret = libvirtmod.virConnectNodeDeviceEventRegisterAny(self._o, dev._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectNodeDeviceEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectNodeDeviceEventRegisterAny() failed', conn=self)
         self.nodeDeviceEventCallbackID[ret] = opaque
         return ret
 
@@ -439,7 +445,8 @@
            secret callback will disable delivery of this event type"""
         try:
             ret = libvirtmod.virConnectSecretEventDeregisterAny(self._o, callbackID)
-            if ret == -1: raise libvirtError ('virConnectSecretEventDeregisterAny() failed', conn=self)
+            if ret == -1:
+                raise libvirtError('virConnectSecretEventDeregisterAny() failed', conn=self)
             del self.secretEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -449,13 +456,13 @@
            callback will enable delivery of the events"""
         if not hasattr(self, 'secretEventCallbackID'):
             self.secretEventCallbackID = {}
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         if secret is None:
             ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, None, eventID, cbData)
         else:
             ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, secret._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectSecretEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectSecretEventRegisterAny() failed', conn=self)
         self.secretEventCallbackID[ret] = opaque
         return ret
 
@@ -563,19 +570,19 @@
         cb(self, reason, opaque)
         return 0
 
-
     def unregisterCloseCallback(self):
         """Removes a close event callback"""
         ret = libvirtmod.virConnectUnregisterCloseCallback(self._o)
-        if ret == -1: raise libvirtError ('virConnectUnregisterCloseCallback() failed', conn=self)
+        if ret == -1:
+            raise libvirtError('virConnectUnregisterCloseCallback() failed', conn=self)
 
     def registerCloseCallback(self, cb, opaque):
         """Adds a close event callback, providing a notification
          when a connection fails / closes"""
-        cbData = { "cb": cb, "conn": self, "opaque": opaque }
+        cbData = {"cb": cb, "conn": self, "opaque": opaque}
         ret = libvirtmod.virConnectRegisterCloseCallback(self._o, cbData)
         if ret == -1:
-            raise libvirtError ('virConnectRegisterCloseCallback() failed', conn=self)
+            raise libvirtError('virConnectRegisterCloseCallback() failed', conn=self)
         return ret
 
     def createXMLWithFiles(self, xmlDesc, files, flags=0):
@@ -604,11 +611,12 @@
         libvirtd daemon. Any domains marked for auto destroy will
         block attempts at migration, save-to-file, or snapshots. """
         ret = libvirtmod.virDomainCreateXMLWithFiles(self._o, xmlDesc, files, flags)
-        if ret is None:raise libvirtError('virDomainCreateXMLWithFiles() failed', conn=self)
-        __tmp = virDomain(self,_obj=ret)
+        if ret is None:
+            raise libvirtError('virDomainCreateXMLWithFiles() failed', conn=self)
+        __tmp = virDomain(self, _obj=ret)
         return __tmp
 
-    def getAllDomainStats(self, stats = 0, flags=0):
+    def getAllDomainStats(self, stats=0, flags=0):
         """Query statistics for all domains on a given connection.
 
         Report statistics of various parameters for a running VM according to @stats
@@ -656,7 +664,7 @@
 
         retlist = list()
         for elem in ret:
-            record = (virDomain(self, _obj=elem[0]) , elem[1])
+            record = (virDomain(self, _obj=elem[0]), elem[1])
             retlist.append(record)
 
         return retlist
@@ -703,7 +711,7 @@
 
         retlist = list()
         for elem in ret:
-            record = (virDomain(self, _obj=elem[0]) , elem[1])
+            record = (virDomain(self, _obj=elem[0]), elem[1])
             retlist.append(record)
 
         return retlist

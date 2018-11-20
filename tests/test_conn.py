@@ -1,6 +1,6 @@
-
 import unittest
 import libvirt
+
 
 class TestLibvirtConn(unittest.TestCase):
     def setUp(self):

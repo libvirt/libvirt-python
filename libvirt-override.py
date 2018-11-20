@@ -78,6 +78,7 @@ class libvirtError(Exception):
             return None
         return self.err[8]
 
+
 #
 # register the libvirt global error handler
 #
@@ -86,18 +87,20 @@ def registerErrorHandler(f, ctx):
        The function is called back as f(ctx, error), with error
        being a list of information about the error being raised.
        Returns 1 in case of success."""
-    return libvirtmod.virRegisterErrorHandler(f,ctx)
+    return libvirtmod.virRegisterErrorHandler(f, ctx)
+
 
 def openAuth(uri, auth, flags=0):
     ret = libvirtmod.virConnectOpenAuth(uri, auth, flags)
-    if ret is None:raise libvirtError('virConnectOpenAuth() failed')
+    if ret is None:
+        raise libvirtError('virConnectOpenAuth() failed')
     return virConnect(_obj=ret)
 
 
 #
 # Return library version.
 #
-def getVersion (name = None):
+def getVersion(name=None):
     """If no name parameter is passed (or name is None) then the
     version of the libvirt library is returned as an integer.
 
@@ -110,10 +113,11 @@ def getVersion (name = None):
 
     Versions numbers are integers: 1000000*major + 1000*minor + release."""
     if name is None:
-        ret = libvirtmod.virGetVersion ()
+        ret = libvirtmod.virGetVersion()
     else:
-        ret = libvirtmod.virGetVersion (name)
-    if ret is None: raise libvirtError ("virGetVersion() failed")
+        ret = libvirtmod.virGetVersion(name)
+    if ret is None:
+        raise libvirtError("virGetVersion() failed")
     return ret
 
 
@@ -137,6 +141,7 @@ def _eventInvokeHandleCallback(watch, fd, event, opaque, opaquecompat=None):
 
     libvirtmod.virEventInvokeHandleCallback(watch, fd, event, callback, opaque)
 
+
 #
 # Invoke an EventTimeout callback
 #
@@ -157,6 +162,7 @@ def _eventInvokeTimeoutCallback(timer, opaque, opaquecompat=None):
 
     libvirtmod.virEventInvokeTimeoutCallback(timer, callback, opaque)
 
+
 def _dispatchEventHandleCallback(watch, fd, events, cbData):
     cb = cbData["cb"]
     opaque = cbData["opaque"]
@@ -164,12 +170,14 @@ def _dispatchEventHandleCallback(watch, fd, events, cbData):
     cb(watch, fd, events, opaque)
     return 0
 
+
 def _dispatchEventTimeoutCallback(timer, cbData):
     cb = cbData["cb"]
     opaque = cbData["opaque"]
 
     cb(timer, opaque)
     return 0
+
 
 def virEventAddHandle(fd, events, cb, opaque):
     """
@@ -186,10 +194,12 @@ def virEventAddHandle(fd, events, cb, opaque):
                events,  # int bitmap of events that have occurred
                opaque): # opaque data passed to eventAddHandle
     """
-    cbData = {"cb" : cb, "opaque" : opaque}
+    cbData = {"cb": cb, "opaque": opaque}
     ret = libvirtmod.virEventAddHandle(fd, events, cbData)
-    if ret == -1: raise libvirtError ('virEventAddHandle() failed')
+    if ret == -1:
+        raise libvirtError('virEventAddHandle() failed')
     return ret
+
 
 def virEventAddTimeout(timeout, cb, opaque):
     """
@@ -206,9 +216,10 @@ def virEventAddTimeout(timeout, cb, opaque):
         def cb(timer,   # int id of the timer
                opaque): # opaque data passed to eventAddTimeout
     """
-    cbData = {"cb" : cb, "opaque" : opaque}
+    cbData = {"cb": cb, "opaque": opaque}
     ret = libvirtmod.virEventAddTimeout(timeout, cbData)
-    if ret == -1: raise libvirtError ('virEventAddTimeout() failed')
+    if ret == -1:
+        raise libvirtError('virEventAddTimeout() failed')
     return ret
 
 

@@ -1,6 +1,6 @@
-
 import unittest
 import libvirt
+
 
 class TestLibvirtDomain(unittest.TestCase):
     def setUp(self):
