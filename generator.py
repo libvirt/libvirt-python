@@ -1342,17 +1342,8 @@ def writeDoc(module, name, args, indent, output):
         return
     val = funcs[name][0]
     val = val.replace("NULL", "None")
-    output.write(indent)
-    output.write('"""')
-    i = val.find("\n")
-    while i >= 0:
-        str = val[0:i + 1]
-        val = val[i + 1:]
-        output.write(str)
-        i = val.find("\n")
-        output.write(indent)
-    output.write(val)
-    output.write(' """\n')
+    sep = '\n%s' % (indent,)
+    output.write('%s"""%s """\n' % (indent, sep.join(val.splitlines())))
 
 
 def buildWrappers(module):
