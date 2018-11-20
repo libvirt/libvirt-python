@@ -71,47 +71,29 @@ class docParser(xml.sax.handler.ContentHandler):
         if tag == 'function':
             self._data = []
             self.in_function = True
-            self.function = None
             self.function_cond = None
             self.function_args = []
             self.function_descr = None
             self.function_return = None
-            self.function_file = None
-            self.function_module = None
-            if 'name' in attrs:
-                self.function = attrs['name']
-            if 'file' in attrs:
-                self.function_file = attrs['file']
-            if 'module' in attrs:
-                self.function_module = attrs['module']
+            self.function = attrs.get('name', '')
+            self.function_file = attrs.get('file', '')
+            self.function_module = attrs.get('module', '')
         elif tag == 'cond':
             self._data = []
         elif tag == 'info':
             self._data = []
         elif tag == 'arg':
             if self.in_function:
-                self.function_arg_name = None
-                self.function_arg_type = None
-                self.function_arg_info = None
-                if 'name' in attrs:
-                    self.function_arg_name = attrs['name']
-                    if self.function_arg_name == 'from':
-                        self.function_arg_name = 'frm'
-                if 'type' in attrs:
-                    self.function_arg_type = attrs['type']
-                if 'info' in attrs:
-                    self.function_arg_info = attrs['info']
+                self.function_arg_name = attrs.get('name', '')
+                if self.function_arg_name == 'from':
+                    self.function_arg_name = 'frm'
+                self.function_arg_type = attrs.get('type', '')
+                self.function_arg_info = attrs.get('info', '')
         elif tag == 'return':
             if self.in_function:
-                self.function_return_type = None
-                self.function_return_info = None
-                self.function_return_field = None
-                if 'type' in attrs:
-                    self.function_return_type = attrs['type']
-                if 'info' in attrs:
-                    self.function_return_info = attrs['info']
-                if 'field' in attrs:
-                    self.function_return_field = attrs['field']
+                self.function_return_type = attrs.get('type', '')
+                self.function_return_info = attrs.get('info', '')
+                self.function_return_field = attrs.get('field', '')
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
             if attrs['file'] in libvirt_headers + ["virerror", "virterror"]:
