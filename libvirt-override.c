@@ -571,7 +571,7 @@ libvirt_virDomainSetSchedulerParameters(PyObject *self ATTRIBUTE_UNUSED,
     Py_ssize_t size = 0;
     virTypedParameterPtr params = NULL, new_params = NULL;
 
-    if (!PyArg_ParseTuple(args, (char *)"OO:virDomainSetScedulerParameters",
+    if (!PyArg_ParseTuple(args, (char *)"OO:virDomainSetSchedulerParameters",
                           &pyobj_domain, &info))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -647,7 +647,7 @@ libvirt_virDomainSetSchedulerParametersFlags(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args,
-                          (char *)"OOI:virDomainSetScedulerParametersFlags",
+                          (char *)"OOI:virDomainSetSchedulerParametersFlags",
                           &pyobj_domain, &info, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
