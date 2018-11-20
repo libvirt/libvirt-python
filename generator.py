@@ -9,15 +9,20 @@ import re
 import xml.sax
 from contextlib import closing
 from collections import defaultdict
+from typing import Dict, IO, List, Optional, Set, Tuple, Union
+ArgumentType = Tuple[str, str, str]
+FunctionType = Tuple[str, ArgumentType, List[ArgumentType], str, str, str]
+EnumValue = Union[str, int]
+EnumType = Dict[str, EnumValue]
 
-functions = {}
-lxc_functions = {}
-qemu_functions = {}
-enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
-lxc_enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
-qemu_enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
-event_ids = []
-params = []  # [ (paramName, paramValue)... ]
+functions = {}  # type: Dict[str, FunctionType]
+lxc_functions = {}  # type: Dict[str, FunctionType]
+qemu_functions = {}  # type: Dict[str, FunctionType]
+enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
+lxc_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
+qemu_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
+event_ids = []  # type: List[str]
+params = []  # type: List[Tuple[str, str]] # [ (paramName, paramValue)... ]
 
 
 quiet = True
@@ -49,7 +54,7 @@ libvirt_headers = [
 ]
 
 
-def parse(data):
+def parse(data: IO[str]) -> None:
     target = docParser()
     with closing(xml.sax.make_parser()) as parser:
         parser.setContentHandler(target)
@@ -57,25 +62,25 @@ def parse(data):
 
 
 class docParser(xml.sax.handler.ContentHandler):
-    def __init__(self):
-        self._data = []
+    def __init__(self) -> None:
+        self._data = []  # type: List[str]
         self.in_function = False
 
-    def characters(self, text):
+    def characters(self, text: str) -> None:
         if debug:
             print("data %s" % text)
         self._data.append(text)
 
-    def startElement(self, tag, attrs):
+    def startElement(self, tag: str, attrs: Dict[str, str]) -> None:
         if debug:
             print("start %s, %s" % (tag, attrs))
         if tag == 'function':
             self._data = []
             self.in_function = True
             self.function_cond = ''
-            self.function_args = []
+            self.function_args = []  # type: List[ArgumentType]
             self.function_descr = ''
-            self.function_return = None
+            self.function_return = None  # type: Optional[ArgumentType]
             self.function = attrs.get('name', '')
             self.function_file = attrs.get('file', '')
             self.function_module = attrs.get('module', '')
@@ -107,7 +112,7 @@ class docParser(xml.sax.handler.ContentHandler):
             if "string" in attrs:
                 params.append((attrs['name'], attrs['string']))
 
-    def endElement(self, tag):
+    def endElement(self, tag: str) -> None:
         if debug:
             print("end %s" % tag)
         if tag == 'function':
@@ -166,7 +171,7 @@ class docParser(xml.sax.handler.ContentHandler):
                 self.function_cond = str
 
 
-def function(name, desc, ret, args, file, module, cond):
+def function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
     if onlyOverrides and name not in functions:
         return
     if name == "virConnectListDomains":
@@ -174,19 +179,19 @@ def function(name, desc, ret, args, file, module, cond):
     functions[name] = (desc, ret, args, file, module, cond)
 
 
-def qemu_function(name, desc, ret, args, file, module, cond):
+def qemu_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
     if onlyOverrides and name not in qemu_functions:
         return
     qemu_functions[name] = (desc, ret, args, file, module, cond)
 
 
-def lxc_function(name, desc, ret, args, file, module, cond):
+def lxc_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
     if onlyOverrides and name not in lxc_functions:
         return
     lxc_functions[name] = (desc, ret, args, file, module, cond)
 
 
-def enum(type, name, value):
+def enum(type: str, name: str, value: EnumValue) -> None:
     if (name.startswith('VIR_DOMAIN_EVENT_ID_') or
             name.startswith('VIR_NETWORK_EVENT_ID_')):
         event_ids.append(name)
@@ -213,13 +218,13 @@ def enum(type, name, value):
     enums[type][name] = value
 
 
-def lxc_enum(type, name, value):
+def lxc_enum(type: str, name: str, value: EnumValue) -> None:
     if onlyOverrides and name not in lxc_enums[type]:
         return
     lxc_enums[type][name] = value
 
 
-def qemu_enum(type, name, value):
+def qemu_enum(type: str, name: str, value: EnumValue) -> None:
     if value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_BLOCK':
         value = -2
     elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_DEFAULT':
@@ -238,14 +243,14 @@ def qemu_enum(type, name, value):
 #
 #######################################################################
 
-functions_failed = []
-lxc_functions_failed = []
-qemu_functions_failed = []
+functions_failed = []  # type: List[str]
+lxc_functions_failed = []  # type: List[str]
+qemu_functions_failed = []  # type: List[str]
 functions_skipped = [
     "virConnectListDomains",
 ]
-lxc_functions_skipped = []
-qemu_functions_skipped = []
+lxc_functions_skipped = []  # type: List[str]
+qemu_functions_skipped = []  # type: List[str]
 
 skipped_types = {
     # 'int *': "usually a return type",
@@ -338,9 +343,9 @@ py_types = {
     'virDomainSnapshotPtr': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
     'virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
     'const virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-}
+}  # type: Dict[str, Tuple[str, str, str, str]]
 
-unknown_types = defaultdict(list)
+unknown_types = defaultdict(list)  # type: Dict[str, List[str]]
 
 #######################################################################
 #
@@ -634,7 +639,7 @@ function_skip_index_one = (
 )
 
 
-def print_function_wrapper(module, name, output, export, include):
+def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> int:
     try:
         if module == "libvirt":
             (desc, ret, args, file, mod, cond) = functions[name]
@@ -815,7 +820,7 @@ def print_function_wrapper(module, name, output, export, include):
     return 1
 
 
-def print_c_pointer(classname, output, export, include):
+def print_c_pointer(classname: str, output: IO[str], export: IO[str], include: IO[str]) -> None:
     output.write("PyObject *\n")
     output.write("libvirt_%s_pointer(PyObject *self ATTRIBUTE_UNUSED, PyObject *args)\n" % classname)
     output.write("{\n")
@@ -837,7 +842,7 @@ def print_c_pointer(classname, output, export, include):
                  (classname, classname))
 
 
-def buildStubs(module, api_xml):
+def buildStubs(module: str, api_xml: str) -> int:
     global onlyOverrides
 
     if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
@@ -1046,7 +1051,7 @@ functions_noexcept = {
 
 function_classes = {
     "None": []
-}  # type: Dict[str, List[Any]]
+}  # type: Dict[str, List[Tuple[int, str, str, ArgumentType, List[ArgumentType], str, str]]]
 
 # Functions returning an integral type which need special rules to
 # check for errors and raise exceptions.
@@ -1055,15 +1060,16 @@ functions_int_exception_test = {
 }
 functions_int_default_test = "%s == -1"
 
-def is_integral_type(name):
+
+def is_integral_type(name: str) -> bool:
     return re.search ("^(unsigned)? ?(int|long)$", name) is not None
 
 
-def is_optional_arg(info):
+def is_optional_arg(info: str) -> bool:
     return re.search("^\(?optional\)?", info) is not None
 
 
-def is_python_noninteger_type(name):
+def is_python_noninteger_type(name: str) -> bool:
     return name[-1:] == "*"
 
 
@@ -1270,12 +1276,12 @@ def nameFixup(name, classe, type, file):
     return func
 
 
-def functionSortKey(info):
+def functionSortKey(info: Tuple) -> Tuple[str, str]:
     (index, func, name, ret, args, filename, mod) = info
     return func, filename
 
 
-def writeDoc(module, name, args, indent, output):
+def writeDoc(module: str, name: str, args: List[ArgumentType], indent: str, output: IO) -> None:
     if module == "libvirt":
         funcs = functions
     elif module == "libvirt-lxc":
@@ -1290,7 +1296,7 @@ def writeDoc(module, name, args, indent, output):
     output.write('%s"""%s """\n' % (indent, sep.join(val.splitlines())))
 
 
-def buildWrappers(module):
+def buildWrappers(module: str) -> None:
     if not module == "libvirt":
         print("ERROR: Unknown module type: %s" % module)
         return None
@@ -1302,10 +1308,10 @@ def buildWrappers(module):
     # Build the list of C types to look for ordered to start
     # with primary classes
     #
-    ctypes = []
-    classes_list = []
-    ctypes_processed = set()
-    classes_processed = set()
+    ctypes = []  # type: List[str]
+    classes_list = []  # type: List[str]
+    ctypes_processed = set()  # type: Set[str]
+    classes_processed = set()  # type: Set[str]
     for classe in primary_classes:
         classes_list.append(classe)
         classes_processed.add(classe)
@@ -1689,17 +1695,17 @@ def buildWrappers(module):
         return value, data[0]
 
     # Resolve only one level of reference
-    def resolveEnum(enum, data):
+    def resolveEnum(enum: EnumType, data: EnumType) -> EnumType:
         for name, val in enum.items():
             try:
                 int(val)
             except ValueError:
-                enum[name] = data[val]
+                enum[name] = data[val]  # type: ignore
         return enum
 
     enumvals = list(enums.items())
     # convert list of dicts to one dict
-    enumData = {}
+    enumData = {}  # type: EnumType
     for type, enum in enumvals:
         enumData.update(enum)
 
@@ -1719,7 +1725,7 @@ def buildWrappers(module):
     classes.close()
 
 
-def qemuBuildWrappers(module):
+def qemuBuildWrappers(module: str) -> None:
     if not module == "libvirt-qemu":
         print("ERROR: only libvirt-qemu is supported")
         return None
@@ -1824,7 +1830,7 @@ def qemuBuildWrappers(module):
     fd.close()
 
 
-def lxcBuildWrappers(module):
+def lxcBuildWrappers(module: str) -> None:
     if not module == "libvirt-lxc":
         print("ERROR: only libvirt-lxc is supported")
         return None
