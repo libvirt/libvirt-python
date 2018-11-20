@@ -1,4 +1,4 @@
-    def listAllSnapshots(self, flags=0):
+    def listAllSnapshots(self, flags: int = 0) -> List['virDomainSnapshot']:
         """List all snapshots and returns a list of snapshot objects"""
         ret = libvirtmod.virDomainListAllSnapshots(self._o, flags)
         if ret is None:
@@ -10,7 +10,7 @@
 
         return retlist
 
-    def listAllCheckpoints(self, flags=0):
+    def listAllCheckpoints(self, flags: int = 0) -> List['virDomainCheckpoint']:
         """List all checkpoints and returns a list of checkpoint objects"""
         ret = libvirtmod.virDomainListAllCheckpoints(self._o, flags)
         if ret is None:
@@ -22,7 +22,7 @@
 
         return retlist
 
-    def createWithFiles(self, files, flags=0):
+    def createWithFiles(self, files: List[int], flags: int = 0) -> 'virDomain':
         """Launch a defined domain. If the call succeeds the domain moves from the
         defined to the running domains pools.
 
@@ -60,28 +60,28 @@
             raise libvirtError('virDomainCreateWithFiles() failed')
         return ret
 
-    def fsFreeze(self, mountpoints=None, flags=0):
+    def fsFreeze(self, mountpoints: List[str] = None, flags: int = 0) -> int:
         """Freeze specified filesystems within the guest """
         ret = libvirtmod.virDomainFSFreeze(self._o, mountpoints, flags)
         if ret == -1:
             raise libvirtError('virDomainFSFreeze() failed')
         return ret
 
-    def fsThaw(self, mountpoints=None, flags=0):
+    def fsThaw(self, mountpoints: List[str] = None, flags: int = 0) -> int:
         """Thaw specified filesystems within the guest """
         ret = libvirtmod.virDomainFSThaw(self._o, mountpoints, flags)
         if ret == -1:
             raise libvirtError('virDomainFSThaw() failed')
         return ret
 
-    def getTime(self, flags=0):
+    def getTime(self, flags: int = 0) -> int:
         """Extract information about guest time """
         ret = libvirtmod.virDomainGetTime(self._o, flags)
         if ret == None:
             raise libvirtError('virDomainGetTime() failed')
         return ret
 
-    def setTime(self, time=None, flags=0):
+    def setTime(self, time: int = None, flags: int = 0) -> int:
         """Set guest time to the given value. @time is a dict containing
         'seconds' field for seconds and 'nseconds' field for nanoseconds """
         ret = libvirtmod.virDomainSetTime(self._o, time, flags)
