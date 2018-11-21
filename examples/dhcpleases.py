@@ -35,7 +35,7 @@ except libvirt.libvirtError:
     sys.exit(0)
 
 leases = net.DHCPLeases()
-if (leases == None):
+if not leases:
     print("Failed to get leases for %s" % net.name())
     sys.exit(0)
 
