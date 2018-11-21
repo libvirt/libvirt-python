@@ -1,7 +1,6 @@
     def __del__(self) -> None:
         try:
-            for cb, opaque in self.domainEventCallbacks.items():
-                del self.domainEventCallbacks[cb]
+            self.domainEventCallbacks.clear()
             del self.domainEventCallbacks
             libvirtmod.virConnectDomainEventDeregister(self._o, self)
         except AttributeError:
