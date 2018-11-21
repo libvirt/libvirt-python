@@ -179,12 +179,13 @@ def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Union[Tu
     # future invocations match the virEventHandleCallback prototype
     if opaquecompat:
         callback = opaque
-        opaque = opaquecompat
+        opaque_ = opaquecompat
     else:
+        assert isinstance(opaque, tuple)
         callback = opaque[0]
-        opaque = opaque[1]
+        opaque_ = opaque[1]
 
-    libvirtmod.virEventInvokeHandleCallback(watch, fd, event, callback, opaque)
+    libvirtmod.virEventInvokeHandleCallback(watch, fd, event, callback, opaque_)
 
 
 #
@@ -200,12 +201,13 @@ def _eventInvokeTimeoutCallback(timer: int, opaque: Union[Tuple[_TimerCB, _T], _
     # future invocations match the virEventTimeoutCallback prototype
     if opaquecompat:
         callback = opaque
-        opaque = opaquecompat
+        opaque_ = opaquecompat
     else:
+        assert isinstance(opaque, tuple)
         callback = opaque[0]
-        opaque = opaque[1]
+        opaque_ = opaque[1]
 
-    libvirtmod.virEventInvokeTimeoutCallback(timer, callback, opaque)
+    libvirtmod.virEventInvokeTimeoutCallback(timer, callback, opaque_)
 
 
 def _dispatchEventHandleCallback(watch: int, fd: int, events: int, cbData: Dict[str, Any]) -> int:
