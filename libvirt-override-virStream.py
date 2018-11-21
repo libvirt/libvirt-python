@@ -203,10 +203,10 @@
                 if length is None:
                     self.abort()
                     raise RuntimeError("recvHole handler failed")
-                ret = holeHandler(self, length, opaque)
-                if type(ret) is int and ret < 0:
+                ret_hole = holeHandler(self, length, opaque)
+                if type(ret_hole) is int and ret_hole < 0:
                     self.abort()
-                    raise RuntimeError("holeHandler handler returned %d" % ret)
+                    raise RuntimeError("holeHandler handler returned %d" % ret_hole)
                 continue
             elif isinstance(got, int):
                 raise ValueError(got)
@@ -216,10 +216,10 @@
             if len(got) == 0:
                 break
 
-            ret = handler(self, got, opaque)
-            if type(ret) is int and ret < 0:
+            ret_data = handler(self, got, opaque)
+            if type(ret_data) is int and ret_data < 0:
                 self.abort()
-                raise RuntimeError("sparseRecvAll handler returned %d" % ret)
+                raise RuntimeError("sparseRecvAll handler returned %d" % ret_data)
 
     def sparseSendAll(self, handler: Callable[['virStream', int, _T], Union[bytes, int]], holeHandler: Callable[['virStream', _T], Tuple[bool, int]], skipHandler: Callable[['virStream', int, _T], int], opaque: _T) -> None:
         """Send the entire data stream, reading the data from the
