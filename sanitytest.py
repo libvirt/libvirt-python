@@ -76,7 +76,7 @@ for n in second_pass:
     # Version 4.0.0 was broken as missing VIR_TYPED_PARAM enums
     # constants. This is harmless from POV of validating API
     # coverage so ignore this error.
-    if (type(val) != int and
+    if (not isinstance(val, int) and
         not val.startswith("VIR_TYPED_PARAM_")):
         fail = True
         print("Cannot get a value of enum %s (originally %s)" % (val, name))
@@ -104,7 +104,7 @@ for name in dir(libvirt):
     thing = getattr(libvirt, name)
     # Special-case libvirtError to deal with python 2.4 difference
     # in Exception class type reporting.
-    if type(thing) in (int, long):
+    if isinstance(thing, (int, long)):
         gotenums.append(name)
     elif getattr(thing, "__module__", "") == "typing":
         continue
