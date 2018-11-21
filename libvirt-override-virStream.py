@@ -49,7 +49,7 @@
 
             try:
                 ret = handler(self, got, opaque)
-                if type(ret) is int and ret < 0:
+                if isinstance(ret, int) and ret < 0:
                     raise RuntimeError("recvAll handler returned %d" % ret)
             except BaseException:
                 try:
@@ -204,7 +204,7 @@
                     self.abort()
                     raise RuntimeError("recvHole handler failed")
                 ret_hole = holeHandler(self, length, opaque)
-                if type(ret_hole) is int and ret_hole < 0:
+                if isinstance(ret_hole, int) and ret_hole < 0:
                     self.abort()
                     raise RuntimeError("holeHandler handler returned %d" % ret_hole)
                 continue
@@ -217,7 +217,7 @@
                 break
 
             ret_data = handler(self, got, opaque)
-            if type(ret_data) is int and ret_data < 0:
+            if isinstance(ret_data, int) and ret_data < 0:
                 self.abort()
                 raise RuntimeError("sparseRecvAll handler returned %d" % ret_data)
 
@@ -264,7 +264,7 @@
                 want = sectionLen
 
             got = handler(self, want, opaque)
-            if type(got) is int and got < 0:
+            if isinstance(got, int) and got < 0:
                 self.abort()
                 raise RuntimeError("sparseSendAll handler returned %d" % got)
 
