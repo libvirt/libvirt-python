@@ -74,14 +74,14 @@ for dom, v in domsStrictCfg.items():
     print("Domain '%s':\t" % dom.name())
 
     toPrint = "\tOverall memory: %d MiB" % (v["memory"]["size"] // 1024)
-    if v["memory"]["pin"] is not None and v["memory"]["pin"] is not "":
+    if v["memory"]["pin"] is not None and v["memory"]["pin"] != "":
         toPrint = toPrint + " nodes %s" % v["memory"]["pin"]
     print(toPrint)
 
     for k, node in sorted(v.items()):
-        if k is "memory":
+        if k == "memory":
             continue
         toPrint = "\tNode %s:\t%d MiB" % (k, node["size"] // 1024)
-        if node["pin"] is not None and node["pin"] is not "":
+        if node["pin"] is not None and node["pin"] == "":
             toPrint = toPrint + " nodes %s" % node["pin"]
         print(toPrint)
