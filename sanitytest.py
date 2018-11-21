@@ -81,10 +81,10 @@ for n in second_pass:
 for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
     for enumval in enumvals.values():
         if n in enumval:
-            enum = enumval
+            enumv = enumval
             break
     # Eliminate sentinels
-    if n.endswith('_LAST') and enum[n] == max(enum.values()):
+    if n.endswith('_LAST') and enumv[n] == max(enumv.values()):
         continue
     wantenums.append(n)
 
