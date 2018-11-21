@@ -253,7 +253,7 @@
         """
         while True:
             [inData, sectionLen] = holeHandler(self, opaque)
-            if (inData == False and sectionLen > 0):
+            if not inData and sectionLen > 0:
                 if (self.sendHole(sectionLen) < 0 or
                         skipHandler(self, sectionLen, opaque) < 0):
                     self.abort()
