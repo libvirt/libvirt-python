@@ -2,7 +2,7 @@
         """List all ports on the network and returns a list of network port objects"""
         ret = libvirtmod.virNetworkListAllPorts(self._o, flags)
         if ret is None:
-            raise libvirtError("virNetworkListAllPorts() failed", conn=self)
+            raise libvirtError("virNetworkListAllPorts() failed")
 
         retlist = list()
         for domptr in ret:

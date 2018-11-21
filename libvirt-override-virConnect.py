@@ -26,7 +26,7 @@
                 del self.domainEventCallbacks
                 ret = libvirtmod.virConnectDomainEventDeregister(self._o, self)
                 if ret == -1:
-                    raise libvirtError('virConnectDomainEventDeregister() failed', conn=self)
+                    raise libvirtError('virConnectDomainEventDeregister() failed')
         except AttributeError:
             pass
 
@@ -39,7 +39,7 @@
             self.domainEventCallbacks = {cb: opaque}
             ret = libvirtmod.virConnectDomainEventRegister(self._o, self)
             if ret == -1:
-                raise libvirtError('virConnectDomainEventRegister() failed', conn=self)
+                raise libvirtError('virConnectDomainEventRegister() failed')
 
     def _dispatchDomainEventCallbacks(self, dom, event, detail):
         """Dispatches events to python user domain event callbacks
@@ -275,7 +275,7 @@
         try:
             ret = libvirtmod.virConnectDomainEventDeregisterAny(self._o, callbackID)
             if ret == -1:
-                raise libvirtError('virConnectDomainEventDeregisterAny() failed', conn=self)
+                raise libvirtError('virConnectDomainEventDeregisterAny() failed')
             del self.domainEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -295,7 +295,7 @@
         try:
             ret = libvirtmod.virConnectNetworkEventDeregisterAny(self._o, callbackID)
             if ret == -1:
-                raise libvirtError('virConnectNetworkEventDeregisterAny() failed', conn=self)
+                raise libvirtError('virConnectNetworkEventDeregisterAny() failed')
             del self.networkEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -311,7 +311,7 @@
         else:
             ret = libvirtmod.virConnectNetworkEventRegisterAny(self._o, net._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError('virConnectNetworkEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectNetworkEventRegisterAny() failed')
         self.networkEventCallbackID[ret] = opaque
         return ret
 
@@ -326,7 +326,7 @@
         else:
             ret = libvirtmod.virConnectDomainEventRegisterAny(self._o, dom._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError('virConnectDomainEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectDomainEventRegisterAny() failed')
         self.domainEventCallbackID[ret] = opaque
         return ret
 
@@ -356,7 +356,7 @@
         try:
             ret = libvirtmod.virConnectStoragePoolEventDeregisterAny(self._o, callbackID)
             if ret == -1:
-                raise libvirtError('virConnectStoragePoolEventDeregisterAny() failed', conn=self)
+                raise libvirtError('virConnectStoragePoolEventDeregisterAny() failed')
             del self.storagePoolEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -372,7 +372,7 @@
         else:
             ret = libvirtmod.virConnectStoragePoolEventRegisterAny(self._o, pool._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError('virConnectStoragePoolEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectStoragePoolEventRegisterAny() failed')
         self.storagePoolEventCallbackID[ret] = opaque
         return ret
 
@@ -402,7 +402,7 @@
         try:
             ret = libvirtmod.virConnectNodeDeviceEventDeregisterAny(self._o, callbackID)
             if ret == -1:
-                raise libvirtError('virConnectNodeDeviceEventDeregisterAny() failed', conn=self)
+                raise libvirtError('virConnectNodeDeviceEventDeregisterAny() failed')
             del self.nodeDeviceEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -418,7 +418,7 @@
         else:
             ret = libvirtmod.virConnectNodeDeviceEventRegisterAny(self._o, dev._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError('virConnectNodeDeviceEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectNodeDeviceEventRegisterAny() failed')
         self.nodeDeviceEventCallbackID[ret] = opaque
         return ret
 
@@ -446,7 +446,7 @@
         try:
             ret = libvirtmod.virConnectSecretEventDeregisterAny(self._o, callbackID)
             if ret == -1:
-                raise libvirtError('virConnectSecretEventDeregisterAny() failed', conn=self)
+                raise libvirtError('virConnectSecretEventDeregisterAny() failed')
             del self.secretEventCallbackID[callbackID]
         except AttributeError:
             pass
@@ -462,7 +462,7 @@
         else:
             ret = libvirtmod.virConnectSecretEventRegisterAny(self._o, secret._o, eventID, cbData)
         if ret == -1:
-            raise libvirtError('virConnectSecretEventRegisterAny() failed', conn=self)
+            raise libvirtError('virConnectSecretEventRegisterAny() failed')
         self.secretEventCallbackID[ret] = opaque
         return ret
 
@@ -470,7 +470,7 @@
         """List all domains and returns a list of domain objects"""
         ret = libvirtmod.virConnectListAllDomains(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllDomains() failed", conn=self)
+            raise libvirtError("virConnectListAllDomains() failed")
 
         retlist = list()
         for domptr in ret:
@@ -482,7 +482,7 @@
         """Returns a list of storage pool objects"""
         ret = libvirtmod.virConnectListAllStoragePools(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllStoragePools() failed", conn=self)
+            raise libvirtError("virConnectListAllStoragePools() failed")
 
         retlist = list()
         for poolptr in ret:
@@ -494,7 +494,7 @@
         """Returns a list of network objects"""
         ret = libvirtmod.virConnectListAllNetworks(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllNetworks() failed", conn=self)
+            raise libvirtError("virConnectListAllNetworks() failed")
 
         retlist = list()
         for netptr in ret:
@@ -506,7 +506,7 @@
         """Returns a list of interface objects"""
         ret = libvirtmod.virConnectListAllInterfaces(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllInterfaces() failed", conn=self)
+            raise libvirtError("virConnectListAllInterfaces() failed")
 
         retlist = list()
         for ifaceptr in ret:
@@ -518,7 +518,7 @@
         """Returns a list of host node device objects"""
         ret = libvirtmod.virConnectListAllNodeDevices(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllNodeDevices() failed", conn=self)
+            raise libvirtError("virConnectListAllNodeDevices() failed")
 
         retlist = list()
         for devptr in ret:
@@ -530,7 +530,7 @@
         """Returns a list of network filter objects"""
         ret = libvirtmod.virConnectListAllNWFilters(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllNWFilters() failed", conn=self)
+            raise libvirtError("virConnectListAllNWFilters() failed")
 
         retlist = list()
         for filter_ptr in ret:
@@ -542,7 +542,7 @@
         """Returns a list of network filter binding objects"""
         ret = libvirtmod.virConnectListAllNWFilterBindings(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllNWFilterBindings() failed", conn=self)
+            raise libvirtError("virConnectListAllNWFilterBindings() failed")
 
         retlist = list()
         for filter_ptr in ret:
@@ -554,7 +554,7 @@
         """Returns a list of secret objects"""
         ret = libvirtmod.virConnectListAllSecrets(self._o, flags)
         if ret is None:
-            raise libvirtError("virConnectListAllSecrets() failed", conn=self)
+            raise libvirtError("virConnectListAllSecrets() failed")
 
         retlist = list()
         for secret_ptr in ret:
@@ -574,7 +574,7 @@
         """Removes a close event callback"""
         ret = libvirtmod.virConnectUnregisterCloseCallback(self._o)
         if ret == -1:
-            raise libvirtError('virConnectUnregisterCloseCallback() failed', conn=self)
+            raise libvirtError('virConnectUnregisterCloseCallback() failed')
 
     def registerCloseCallback(self, cb, opaque):
         """Adds a close event callback, providing a notification
@@ -582,7 +582,7 @@
         cbData = {"cb": cb, "conn": self, "opaque": opaque}
         ret = libvirtmod.virConnectRegisterCloseCallback(self._o, cbData)
         if ret == -1:
-            raise libvirtError('virConnectRegisterCloseCallback() failed', conn=self)
+            raise libvirtError('virConnectRegisterCloseCallback() failed')
         return ret
 
     def createXMLWithFiles(self, xmlDesc, files, flags=0):
@@ -612,7 +612,7 @@
         block attempts at migration, save-to-file, or snapshots. """
         ret = libvirtmod.virDomainCreateXMLWithFiles(self._o, xmlDesc, files, flags)
         if ret is None:
-            raise libvirtError('virDomainCreateXMLWithFiles() failed', conn=self)
+            raise libvirtError('virDomainCreateXMLWithFiles() failed')
         __tmp = virDomain(self, _obj=ret)
         return __tmp
 
@@ -660,7 +660,7 @@
         VIR_CONNECT_GET_ALL_DOMAINS_STATS_OTHER for all other states. """
         ret = libvirtmod.virConnectGetAllDomainStats(self._o, stats, flags)
         if ret is None:
-            raise libvirtError("virConnectGetAllDomainStats() failed", conn=self)
+            raise libvirtError("virConnectGetAllDomainStats() failed")
 
         retlist = list()
         for elem in ret:
@@ -701,13 +701,13 @@
         domlist = list()
         for dom in doms:
             if not isinstance(dom, virDomain):
-                raise libvirtError("domain list contains non-domain elements", conn=self)
+                raise libvirtError("domain list contains non-domain elements")
 
             domlist.append(dom._o)
 
         ret = libvirtmod.virDomainListGetStats(self._o, domlist, stats, flags)
         if ret is None:
-            raise libvirtError("virDomainListGetStats() failed", conn=self)
+            raise libvirtError("virDomainListGetStats() failed")
 
         retlist = list()
         for elem in ret:

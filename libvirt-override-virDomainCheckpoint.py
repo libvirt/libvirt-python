@@ -10,7 +10,7 @@
         """List all child checkpoints and returns a list of checkpoint objects"""
         ret = libvirtmod.virDomainCheckpointListAllChildren(self._o, flags)
         if ret is None:
-            raise libvirtError("virDomainCheckpointListAllChildren() failed", conn=self)
+            raise libvirtError("virDomainCheckpointListAllChildren() failed")
 
         retlist = list()
         for chkptr in ret:

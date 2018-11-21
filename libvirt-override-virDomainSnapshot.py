@@ -10,7 +10,7 @@
         """List all child snapshots and returns a list of snapshot objects"""
         ret = libvirtmod.virDomainSnapshotListAllChildren(self._o, flags)
         if ret is None:
-            raise libvirtError("virDomainSnapshotListAllChildren() failed", conn=self)
+            raise libvirtError("virDomainSnapshotListAllChildren() failed")
 
         retlist = list()
         for snapptr in ret:

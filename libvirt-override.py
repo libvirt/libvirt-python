@@ -19,7 +19,7 @@ except ImportError:
 
 # The root of all libvirt errors.
 class libvirtError(Exception):
-    def __init__(self, defmsg, conn=None, dom=None, net=None, pool=None, vol=None):
+    def __init__(self, defmsg):
 
         # Never call virConnGetLastError().
         # virGetLastError() is now thread local
