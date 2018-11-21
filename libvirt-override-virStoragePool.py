@@ -2,7 +2,7 @@
         """List all storage volumes and returns a list of storage volume objects"""
         ret = libvirtmod.virStoragePoolListAllVolumes(self._o, flags)
         if ret is None:
-            raise libvirtError("virStoragePoolListAllVolumes() failed", conn=self)
+            raise libvirtError("virStoragePoolListAllVolumes() failed")
 
         retlist = list()
         for volptr in ret:

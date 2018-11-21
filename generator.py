@@ -1699,31 +1699,31 @@ def buildWrappers(module):
                         else:
                             if classname == "virConnect":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', conn=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname == "virDomain":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', dom=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname == "virNetwork":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname == "virInterface":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', net=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname == "virStoragePool":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', pool=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname == "virStorageVol":
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', vol=self)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                                 classes.write(
-                                    "        if ret is None:raise libvirtError('%s() failed', dom=self._dom)\n" %
+                                    "        if ret is None:raise libvirtError('%s() failed')\n" %
                                     (name))
                             else:
                                 classes.write(
@@ -1753,27 +1753,27 @@ def buildWrappers(module):
                                 test = functions_int_default_test
                             if classname == "virConnect":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', conn=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virDomain":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', dom=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virNetwork":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virInterface":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virStoragePool":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', pool=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virStorageVol":
                                 classes.write(("        if " + test +
-                                               ": raise libvirtError('%s() failed', vol=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             else:
                                 classes.write(("        if " + test +
@@ -1786,27 +1786,27 @@ def buildWrappers(module):
                         if name not in functions_noexcept:
                             if classname == "virConnect":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', conn=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virDomain":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', dom=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virNetwork":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virInterface":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', net=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virStoragePool":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', pool=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             elif classname == "virStorageVol":
                                 classes.write(("        if %s is None" +
-                                               ": raise libvirtError('%s() failed', vol=self)\n") %
+                                               ": raise libvirtError('%s() failed')\n") %
                                               ("ret", name))
                             else:
                                 classes.write(("        if %s is None" +
