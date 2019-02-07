@@ -1095,7 +1095,7 @@ def is_python_noninteger_type (name):
     return name[-1:] == "*"
 
 def nameFixup(name, classe, type, file):
-    # avoid a desastrous clash
+    # avoid a disastrous clash
     listname = classe + "List"
     ll = len(listname)
     l = len(classe)
