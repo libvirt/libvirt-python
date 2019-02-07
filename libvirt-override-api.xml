@@ -576,6 +576,18 @@
       <arg name='flags' type='unsigned int' info='flags'/>
       <return type='int' info="0 on success, -1 on error"/>
     </function>
+    <function name='virDomainListAllCheckpoints' file='python'>
+      <info>returns the list of checkpoints for the given domain</info>
+      <arg name='dom' type='virDomainPtr' info='pointer to the domain'/>
+      <arg name='flags' type='unsigned int' info='flags'/>
+      <return type='char *' info='the list of checkpoints or None in case of error'/>
+    </function>
+    <function name='virDomainCheckpointListAllChildren' file='python'>
+      <info>collect the list of child checkpoint names for the given checkpoint</info>
+      <arg name='checkpoint' type='virDomainCheckpointPtr' info='pointer to the checkpoint'/>
+      <arg name='flags' type='unsigned int' info='flags'/>
+      <return type='char *' info='the list of checkpoints or None in case of error'/>
+    </function>
     <function name='virDomainGetBlockJobInfo' file='python'>
       <info>Get progress information for a block job</info>
       <arg name='dom' type='virDomainPtr' info='pointer to the domain'/>

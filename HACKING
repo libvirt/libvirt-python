@@ -28,6 +28,8 @@ hand written source files
    the virConnect class
  - libvirt-override-virDomain.py - high level overrides in
    the virDomain class
+ - libvirt-override-virDomainCheckpoint.py - high level overrides in
+   the virDomainCheckpoint class
  - libvirt-override-virDomainSnapshot.py - high level overrides in
    the virDomainSnapshot class
  - libvirt-override-virStoragePool.py - high level overrides in

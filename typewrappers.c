@@ -582,6 +582,19 @@ libvirt_virStreamPtrWrap(virStreamPtr node)
 }
 
 PyObject *
+libvirt_virDomainCheckpointPtrWrap(virDomainCheckpointPtr node)
+{
+    PyObject *ret;
+
+    if (node == NULL) {
+        return VIR_PY_NONE;
+    }
+
+    ret = libvirt_buildPyObject(node, "virDomainCheckpointPtr", NULL);
+    return ret;
+}
+
+PyObject *
 libvirt_virDomainSnapshotPtrWrap(virDomainSnapshotPtr node)
 {
     PyObject *ret;

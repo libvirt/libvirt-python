@@ -2325,6 +2325,98 @@ libvirt_virConnectListDefinedDomains(PyObject *self ATTRIBUTE_UNUSED,
     goto cleanup;
 }
 
+#if LIBVIR_CHECK_VERSION(5, 6, 0)
+static PyObject *
+libvirt_virDomainListAllCheckpoints(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    PyObject *py_retval = NULL;
+    virDomainCheckpointPtr *chks = NULL;
+    int c_retval;
+    ssize_t i;
+    virDomainPtr dom;
+    PyObject *pyobj_dom;
+    unsigned int flags;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainListAllCheckpoints",
+                          &pyobj_dom, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainListAllCheckpoints(dom, &chks, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    if (!(py_retval = PyList_New(c_retval)))
+        goto cleanup;
+
+    for (i = 0; i < c_retval; i++) {
+        VIR_PY_LIST_SET_GOTO(py_retval, i,
+                             libvirt_virDomainCheckpointPtrWrap(chks[i]), error);
+        chks[i] = NULL;
+    }
+
+ cleanup:
+    for (i = 0; i < c_retval; i++)
+        if (chks[i])
+            virDomainCheckpointFree(chks[i]);
+    VIR_FREE(chks);
+    return py_retval;
+
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
+}
+
+static PyObject *
+libvirt_virDomainCheckpointListAllChildren(PyObject *self ATTRIBUTE_UNUSED,
+                                           PyObject *args)
+{
+    PyObject *py_retval = NULL;
+    virDomainCheckpointPtr *chks = NULL;
+    int c_retval;
+    ssize_t i;
+    virDomainCheckpointPtr parent;
+    PyObject *pyobj_parent;
+    unsigned int flags;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainCheckpointListAllChildren",
+                          &pyobj_parent, &flags))
+        return NULL;
+    parent = (virDomainCheckpointPtr) PyvirDomainCheckpoint_Get(pyobj_parent);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainCheckpointListAllChildren(parent, &chks, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    if (!(py_retval = PyList_New(c_retval)))
+        goto cleanup;
+
+    for (i = 0; i < c_retval; i++) {
+        VIR_PY_LIST_SET_GOTO(py_retval, i,
+                             libvirt_virDomainCheckpointPtrWrap(chks[i]), error);
+        chks[i] = NULL;
+    }
+
+ cleanup:
+    for (i = 0; i < c_retval; i++)
+        if (chks[i])
+            virDomainCheckpointFree(chks[i]);
+    VIR_FREE(chks);
+    return py_retval;
+
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
+}
+#endif /* LIBVIR_CHECK_VERSION(5, 6, 0) */
+
 static PyObject *
 libvirt_virDomainSnapshotListNames(PyObject *self ATTRIBUTE_UNUSED,
                                    PyObject *args)
@@ -10238,6 +10330,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(1, 0, 3)
     {(char *) "virDomainGetJobStats", libvirt_virDomainGetJobStats, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 0, 3) */
+#if LIBVIR_CHECK_VERSION(5, 6, 0)
+    {(char *) "virDomainListAllCheckpoints", libvirt_virDomainListAllCheckpoints, METH_VARARGS, NULL},
+    {(char *) "virDomainCheckpointListAllChildren", libvirt_virDomainCheckpointListAllChildren, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(5, 6, 0) */
     {(char *) "virDomainSnapshotListNames", libvirt_virDomainSnapshotListNames, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 9, 13)
     {(char *) "virDomainListAllSnapshots", libvirt_virDomainListAllSnapshots, METH_VARARGS, NULL},

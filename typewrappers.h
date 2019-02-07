@@ -140,6 +140,15 @@ typedef struct {
 } PyvirStream_Object;
 
 
+#define PyvirDomainCheckpoint_Get(v) (((v) == Py_None) ? NULL : \
+        (((PyvirDomainCheckpoint_Object *)(v))->obj))
+
+typedef struct {
+    PyObject_HEAD
+    virDomainCheckpointPtr obj;
+} PyvirDomainCheckpoint_Object;
+
+
 #define PyvirDomainSnapshot_Get(v) (((v) == Py_None) ? NULL : \
         (((PyvirDomainSnapshot_Object *)(v))->obj))
 
@@ -217,6 +226,7 @@ PyObject * libvirt_virSecretPtrWrap(virSecretPtr node);
 PyObject * libvirt_virNWFilterPtrWrap(virNWFilterPtr node);
 PyObject * libvirt_virNWFilterBindingPtrWrap(virNWFilterBindingPtr node);
 PyObject * libvirt_virStreamPtrWrap(virStreamPtr node);
+PyObject * libvirt_virDomainCheckpointPtrWrap(virDomainCheckpointPtr node);
 PyObject * libvirt_virDomainSnapshotPtrWrap(virDomainSnapshotPtr node);
 
 
