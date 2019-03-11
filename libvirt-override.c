@@ -8837,7 +8837,7 @@ libvirt_virDomainBlockCopy(PyObject *self ATTRIBUTE_UNUSED,
                                    VIR_N_ELEMENTS(virPyDomainBlockCopyParams)) < 0) {
             return NULL;
         }
-    } else {
+    } else if (pyobj_dict != Py_None) {
         PyErr_Format(PyExc_TypeError, "block params must be a dictionary");
         return NULL;
     }
