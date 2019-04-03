@@ -119,18 +119,34 @@ exit 1
 %endif
 
 %if %{with_python2}
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%py2_build
+%else
 CFLAGS="$RPM_OPT_FLAGS" %{__python2} setup.py build
 %endif
+%endif
 %if %{with_python3}
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%py3_build
+%else
 CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
+%endif
 %endif
 
 %install
 %if %{with_python2}
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%py2_install
+%else
 %{__python2} setup.py install --skip-build --root=%{buildroot}
 %endif
+%endif
 %if %{with_python3}
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%py3_install
+%else
 %{__python3} setup.py install --skip-build --root=%{buildroot}
+%endif
 %endif
 
 %check
