@@ -754,5 +754,15 @@
       <arg name='conn' type='virConnectPtr' info='pointer to hypervisor connection'/>
       <arg name='flags' type='int' info='unused, always pass 0'/>
     </function>
+    <function name='virConnectGetDomainCapabilities' file='libvirt-domain' module='libvirt-domain'>
+      <info>Query domain capabilities</info>
+      <return type='char *' info='NULL in case of error or an XML string defining the capabilities.'/>
+      <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
+      <arg name='emulatorbin' type='const char *' info='optional path to emulator'/>
+      <arg name='arch' type='const char *' info='optional domain architecture'/>
+      <arg name='machine' type='const char *' info='optional machine type'/>
+      <arg name='virttype' type='const char *' info='optional virtualization type'/>
+      <arg name='flags' type='int' info='unused, always pass 0'/>
+    </function>
   </symbols>
 </api>
