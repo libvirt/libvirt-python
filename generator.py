@@ -328,6 +328,10 @@ py_types = {
     'virNetwork *':  ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
     'const virNetwork *':  ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
 
+    'virNetworkPortPtr':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'virNetworkPort *':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'const virNetworkPort *':  ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+
     'virInterfacePtr':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
     'virInterface *':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
     'const virInterface *':  ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
@@ -496,6 +500,8 @@ skip_impl = (
     'virConnectBaselineHypervisorCPU',
     'virDomainGetLaunchSecurityInfo',
     'virNodeGetSEVInfo',
+    'virNetworkPortGetParameters',
+    'virNetworkPortSetParameters',
 )
 
 lxc_skip_impl = (
@@ -541,6 +547,7 @@ skip_function = (
     'virConnectListAllStoragePools', # overridden in virConnect.py
     'virStoragePoolListAllVolumes', # overridden in virStoragePool.py
     'virConnectListAllNetworks', # overridden in virConnect.py
+    'virNetworkListAllPorts', # overridden in virConnect.py
     'virConnectListAllInterfaces', # overridden in virConnect.py
     'virConnectListAllNodeDevices', # overridden in virConnect.py
     'virConnectListAllNWFilters', # overridden in virConnect.py
@@ -575,6 +582,7 @@ skip_function = (
     "virDomainRef",
     "virInterfaceRef",
     "virNetworkRef",
+    "virNetworkPortRef",
     "virNodeDeviceRef",
     "virSecretRef",
     "virNWFilterRef",
@@ -590,6 +598,7 @@ skip_function = (
     "virDomainGetConnect",
     "virInterfaceGetConnect",
     "virNetworkGetConnect",
+    "virNetworkPortGetNetwork",
     "virSecretGetConnect",
     "virNWFilterGetConnect",
     "virStoragePoolGetConnect",
@@ -1005,6 +1014,8 @@ classes_type = {
     "virDomain *": ("._o", "virDomain(self, _obj=%s)", "virDomain"),
     "virNetworkPtr": ("._o", "virNetwork(self, _obj=%s)", "virNetwork"),
     "virNetwork *": ("._o", "virNetwork(self, _obj=%s)", "virNetwork"),
+    "virNetworkPortPtr": ("._o", "virNetworkPort(self, _obj=%s)", "virNetworkPort"),
+    "virNetworkPort *": ("._o", "virNetworkPort(self, _obj=%s)", "virNetworkPort"),
     "virInterfacePtr": ("._o", "virInterface(self, _obj=%s)", "virInterface"),
     "virInterface *": ("._o", "virInterface(self, _obj=%s)", "virInterface"),
     "virStoragePoolPtr": ("._o", "virStoragePool(self, _obj=%s)", "virStoragePool"),
@@ -1027,8 +1038,8 @@ classes_type = {
     "virDomainSnapshot *": ("._o", "virDomainSnapshot(self, _obj=%s)", "virDomainSnapshot"),
 }
 
-primary_classes = ["virDomain", "virNetwork", "virInterface",
-                   "virStoragePool", "virStorageVol",
+primary_classes = ["virDomain", "virNetwork", "virNetworkPort",
+                   "virInterface", "virStoragePool", "virStorageVol",
                    "virConnect", "virNodeDevice", "virSecret",
                    "virNWFilter", "virNWFilterBinding",
                    "virStream", "virDomainSnapshot"]
@@ -1036,6 +1047,7 @@ primary_classes = ["virDomain", "virNetwork", "virInterface",
 classes_destructors = {
     "virDomain": "virDomainFree",
     "virNetwork": "virNetworkFree",
+    "virNetworkPort": "virNetworkPortFree",
     "virInterface": "virInterfaceFree",
     "virStoragePool": "virStoragePoolFree",
     "virStorageVol": "virStorageVolFree",
@@ -1110,6 +1122,12 @@ def nameFixup(name, classe, type, file):
         func = func[0:1].lower() + func[1:]
     elif name[0:16] == "virNetworkLookup":
         func = name[3:]
+        func = func[0:1].lower() + func[1:]
+    elif name[0:23] == "virNetworkPortCreateXML":
+        func = name[10:]
+        func = func[0:1].lower() + func[1:]
+    elif name[0:20] == "virNetworkPortLookup":
+        func = name[10:]
         func = func[0:1].lower() + func[1:]
     elif name[0:18] == "virInterfaceDefine":
         func = name[3:]
@@ -1199,6 +1217,9 @@ def nameFixup(name, classe, type, file):
         func = name[13:]
         func = func[0:1].lower() + func[1:]
         func = func.replace("dHCP", "DHCP")
+    elif name[0:14] == "virNetworkPort":
+        func = name[14:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:10] == "virNetwork":
         func = name[10:]
         func = func[0:1].lower() + func[1:]

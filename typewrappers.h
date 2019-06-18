@@ -58,6 +58,15 @@ typedef struct {
 } PyvirNetwork_Object;
 
 
+#define PyvirNetworkPort_Get(v) (((v) == Py_None) ? NULL : \
+        (((PyvirNetworkPort_Object *)(v))->obj))
+
+typedef struct {
+    PyObject_HEAD
+    virNetworkPortPtr obj;
+} PyvirNetworkPort_Object;
+
+
 #define PyvirInterface_Get(v) (((v) == Py_None) ? NULL : \
         (((PyvirInterface_Object *)(v))->obj))
 
@@ -192,6 +201,7 @@ int libvirt_charPtrSizeUnwrap(PyObject *obj, char **str, Py_ssize_t *size);
 PyObject * libvirt_virConnectPtrWrap(virConnectPtr node);
 PyObject * libvirt_virDomainPtrWrap(virDomainPtr node);
 PyObject * libvirt_virNetworkPtrWrap(virNetworkPtr node);
+PyObject * libvirt_virNetworkPortPtrWrap(virNetworkPortPtr node);
 PyObject * libvirt_virInterfacePtrWrap(virInterfacePtr node);
 PyObject * libvirt_virStoragePoolPtrWrap(virStoragePoolPtr node);
 PyObject * libvirt_virStorageVolPtrWrap(virStorageVolPtr node);

@@ -9945,6 +9945,99 @@ libvirt_virNodeGetSEVInfo(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
 
+#if LIBVIR_CHECK_VERSION(5, 5, 0)
+static PyObject *
+libvirt_virNetworkPortSetParameters(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    virNetworkPortPtr port;
+    PyObject *pyobj_port, *info;
+    PyObject *ret = NULL;
+    int i_retval;
+    int nparams = 0;
+    Py_ssize_t size = 0;
+    unsigned int flags;
+    virTypedParameterPtr params = NULL, new_params = NULL;
+
+    if (!PyArg_ParseTuple(args,
+                          (char *)"OOI:virNetworkPortSetParameters",
+                          &pyobj_port, &info, &flags))
+        return NULL;
+    port = (virNetworkPortPtr) PyvirNetworkPort_Get(pyobj_port);
+
+    if ((size = PyDict_Size(info)) < 0)
+        return NULL;
+
+    if (size == 0) {
+        PyErr_Format(PyExc_LookupError,
+                     "Need non-empty dictionary to set attributes");
+        return NULL;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virNetworkPortGetParameters(port, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0)
+        return VIR_PY_INT_FAIL;
+
+    if (nparams == 0) {
+        PyErr_Format(PyExc_LookupError,
+                     "Port has no settable attributes");
+        return NULL;
+    }
+
+    new_params = setPyVirTypedParameter(info, params, nparams);
+    if (!new_params)
+        goto cleanup;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virNetworkPortSetParameters(port, new_params, size, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_INT_FAIL;
+        goto cleanup;
+    }
+
+    ret = VIR_PY_INT_SUCCESS;
+
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    virTypedParamsFree(new_params, size);
+    return ret;
+}
+
+static PyObject *
+libvirt_virNetworkPortGetParameters(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    PyObject *pyobj_port;
+    virNetworkPortPtr port;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    PyObject *dict = NULL;
+    unsigned int flags;
+    int rc;
+
+    if (!PyArg_ParseTuple(args, (char *) "OI:virNetworkPortGetParameters",
+                          &pyobj_port, &flags))
+        return NULL;
+    port = (virNetworkPortPtr) PyvirNetworkPort_Get(pyobj_port);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    rc = virNetworkPortGetParameters(port, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (rc < 0)
+        return VIR_PY_NONE;
+
+    dict = getPyVirTypedParameter(params, nparams)))
+
+    virTypedParamsFree(params, nparams);
+    return dict;
+}
+#endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
 
 /************************************************************************
  *									*
@@ -10192,6 +10285,10 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainGetLaunchSecurityInfo", libvirt_virDomainGetLaunchSecurityInfo, METH_VARARGS, NULL},
     {(char *) "virNodeGetSEVInfo", libvirt_virNodeGetSEVInfo, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
+#if LIBVIR_CHECK_VERSION(5, 5, 0)
+    {(char *) "virNetworkPortSetParameters", libvirt_virNetworkPortSetParameters, METH_VARARGS, NULL},
+    {(char *) "virNetworkPortGetParameters", libvirt_virNetworkPortGetParameters, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
     {NULL, NULL, 0, NULL}
 };
 

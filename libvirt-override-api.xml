@@ -764,5 +764,18 @@
       <arg name='virttype' type='const char *' info='optional virtualization type'/>
       <arg name='flags' type='int' info='unused, always pass 0'/>
     </function>
+    <function name='virNetworkPortSetParameters' file='python'>
+      <info>Change the port tunables</info>
+      <return type='int' info='-1 in case of error, 0 in case of success.'/>
+      <arg name='port' type='virNetworkPortPtr' info='pointer to network port object'/>
+      <arg name='params' type='virTypedParameterPtr' info='pointer to tunable objects'/>
+      <arg name='flags'  type='int' info='unused, always pass 0'/>
+    </function>
+    <function name='virNetworkPortGetParameters' file='python'>
+      <info>Get the port parameters</info>
+      <return type='char *' info='None in case of error, returns a dictionary of params'/>
+      <arg name='port' type='virNetworkPortPtr' info='pointer to network port object'/>
+      <arg name='flags'  type='int' info='unused, always pass 0'/>
+    </function>
   </symbols>
 </api>

@@ -452,6 +452,19 @@ libvirt_virNetworkPtrWrap(virNetworkPtr node)
 }
 
 PyObject *
+libvirt_virNetworkPortPtrWrap(virNetworkPortPtr node)
+{
+    PyObject *ret;
+
+    if (node == NULL) {
+        return VIR_PY_NONE;
+    }
+
+    ret = libvirt_buildPyObject(node, "virNetworkPortPtr", NULL);
+    return ret;
+}
+
+PyObject *
 libvirt_virInterfacePtrWrap(virInterfacePtr node)
 {
     PyObject *ret;
