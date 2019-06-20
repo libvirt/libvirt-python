@@ -10032,7 +10032,7 @@ libvirt_virNetworkPortGetParameters(PyObject *self ATTRIBUTE_UNUSED,
     if (rc < 0)
         return VIR_PY_NONE;
 
-    dict = getPyVirTypedParameter(params, nparams)))
+    dict = getPyVirTypedParameter(params, nparams);
 
     virTypedParamsFree(params, nparams);
     return dict;
