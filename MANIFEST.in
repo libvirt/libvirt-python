@@ -24,6 +24,7 @@ include libvirt-override.py
 include libvirt-override-virConnect.py
 include libvirt-override-virDomain.py
 include libvirt-override-virDomainSnapshot.py
+include libvirt-override-virNetwork.py
 include libvirt-override-virStoragePool.py
 include libvirt-override-virStream.py
 include libvirt-python.spec
