@@ -33,6 +33,9 @@ typedef struct _virNWFilterBinding *virNWFilterBindingPtr;
 #if !LIBVIR_CHECK_VERSION(5, 5, 0)
 typedef struct _virNetworkPort *virNetworkPortPtr;
 #endif
+#if !LIBVIR_CHECK_VERSION(5, 6, 0)
+typedef struct _virDomainCheckpoint *virDomainCheckpointPtr;
+#endif
 
 #define PyvirConnect_Get(v) (((v) == Py_None) ? NULL : \
         (((PyvirConnect_Object *)(v))->obj))
