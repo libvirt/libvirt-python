@@ -1213,6 +1213,9 @@ def nameFixup(name, classe, type, file):
     elif name[0:9] == "virDomain":
         func = name[9:]
         func = func[0:1].lower() + func[1:]
+    elif name[0:17] == "virNetworkPortGet":
+        func = name[17:]
+        func = func[0:1].lower() + func[1:]
     elif name[0:13] == "virNetworkGet":
         func = name[13:]
         func = func[0:1].lower() + func[1:]
