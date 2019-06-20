@@ -9947,6 +9947,51 @@ libvirt_virNodeGetSEVInfo(PyObject *self ATTRIBUTE_UNUSED,
 
 #if LIBVIR_CHECK_VERSION(5, 5, 0)
 static PyObject *
+libvirt_virNetworkListAllPorts(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
+    PyObject *pyobj_conn;
+    PyObject *py_retval = NULL;
+    virNetworkPtr conn;
+    virNetworkPortPtr *doms = NULL;
+    int c_retval = 0;
+    ssize_t i;
+    unsigned int flags;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virNetworkListAllPorts",
+                          &pyobj_conn, &flags))
+        return NULL;
+    conn = (virNetworkPtr) PyvirNetwork_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNetworkListAllPorts(conn, &doms, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    if (!(py_retval = PyList_New(c_retval)))
+        goto cleanup;
+
+    for (i = 0; i < c_retval; i++) {
+        VIR_PY_LIST_SET_GOTO(py_retval, i, libvirt_virNetworkPortPtrWrap(doms[i]), error);
+        /* python steals the pointer */
+        doms[i] = NULL;
+    }
+
+ cleanup:
+    for (i = 0; i < c_retval; i++)
+        if (doms[i])
+            virNetworkPortFree(doms[i]);
+    VIR_FREE(doms);
+    return py_retval;
+
+ error:
+    Py_CLEAR(py_retval);
+    goto cleanup;
+}
+
+static PyObject *
 libvirt_virNetworkPortSetParameters(PyObject *self ATTRIBUTE_UNUSED,
                                     PyObject *args)
 {
@@ -10286,6 +10331,7 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virNodeGetSEVInfo", libvirt_virNodeGetSEVInfo, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(4, 5, 0) */
 #if LIBVIR_CHECK_VERSION(5, 5, 0)
+    {(char *) "virNetworkListAllPorts", libvirt_virNetworkListAllPorts, METH_VARARGS, NULL},
     {(char *) "virNetworkPortSetParameters", libvirt_virNetworkPortSetParameters, METH_VARARGS, NULL},
     {(char *) "virNetworkPortGetParameters", libvirt_virNetworkPortGetParameters, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
