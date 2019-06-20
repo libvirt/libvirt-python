@@ -220,7 +220,7 @@ for name in sorted(basicklassmap):
 
     # The object lifecycle APIs are irrelevant since they're
     # used inside the object constructors/destructors.
-    if func in ["Ref", "Free", "New", "GetConnect", "GetDomain"]:
+    if func in ["Ref", "Free", "New", "GetConnect", "GetDomain", "GetNetwork"]:
         if klass == "virStream" and func == "New":
             klass = "virConnect"
             func = "NewStream"
@@ -272,6 +272,9 @@ for name in sorted(basicklassmap):
         elif klass == "virStorageVol" and func in ["StorageVolCreateXMLFrom", "StorageVolCreateXML"]:
             klass = "virStoragePool"
             func = func[10:]
+        elif klass == "virNetworkPort":
+            klass = "virNetwork"
+            func = func[7:]
         elif func == "StoragePoolLookupByVolume":
             klass = "virStorageVol"
         elif func == "StorageVolLookupByName":
