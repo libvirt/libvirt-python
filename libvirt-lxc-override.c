@@ -83,7 +83,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
         goto error;
 
     for (i = 0; i < c_retval; i++)
-        VIR_PY_LIST_APPEND_GOTO(py_retval, libvirt_intWrap(fdlist[1]), error);
+        VIR_PY_LIST_APPEND_GOTO(py_retval, libvirt_intWrap(fdlist[i]), error);
 
  cleanup:
     VIR_FREE(fdlist);
