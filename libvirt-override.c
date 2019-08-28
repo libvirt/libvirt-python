@@ -10176,6 +10176,39 @@ libvirt_virNetworkPortGetParameters(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
 
+#if LIBVIR_CHECK_VERSION(5, 7, 0)
+static PyObject *
+libvirt_virDomainGetGuestInfo(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *dict = NULL;
+    virDomainPtr dom = NULL;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int types;
+    unsigned int flags;
+    int rc;
+
+    if (!PyArg_ParseTuple(args, (char *) "OII:virDomainGetGuestInfo",
+                          &pyobj_dom, &types, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    rc = virDomainGetGuestInfo(dom, types, &params, &nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (rc < 0)
+        return VIR_PY_NONE;
+
+    dict = getPyVirTypedParameter(params, nparams);
+
+    virTypedParamsFree(params, nparams);
+    return dict;
+}
+#endif /* LIBVIR_CHECK_VERSION(5, 7, 0) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -10431,6 +10464,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virNetworkPortSetParameters", libvirt_virNetworkPortSetParameters, METH_VARARGS, NULL},
     {(char *) "virNetworkPortGetParameters", libvirt_virNetworkPortGetParameters, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
+#if LIBVIR_CHECK_VERSION(5, 7, 0)
+    {(char *) "virDomainGetGuestInfo", libvirt_virDomainGetGuestInfo, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(5, 7, 0) */
     {NULL, NULL, 0, NULL}
 };
 

@@ -507,6 +507,7 @@ skip_impl = (
     'virNodeGetSEVInfo',
     'virNetworkPortGetParameters',
     'virNetworkPortSetParameters',
+    'virDomainGetGuestInfo',
 )
 
 lxc_skip_impl = (

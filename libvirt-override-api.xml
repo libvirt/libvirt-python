@@ -789,5 +789,12 @@
       <arg name='port' type='virNetworkPortPtr' info='pointer to network port object'/>
       <arg name='flags'  type='int' info='unused, always pass 0'/>
     </function>
+    <function name='virDomainGetGuestInfo' file='python'>
+      <info>Get aggregated info from guest agent</info>
+      <return type='char *' info='None in case of error, returns a dictionary of params'/>
+      <arg name='dom' type='virDomainPtr' info='pointer to the domain'/>
+      <arg name='types' type='int' info='optional binary-OR of virDomainGuestInfoTypes'/>
+      <arg name='flags' type='int' info='unused, always pass 0'/>
+    </function>
   </symbols>
 </api>
