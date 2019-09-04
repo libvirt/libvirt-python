@@ -9927,7 +9927,7 @@ libvirt_virConnectBaselineHypervisorCPU(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     char **xmlCPUs = NULL;
     int ncpus = 0;
-    size_t i;
+    ssize_t i;
     char *cpu;
     PyObject *ret = NULL;
 
