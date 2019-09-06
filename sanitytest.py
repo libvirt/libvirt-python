@@ -22,6 +22,21 @@ def get_libvirt_api_xml_path():
         sys.exit(proc.returncode)
     return stdout.splitlines()[0]
 
+def sanitize_enum_val(value):
+    if value == 'VIR_TYPED_PARAM_INT':
+        value = 1
+    elif value == 'VIR_TYPED_PARAM_UINT':
+        value = 2
+    elif value == 'VIR_TYPED_PARAM_LLONG':
+        value = 3
+    elif value == 'VIR_TYPED_PARAM_ULLONG':
+        value = 4
+    elif value == 'VIR_TYPED_PARAM_DOUBLE':
+        value = 5
+    elif value == 'VIR_TYPED_PARAM_BOOLEAN':
+        value = 6
+    return value
+
 # Path to the libvirt API XML file
 if len(sys.argv) >= 3:
     xml = sys.argv[2]
@@ -48,8 +63,8 @@ set = tree.xpath('/api/symbols/enum')
 for n in set:
     typ = n.attrib['type']
     name = n.attrib['name']
-    val = n.attrib['value']
-
+    #val = n.attrib['value']
+    val = sanitize_enum_val(n.attrib['value'])
     if typ not in enumvals:
         enumvals[typ] = {}
 
