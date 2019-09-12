@@ -357,7 +357,7 @@ for klass in gotfunctions:
     for func in sorted(gotfunctions[klass]):
         # These are pure python methods with no C APi
         if func in ["connect", "getConnect", "domain", "getDomain",
-                    "virEventInvokeFreeCallback",
+                    "virEventInvokeFreeCallback", "network",
                     "sparseRecvAll", "sparseSendAll"]:
             continue
 
