@@ -489,6 +489,7 @@ skip_impl = (
     'virDomainGetDiskErrors',
     'virNodeGetMemoryParameters',
     'virNodeSetMemoryParameters',
+    'virConnectSetIdentity',
     'virNodeGetCPUMap',
     'virDomainMigrate3',
     'virDomainMigrateToURI3',

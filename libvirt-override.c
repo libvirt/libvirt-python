@@ -10222,6 +10222,67 @@ libvirt_virDomainGetGuestInfo(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(5, 7, 0) */
 
+
+#if LIBVIR_CHECK_VERSION(5, 8, 0)
+static virPyTypedParamsHint virPyConnectSetIdentityParams[] = {
+    { VIR_CONNECT_IDENTITY_USER_NAME, VIR_TYPED_PARAM_STRING },
+    { VIR_CONNECT_IDENTITY_UNIX_USER_ID, VIR_TYPED_PARAM_ULLONG },
+    { VIR_CONNECT_IDENTITY_GROUP_NAME, VIR_TYPED_PARAM_STRING },
+    { VIR_CONNECT_IDENTITY_UNIX_GROUP_ID, VIR_TYPED_PARAM_ULLONG },
+    { VIR_CONNECT_IDENTITY_PROCESS_ID, VIR_TYPED_PARAM_LLONG },
+    { VIR_CONNECT_IDENTITY_PROCESS_TIME, VIR_TYPED_PARAM_ULLONG },
+    { VIR_CONNECT_IDENTITY_SASL_USER_NAME, VIR_TYPED_PARAM_STRING },
+    { VIR_CONNECT_IDENTITY_X509_DISTINGUISHED_NAME, VIR_TYPED_PARAM_STRING },
+    { VIR_CONNECT_IDENTITY_SELINUX_CONTEXT, VIR_TYPED_PARAM_STRING },
+};
+
+static PyObject *
+libvirt_virConnectSetIdentity(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
+    virConnectPtr conn;
+    PyObject *pyobj_conn, *dict;
+    PyObject *ret = NULL;
+    int i_retval;
+    int nparams = 0;
+    unsigned int flags;
+    virTypedParameterPtr params = NULL;
+
+    if (!PyArg_ParseTuple(args,
+                          (char *)"OOI:virConnectSetIdentity",
+                          &pyobj_conn, &dict, &flags))
+        return NULL;
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    if (!PyDict_Check(dict)) {
+        PyErr_Format(PyExc_TypeError, "migration params must be a dictionary");
+        return NULL;
+    }
+
+    if (virPyDictToTypedParams(dict, &params, &nparams,
+                               virPyConnectSetIdentityParams,
+                               VIR_N_ELEMENTS(virPyConnectSetIdentityParams)) < 0) {
+        return NULL;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    i_retval = virConnectSetIdentity(conn, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (i_retval < 0) {
+        ret = VIR_PY_INT_FAIL;
+        goto cleanup;
+    }
+
+    ret = VIR_PY_INT_SUCCESS;
+
+ cleanup:
+    virTypedParamsFree(params, nparams);
+    return ret;
+}
+#endif /* LIBVIR_CHECK_VERSION(5, 8, 0) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -10480,6 +10541,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(5, 7, 0)
     {(char *) "virDomainGetGuestInfo", libvirt_virDomainGetGuestInfo, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(5, 7, 0) */
+#if LIBVIR_CHECK_VERSION(5, 8, 0)
+    {(char *) "virConnectSetIdentity", libvirt_virConnectSetIdentity, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(5, 8, 0) */
     {NULL, NULL, 0, NULL}
 };
 
