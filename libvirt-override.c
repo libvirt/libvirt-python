@@ -409,6 +409,11 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
             key = libvirt_constcharPtrWrap("last_update");
             break;
 #endif /* LIBVIR_CHECK_VERSION(2, 1, 0) */
+#if LIBVIR_CHECK_VERSION(4, 6, 0)
+        case VIR_DOMAIN_MEMORY_STAT_DISK_CACHES:
+            key = libvirt_constcharPtrWrap("disk_caches");
+            break;
+#endif /* LIBVIR_CHECK_VERSION(4, 6, 0) */
         default:
             continue;
         }
