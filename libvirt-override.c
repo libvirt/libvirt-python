@@ -414,6 +414,14 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
             key = libvirt_constcharPtrWrap("disk_caches");
             break;
 #endif /* LIBVIR_CHECK_VERSION(4, 6, 0) */
+#if LIBVIR_CHECK_VERSION(5, 4, 0)
+        case VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGALLOC:
+            key = libvirt_constcharPtrWrap("hugetlb_pgalloc");
+            break;
+        case VIR_DOMAIN_MEMORY_STAT_HUGETLB_PGFAIL:
+            key = libvirt_constcharPtrWrap("hugetlb_pgfail");
+            break;
+#endif /* LIBVIR_CHECK_VERSION(5, 4, 0) */
         default:
             continue;
         }
