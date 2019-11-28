@@ -261,6 +261,12 @@ def lxc_enum(type, name, value):
 def qemu_enum(type, name, value):
     if type not in qemu_enums:
         qemu_enums[type] = {}
+    if value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_BLOCK':
+        value = -2
+    elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_DEFAULT':
+        value = -1
+    elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_NOWAIT':
+        value = 0
     if onlyOverrides and name not in qemu_enums[type]:
         return
     qemu_enums[type][name] = value
