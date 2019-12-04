@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # netdhcpleases - print leases info for given virtual network
 
 import libvirt

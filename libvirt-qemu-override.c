@@ -4,13 +4,13 @@
  *           entry points where an automatically generated stub is
  *           unpractical
  *
- * Copyright (C) 2011-2014 Red Hat, Inc.
+ * Copyright (C) 2011-2019 Red Hat, Inc.
  *
  * Daniel Veillard <veillard@redhat.com>
  */
 
 /* Horrible kludge to work around even more horrible name-space pollution
-   via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
+   via Python.h.  That file includes /usr/include/python3.x/pyconfig*.h,
    which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
 #undef HAVE_PTHREAD_H
 
@@ -21,18 +21,10 @@
 #include "libvirt-utils.h"
 #include "build/libvirt-qemu.h"
 
-#if PY_MAJOR_VERSION > 2
-# ifndef __CYGWIN__
+#ifndef __CYGWIN__
 extern PyObject *PyInit_libvirtmod_qemu(void);
-# else
-extern PyObject *PyInit_cygvirtmod_qemu(void);
-# endif
 #else
-# ifndef __CYGWIN__
-extern void initlibvirtmod_qemu(void);
-# else
-extern void initcygvirtmod_qemu(void);
-# endif
+extern PyObject *PyInit_cygvirtmod_qemu(void);
 #endif
 
 #if 0
@@ -351,14 +343,13 @@ static PyMethodDef libvirtQemuMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-#if PY_MAJOR_VERSION > 2
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
-# ifndef __CYGWIN__
+#ifndef __CYGWIN__
     "libvirtmod_qemu",
-# else
+#else
     "cygvirtmod_qemu",
-# endif
+#endif
     NULL,
     -1,
     libvirtQemuMethods,
@@ -369,11 +360,11 @@ static struct PyModuleDef moduledef = {
 };
 
 PyObject *
-# ifndef __CYGWIN__
+#ifndef __CYGWIN__
 PyInit_libvirtmod_qemu
-# else
+#else
 PyInit_cygvirtmod_qemu
-# endif
+#endif
 (void)
 {
     PyObject *module;
@@ -385,25 +376,3 @@ PyInit_cygvirtmod_qemu
 
     return module;
 }
-#else /* ! PY_MAJOR_VERSION > 2 */
-void
-# ifndef __CYGWIN__
-initlibvirtmod_qemu
-# else
-initcygvirtmod_qemu
-# endif
-(void)
-{
-    if (virInitialize() < 0)
-        return;
-
-    /* initialize the python extension module */
-    Py_InitModule((char *)
-# ifndef __CYGWIN__
-                  "libvirtmod_qemu",
-# else
-                  "cygvirtmod_qemu",
-# endif
-                  libvirtQemuMethods);
-}
-#endif /* ! PY_MAJOR_VERSION > 2 */

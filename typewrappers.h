@@ -22,11 +22,6 @@
 # define ATTRIBUTE_UNUSED
 #endif
 
-/* Work around really old python.  */
-#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 5
-typedef ssize_t Py_ssize_t;
-#endif
-
 #if !LIBVIR_CHECK_VERSION(4, 5, 0)
 typedef struct _virNWFilterBinding *virNWFilterBindingPtr;
 #endif

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # domipaddrs - print domain interfaces along with their MAC and IP addresses
 
 import libvirt

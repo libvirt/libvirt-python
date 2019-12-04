@@ -1,7 +1,7 @@
 /*
  * libvirt-utils.c: misc helper APIs for python binding
  *
- * Copyright (C) 2013 Red Hat, Inc.
+ * Copyright (C) 2013-2019 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -274,11 +274,7 @@ setPyVirTypedParameter(PyObject *info,
                        int nparams)
 {
     PyObject *key, *value;
-#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION <= 4
-    int pos = 0;
-#else
     Py_ssize_t pos = 0;
-#endif
     virTypedParameterPtr temp = NULL, ret = NULL;
     Py_ssize_t size;
     ssize_t i;
@@ -416,13 +412,6 @@ virPyDictToTypedParamOne(virTypedParameterPtr *params,
                 type = VIR_TYPED_PARAM_LLONG;
             else
                 type = VIR_TYPED_PARAM_ULLONG;
-#if PY_MAJOR_VERSION < 3
-        } else if (PyInt_Check(value)) {
-            if (PyInt_AS_LONG(value) < 0)
-                type = VIR_TYPED_PARAM_LLONG;
-            else
-                type = VIR_TYPED_PARAM_ULLONG;
-#endif
         } else if (PyFloat_Check(value)) {
             type = VIR_TYPED_PARAM_DOUBLE;
         }
@@ -520,11 +509,7 @@ virPyDictToTypedParams(PyObject *dict,
 {
     PyObject *key;
     PyObject *value;
-#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION <= 4
-    int pos = 0;
-#else
     Py_ssize_t pos = 0;
-#endif
     virTypedParameterPtr params = NULL;
     int n = 0;
     int max = 0;

@@ -139,11 +139,7 @@ int virReallocN(void *ptrptr, size_t size, size_t count)
 void virFree(void *ptrptr) ATTRIBUTE_NONNULL(1);
 
 
-# if PY_MAJOR_VERSION > 2
-#  define libvirt_PyString_Check PyUnicode_Check
-# else
-#  define libvirt_PyString_Check PyString_Check
-# endif
+# define libvirt_PyString_Check PyUnicode_Check
 
 
 #define VIR_N_ELEMENTS(array) (sizeof(array) / sizeof(*(array)))

@@ -2,141 +2,88 @@
  * types.c: converter functions between the internal representation
  *          and the Python objects
  *
- * Copyright (C) 2005, 2007, 2012 Red Hat, Inc.
+ * Copyright (C) 2005-2019 Red Hat, Inc.
  *
  * Daniel Veillard <veillard@redhat.com>
  */
 
 /* Horrible kludge to work around even more horrible name-space pollution
- *    via Python.h.  That file includes /usr/include/python2.5/pyconfig*.h,
- *       which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
+ * via Python.h.  That file includes /usr/include/python3.x/pyconfig*.h,
+ * which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
 #undef HAVE_PTHREAD_H
 
 #include "typewrappers.h"
 #include "libvirt-utils.h"
-
-#ifndef Py_CAPSULE_H
-typedef void(*PyCapsule_Destructor)(void *, void *);
-#endif
 
 static PyObject *
 libvirt_buildPyObject(void *cobj,
                       const char *name,
                       PyCapsule_Destructor destr)
 {
-    PyObject *ret;
-
-#ifdef Py_CAPSULE_H
-    ret = PyCapsule_New(cobj, name, destr);
-#else
-    ret = PyCObject_FromVoidPtrAndDesc(cobj, (void *) name, destr);
-#endif /* _TEST_CAPSULE */
-
-    return ret;
+    return PyCapsule_New(cobj, name, destr);
 }
 
 PyObject *
 libvirt_intWrap(int val)
 {
-    PyObject *ret;
-#if PY_MAJOR_VERSION > 2
-    ret = PyLong_FromLong((long) val);
-#else
-    ret = PyInt_FromLong((long) val);
-#endif
-    return ret;
+    return PyLong_FromLong((long) val);
 }
 
 PyObject *
 libvirt_uintWrap(uint val)
 {
-    PyObject *ret;
-#if PY_MAJOR_VERSION > 2
-    ret = PyLong_FromLong((long) val);
-#else
-    ret = PyInt_FromLong((long) val);
-#endif
-    return ret;
+    return PyLong_FromLong((long) val);
 }
 
 PyObject *
 libvirt_longWrap(long val)
 {
-    PyObject *ret;
-    ret = PyLong_FromLong(val);
-    return ret;
+    return PyLong_FromLong(val);
 }
 
 PyObject *
 libvirt_ulongWrap(unsigned long val)
 {
-    PyObject *ret;
-    ret = PyLong_FromLong(val);
-    return ret;
+    return PyLong_FromLong(val);
 }
 
 PyObject *
 libvirt_longlongWrap(long long val)
 {
-    PyObject *ret;
-    ret = PyLong_FromLongLong(val);
-    return ret;
+    return PyLong_FromLongLong(val);
 }
 
 PyObject *
 libvirt_ulonglongWrap(unsigned long long val)
 {
-    PyObject *ret;
-    ret = PyLong_FromUnsignedLongLong(val);
-    return ret;
+    return PyLong_FromUnsignedLongLong(val);
 }
 
 PyObject *
 libvirt_charPtrSizeWrap(char *str, Py_ssize_t size)
 {
-    PyObject *ret;
-
     if (str == NULL) {
         return VIR_PY_NONE;
     }
-#if PY_MAJOR_VERSION > 2
-    ret = PyBytes_FromStringAndSize(str, size);
-#else
-    ret = PyString_FromStringAndSize(str, size);
-#endif
-    return ret;
+    return PyBytes_FromStringAndSize(str, size);
 }
 
 PyObject *
 libvirt_charPtrWrap(char *str)
 {
-    PyObject *ret;
-
     if (str == NULL) {
         return VIR_PY_NONE;
     }
-#if PY_MAJOR_VERSION > 2
-    ret = PyUnicode_FromString(str);
-#else
-    ret = PyString_FromString(str);
-#endif
-    return ret;
+    return PyUnicode_FromString(str);
 }
 
 PyObject *
 libvirt_constcharPtrWrap(const char *str)
 {
-    PyObject *ret;
-
     if (str == NULL) {
         return VIR_PY_NONE;
     }
-#if PY_MAJOR_VERSION > 2
-    ret = PyUnicode_FromString(str);
-#else
-    ret = PyString_FromString(str);
-#endif
-    return ret;
+    return PyUnicode_FromString(str);
 }
 
 PyObject *
@@ -163,11 +110,7 @@ libvirt_intUnwrap(PyObject *obj,
      * to C long type directly. If it is of PyLong_Type, PyInt_AsLong
      * will call PyLong_AsLong() to deal with it automatically.
      */
-#if PY_MAJOR_VERSION > 2
     long_val = PyLong_AsLong(obj);
-#else
-    long_val = PyInt_AsLong(obj);
-#endif
     if ((long_val == -1) && PyErr_Occurred())
         return -1;
 
@@ -196,11 +139,7 @@ libvirt_uintUnwrap(PyObject *obj,
         return -1;
     }
 
-#if PY_MAJOR_VERSION > 2
     long_val = PyLong_AsLong(obj);
-#else
-    long_val = PyInt_AsLong(obj);
-#endif
     if ((long_val == -1) && PyErr_Occurred())
         return -1;
 
@@ -269,14 +208,7 @@ libvirt_longlongUnwrap(PyObject *obj,
         return -1;
     }
 
-#if PY_MAJOR_VERSION == 2
-    /* If obj is of PyInt_Type, PyLong_AsLongLong
-     * will call PyInt_AsLong() to handle it automatically.
-     */
-    if (PyInt_Check(obj) || PyLong_Check(obj))
-#else
     if (PyLong_Check(obj))
-#endif
         llong_val = PyLong_AsLongLong(obj);
     else
         PyErr_SetString(PyExc_TypeError, "an integer is required");
@@ -299,21 +231,7 @@ libvirt_ulonglongUnwrap(PyObject *obj,
         return -1;
     }
 
-#if PY_MAJOR_VERSION == 2
-    /* The PyLong_AsUnsignedLongLong doesn't check the type of
-     * obj, only accept argument of PyLong_Type, so we check it instead.
-     */
-    if (PyInt_Check(obj)) {
-        long long llong_val = PyInt_AsLong(obj);
-        if (llong_val < 0)
-            PyErr_SetString(PyExc_OverflowError,
-                            "negative Python int cannot be converted to C unsigned long long");
-        else
-            ullong_val = llong_val;
-    } else if (PyLong_Check(obj)) {
-#else
     if (PyLong_Check(obj)) {
-#endif
         ullong_val = PyLong_AsUnsignedLongLong(obj);
     } else {
         PyErr_SetString(PyExc_TypeError, "an integer is required");
@@ -367,9 +285,7 @@ int
 libvirt_charPtrUnwrap(PyObject *obj,
                       char **str)
 {
-#if PY_MAJOR_VERSION > 2
     PyObject *bytes;
-#endif
     const char *ret;
     *str = NULL;
     if (!obj) {
@@ -377,21 +293,15 @@ libvirt_charPtrUnwrap(PyObject *obj,
         return -1;
     }
 
-#if PY_MAJOR_VERSION > 2
     if (!(bytes = PyUnicode_AsUTF8String(obj)))
         return -1;
     ret = PyBytes_AsString(bytes);
-#else
-    ret = PyString_AsString(obj);
-#endif
     if (ret) {
         *str = strdup(ret);
         if (!*str)
             PyErr_NoMemory();
     }
-#if PY_MAJOR_VERSION > 2
     Py_DECREF(bytes);
-#endif
     return ret && *str ? 0 : -1;
 }
 
@@ -400,10 +310,6 @@ libvirt_charPtrSizeUnwrap(PyObject *obj,
                           char **str,
                           Py_ssize_t *size)
 {
-    int ret;
-#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION <= 4
-    int isize;
-#endif
     *str = NULL;
     *size = 0;
     if (!obj) {
@@ -411,18 +317,7 @@ libvirt_charPtrSizeUnwrap(PyObject *obj,
         return -1;
     }
 
-#if PY_MAJOR_VERSION > 2
-    ret = PyBytes_AsStringAndSize(obj, str, size);
-#else
-# if PY_MINOR_VERSION <= 4
-    ret = PyString_AsStringAndSize(obj, str, &isize);
-    *size = isize;
-# else
-    ret = PyString_AsStringAndSize(obj, str, size);
-# endif
-#endif
-
-    return ret;
+    return PyBytes_AsStringAndSize(obj, str, size);
 }
 
 PyObject *

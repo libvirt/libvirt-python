@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # domstart - make sure a given domU is running, if not start it
 
 import libvirt

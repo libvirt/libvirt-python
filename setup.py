@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
@@ -16,6 +16,10 @@ import os.path
 import re
 import shutil
 import time
+
+if sys.version_info[0] != 3:
+    print("libvirt-python requires Python 3.x to build")
+    sys.exit(1)
 
 MIN_LIBVIRT = "0.9.11"
 MIN_LIBVIRT_LXC = "1.0.2"
@@ -341,7 +345,7 @@ setup(name = 'libvirt-python',
       description = 'The libvirt virtualization API python binding',
       long_description =
         '''The libvirt-python package provides a module that permits applications
-written in the Python programming language to call the interface
+written in the Python 3.x programming language to call the interface
 supplied by the libvirt library, to manage the virtualization capabilities
 of recent versions of Linux (and other OSes).''',
       license = 'LGPLv2+',
@@ -362,7 +366,6 @@ of recent versions of Linux (and other OSes).''',
           "Intended Audience :: Developers",
           "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
           "Programming Language :: Python",
-          "Programming Language :: Python :: 2",
           "Programming Language :: Python :: 3",
       ]
 )

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # esxlist - list active domains of an ESX host and print some info.
 #           also demonstrates how to use the libvirt.openAuth() method
 
