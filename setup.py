@@ -297,6 +297,7 @@ class my_test(Command):
             "nosetests-%d.%d" % (sys.version_info[0],
                                  sys.version_info[1]),
             "nosetests-%d" % (sys.version_info[0]),
+            "nosetests%d" % (sys.version_info[0]),
             "nosetests",
         ]
 
