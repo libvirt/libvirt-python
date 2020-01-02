@@ -10185,6 +10185,86 @@ libvirt_virNetworkPortGetParameters(PyObject *self ATTRIBUTE_UNUSED,
     virTypedParamsFree(params, nparams);
     return dict;
 }
+
+static PyObject *
+libvirt_virNetworkPortGetUUID(PyObject *self ATTRIBUTE_UNUSED,
+                              PyObject *args)
+{
+    unsigned char uuid[VIR_UUID_BUFLEN];
+    virNetworkPortPtr port;
+    PyObject *pyobj_port;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virNetworkPortGetUUID", &pyobj_port))
+        return NULL;
+    port = (virNetworkPortPtr) PyvirNetworkPort_Get(pyobj_port);
+
+    if (port == NULL)
+        return VIR_PY_NONE;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNetworkPortGetUUID(port, &uuid[0]);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    return libvirt_charPtrSizeWrap((char *) &uuid[0], VIR_UUID_BUFLEN);
+}
+
+static PyObject *
+libvirt_virNetworkPortGetUUIDString(PyObject *self ATTRIBUTE_UNUSED,
+                                    PyObject *args)
+{
+    char uuidstr[VIR_UUID_STRING_BUFLEN];
+    virNetworkPortPtr port;
+    PyObject *pyobj_port;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virNetworkPortGetUUIDString",
+                          &pyobj_port))
+        return NULL;
+    port = (virNetworkPortPtr) PyvirNetworkPort_Get(pyobj_port);
+
+    if (port == NULL)
+        return VIR_PY_NONE;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNetworkPortGetUUIDString(port, &uuidstr[0]);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_NONE;
+
+    return libvirt_constcharPtrWrap((char *) &uuidstr[0]);
+}
+
+static PyObject *
+libvirt_virNetworkPortLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
+                                   PyObject *args)
+{
+    virNetworkPortPtr c_retval;
+    virNetworkPtr net;
+    PyObject *pyobj_net;
+    unsigned char *uuid;
+    int len;
+
+    if (!PyArg_ParseTuple(args, (char *)"Oz#:virNetworkPortLookupByUUID",
+                          &pyobj_net, &uuid, &len))
+        return NULL;
+    net = (virNetworkPtr) PyvirNetwork_Get(pyobj_net);
+
+    if ((uuid == NULL) || (len != VIR_UUID_BUFLEN))
+        return VIR_PY_NONE;
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNetworkPortLookupByUUID(net, uuid);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    return libvirt_virNetworkPortPtrWrap((virNetworkPortPtr) c_retval);
+}
+
+
 #endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
 
 #if LIBVIR_CHECK_VERSION(5, 7, 0)
@@ -10535,6 +10615,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virNetworkListAllPorts", libvirt_virNetworkListAllPorts, METH_VARARGS, NULL},
     {(char *) "virNetworkPortSetParameters", libvirt_virNetworkPortSetParameters, METH_VARARGS, NULL},
     {(char *) "virNetworkPortGetParameters", libvirt_virNetworkPortGetParameters, METH_VARARGS, NULL},
+    {(char *) "virNetworkPortGetUUID", libvirt_virNetworkPortGetUUID, METH_VARARGS, NULL},
+    {(char *) "virNetworkPortGetUUIDString", libvirt_virNetworkPortGetUUIDString, METH_VARARGS, NULL},
+    {(char *) "virNetworkPortLookupByUUID", libvirt_virNetworkPortLookupByUUID, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(5, 5, 0) */
 #if LIBVIR_CHECK_VERSION(5, 7, 0)
     {(char *) "virDomainGetGuestInfo", libvirt_virDomainGetGuestInfo, METH_VARARGS, NULL},
