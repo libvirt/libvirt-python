@@ -1541,13 +1541,10 @@ def buildWrappers(module):
                 # contents of functions_int_*:
                 elif is_integral_type(ret[0]):
                     if name not in functions_noexcept:
-                        if name in functions_int_exception_test:
-                            test = functions_int_exception_test[name]
-                        else:
-                            test = functions_int_default_test
-                        classes.write(("    if " + test +
-                                       ": raise libvirtError ('%s() failed')\n") %
-                                      ("ret", name))
+                        test = functions_int_exception_test.get(name, functions_int_default_test) % ("ret",)
+                        classes.write(
+                            "    if %s: raise libvirtError ('%s() failed')\n" %
+                            (test, name))
                     classes.write("    return ret\n")
 
                 elif is_python_noninteger_type(ret[0]):
