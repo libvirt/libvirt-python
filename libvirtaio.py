@@ -373,7 +373,9 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventUpdateHandleFunc
         '''
         self.log.debug('update_handle(watch=%d, event=%d)', watch, event)
-        self.callbacks[watch].update(event=event)
+        callback = self.callbacks[watch]
+        assert isinstance(callback, FDCallback)
+        callback.update(event=event)
 
     def _remove_handle(self, watch):
         '''Unregister a callback from a file handle.
@@ -390,6 +392,7 @@ class virEventAsyncIOImpl(object):
         except KeyError as err:
             self.log.warning('remove_handle(): no such handle: %r', err.args[0])
             return -1
+        assert isinstance(callback, FDCallback)
         fd = callback.descriptor.fd
         assert callback is self.descriptors[fd].remove_handle(watch)
         if len(self.descriptors[fd].callbacks) == 0:
@@ -429,7 +432,9 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventUpdateTimeoutFunc
         '''
         self.log.debug('update_timeout(timer=%d, timeout=%d)', timer, timeout)
-        self.callbacks[timer].update(timeout=timeout)
+        callback = self.callbacks[timer]
+        assert isinstance(callback, TimeoutCallback)
+        callback.update(timeout=timeout)
 
     def _remove_timeout(self, timer):
         '''Unregister a callback for a timer
