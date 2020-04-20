@@ -67,7 +67,6 @@ class Callback(object):
     _iden_counter = itertools.count()
 
     def __init__(self, impl: "virEventAsyncIOImpl", cb: Callable[[int, _T], None], opaque: _T, ) -> None:
-        super().__init__(*args, **kwargs)
         self.iden = next(self._iden_counter)
         self.impl = impl
         self.cb = cb
