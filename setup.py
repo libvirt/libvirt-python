@@ -17,8 +17,8 @@ import re
 import shutil
 import time
 
-if sys.version_info[0] != 3:
-    print("libvirt-python requires Python 3.x to build")
+if sys.version_info < (3, 5):
+    print("libvirt-python requires Python >= 3.5 to build")
     sys.exit(1)
 
 MIN_LIBVIRT = "0.9.11"
@@ -368,5 +368,9 @@ of recent versions of Linux (and other OSes).''',
           "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
           "Programming Language :: Python",
           "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7",
+          "Programming Language :: Python :: 3.8",
       ]
 )
