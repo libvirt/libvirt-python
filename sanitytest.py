@@ -40,12 +40,9 @@ wantenums = []
 wantfunctions = []
 
 # Phase 1: Identify all functions and enums in public API
-set = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
-for n in set:
-    wantfunctions.append(n)
+wantfunctions = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
 
-set = tree.xpath('/api/symbols/enum')
-for n in set:
+for n in tree.xpath('/api/symbols/enum'):
     typ = n.attrib['type']
     name = n.attrib['name']
     val = n.attrib['value']
@@ -82,8 +79,7 @@ for n in second_pass:
         print("Cannot get a value of enum %s (originally %s)" % (val, name))
     enumvals[typ][name] = val
 
-set = tree.xpath('/api/files/file/exports[@type="enum"]/@symbol')
-for n in set:
+for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
     for enumval in enumvals.values():
         if n in enumval:
             enum = enumval
