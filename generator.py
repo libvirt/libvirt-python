@@ -1479,24 +1479,18 @@ def buildWrappers(module):
                              "virStorageVol", "virNodeDevice", "virSecret", "virStream",
                              "virNWFilter", "virNWFilterBinding"]:
                 classes.write("    def __init__(self, conn, _obj=None):\n")
-            elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
-                classes.write("    def __init__(self, dom, _obj=None):\n")
-            elif classname in ["virNetworkPort"]:
-                classes.write("    def __init__(self, net, _obj=None):\n")
-            else:
-                classes.write("    def __init__(self, _obj=None):\n")
-            if classname in ["virDomain", "virNetwork", "virInterface",
-                             "virNodeDevice", "virSecret", "virStream",
-                             "virNWFilter", "virNWFilterBinding"]:
                 classes.write("        self._conn = conn\n")
-            elif classname in ["virStorageVol", "virStoragePool"]:
-                classes.write("        self._conn = conn if isinstance(conn, virConnect) else conn._conn  # type: virConnect\n")
             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
+                classes.write("    def __init__(self, net, _obj=None):\n")
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
             elif classname in ["virNetworkPort"]:
+                classes.write("    def __init__(self, net, _obj=None) -> None:\n")
                 classes.write("        self._net = net\n")
                 classes.write("        self._conn = net.connect()\n")
+            else:
+                classes.write("    def __init__(self, _obj=None):\n")
+
             classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
             classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
             classes.write("        self._o = _obj\n\n")
