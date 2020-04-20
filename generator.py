@@ -1485,10 +1485,12 @@ def buildWrappers(module: str) -> None:
                 classes.write("    # methods. This corresponds to the size of payload\n")
                 classes.write("    # of a stream packet.\n")
                 classes.write("    streamBufSize = 262120\n\n")
-            if classname in ["virDomain", "virNetwork", "virInterface", "virStoragePool",
-                             "virStorageVol", "virNodeDevice", "virSecret", "virStream",
+            if classname in ["virDomain", "virNetwork", "virInterface",
+                             "virNodeDevice", "virSecret", "virStream",
                              "virNWFilter", "virNWFilterBinding"]:
                 classes.write("    def __init__(self, conn: 'virConnect', _obj=None) -> None:\n")
+            elif classname in ["virStoragePool", "virStorageVol"]:
+                classes.write("    def __init__(self, conn: Union['virConnect', 'virStoragePool', 'virStorageVol'], _obj=None) -> None:\n")
             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                 classes.write("    def __init__(self, dom: 'virDomain', _obj=None) -> None:\n")
             elif classname in ["virNetworkPort"]:
@@ -1501,9 +1503,7 @@ def buildWrappers(module: str) -> None:
                              "virNWFilter", "virNWFilterBinding"]:
                 classes.write("        self._conn = conn\n")
             elif classname in ["virStorageVol", "virStoragePool"]:
-                classes.write("        self._conn = conn\n"
-                              "        if not isinstance(conn, virConnect):\n"
-                              "            self._conn = conn._conn\n")
+                classes.write("        self._conn = conn if isinstance(conn, virConnect) else conn._conn  # type: virConnect\n")
             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
