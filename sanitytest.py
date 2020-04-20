@@ -93,7 +93,7 @@ gottypes = []  # type: List[str]
 gotfunctions = {"libvirt": []}  # type: Dict[str, List[str]]
 
 for name in dir(libvirt):
-    if name[0] == '_':
+    if name.startswith('_'):
         continue
     thing = getattr(libvirt, name)
     # Special-case libvirtError to deal with python 2.4 difference
@@ -118,7 +118,7 @@ for enum in wantenums:
 for klassname in gottypes:
     klassobj = getattr(libvirt, klassname)
     for name in dir(klassobj):
-        if name[0] == '_':
+        if name.startswith('_'):
             continue
         if name == 'c_pointer':
             continue
