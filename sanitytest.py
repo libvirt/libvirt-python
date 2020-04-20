@@ -324,15 +324,12 @@ for name, (klass, func, cname) in sorted(basicklassmap.items()):
     if func == "mACString":
         func = "MACString"
 
-    finalklassmap[name] = [klass, func, cname]
+    finalklassmap[name] = (klass, func, cname)
 
 
 # Phase 5: Validate sure that every C API is mapped to a python API
 usedfunctions = {}  # type: Dict[str, int]
-for name in sorted(finalklassmap):
-    klass = finalklassmap[name][0]
-    func = finalklassmap[name][1]
-
+for name, (klass, func, cname) in sorted(finalklassmap.items()):
     if func in gotfunctions[klass]:
         usedfunctions["%s.%s" % (klass, func)] = 1
         if verbose:
@@ -362,9 +359,7 @@ for klass in gotfunctions:
                 print("PASS %s.%s" % (klass, func))
 
 # Phase 7: Validate that all the low level C APIs have binding
-for name in sorted(finalklassmap):
-    cname = finalklassmap[name][2]
-
+for name, (klass, func, cname) in sorted(finalklassmap.items()):
     pyname = cname
     if pyname == "virSetErrorFunc":
         pyname = "virRegisterErrorHandler"
