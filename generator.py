@@ -1029,36 +1029,37 @@ def buildStubs(module, api_xml):
 
 #
 # The type automatically remapped to generated classes
+# "C-type" -> (accessor, create, class, parent-class)
 #
 classes_type = {
-    "virDomainPtr": ("._o", "virDomain(self,_obj=%s)", "virDomain"),
-    "virDomain *": ("._o", "virDomain(self, _obj=%s)", "virDomain"),
-    "virNetworkPtr": ("._o", "virNetwork(self, _obj=%s)", "virNetwork"),
-    "virNetwork *": ("._o", "virNetwork(self, _obj=%s)", "virNetwork"),
-    "virNetworkPortPtr": ("._o", "virNetworkPort(self, _obj=%s)", "virNetworkPort"),
-    "virNetworkPort *": ("._o", "virNetworkPort(self, _obj=%s)", "virNetworkPort"),
-    "virInterfacePtr": ("._o", "virInterface(self, _obj=%s)", "virInterface"),
-    "virInterface *": ("._o", "virInterface(self, _obj=%s)", "virInterface"),
-    "virStoragePoolPtr": ("._o", "virStoragePool(self, _obj=%s)", "virStoragePool"),
-    "virStoragePool *": ("._o", "virStoragePool(self, _obj=%s)", "virStoragePool"),
-    "virStorageVolPtr": ("._o", "virStorageVol(self, _obj=%s)", "virStorageVol"),
-    "virStorageVol *": ("._o", "virStorageVol(self, _obj=%s)", "virStorageVol"),
-    "virNodeDevicePtr": ("._o", "virNodeDevice(self, _obj=%s)", "virNodeDevice"),
-    "virNodeDevice *": ("._o", "virNodeDevice(self, _obj=%s)", "virNodeDevice"),
-    "virSecretPtr": ("._o", "virSecret(self, _obj=%s)", "virSecret"),
-    "virSecret *": ("._o", "virSecret(self, _obj=%s)", "virSecret"),
-    "virNWFilterPtr": ("._o", "virNWFilter(self, _obj=%s)", "virNWFilter"),
-    "virNWFilter *": ("._o", "virNWFilter(self, _obj=%s)", "virNWFilter"),
-    "virNWFilterBindingPtr": ("._o", "virNWFilterBinding(self, _obj=%s)", "virNWFilterBinding"),
-    "virNWFilterBinding *": ("._o", "virNWFilterBinding(self, _obj=%s)", "virNWFilterBinding"),
-    "virStreamPtr": ("._o", "virStream(self, _obj=%s)", "virStream"),
-    "virStream *": ("._o", "virStream(self, _obj=%s)", "virStream"),
-    "virConnectPtr": ("._o", "virConnect(_obj=%s)", "virConnect"),
-    "virConnect *": ("._o", "virConnect(_obj=%s)", "virConnect"),
-    "virDomainCheckpointPtr": ("._o", "virDomainCheckpoint(self,_obj=%s)", "virDomainCheckpoint"),
-    "virDomainCheckpoint *": ("._o", "virDomainCheckpoint(self, _obj=%s)", "virDomainCheckpoint"),
-    "virDomainSnapshotPtr": ("._o", "virDomainSnapshot(self,_obj=%s)", "virDomainSnapshot"),
-    "virDomainSnapshot *": ("._o", "virDomainSnapshot(self, _obj=%s)", "virDomainSnapshot"),
+    "virDomainPtr": ("._o", "virDomain(%(p)s, _obj=%(o)s)", "virDomain", "virConnect"),
+    "virDomain *": ("._o", "virDomain(%(p)s, _obj=%(o)s)", "virDomain", "virConnect"),
+    "virNetworkPtr": ("._o", "virNetwork(%(p)s, _obj=%(o)s)", "virNetwork", "virConnect"),
+    "virNetwork *": ("._o", "virNetwork(%(p)s, _obj=%(o)s)", "virNetwork", "virConnect"),
+    "virNetworkPortPtr": ("._o", "virNetworkPort(%(p)s, _obj=%(o)s)", "virNetworkPort", "virNetwork"),
+    "virNetworkPort *": ("._o", "virNetworkPort(%(p)s, _obj=%(o)s)", "virNetworkPort", "virNetwork"),
+    "virInterfacePtr": ("._o", "virInterface(%(p)s, _obj=%(o)s)", "virInterface", "virConnect"),
+    "virInterface *": ("._o", "virInterface(%(p)s, _obj=%(o)s)", "virInterface", "virConnect"),
+    "virStoragePoolPtr": ("._o", "virStoragePool(%(p)s, _obj=%(o)s)", "virStoragePool", "virConnect"),
+    "virStoragePool *": ("._o", "virStoragePool(%(p)s, _obj=%(o)s)", "virStoragePool", "virConnect"),
+    "virStorageVolPtr": ("._o", "virStorageVol(%(p)s, _obj=%(o)s)", "virStorageVol", "virConnect"),
+    "virStorageVol *": ("._o", "virStorageVol(%(p)s, _obj=%(o)s)", "virStorageVol", "virConnect"),
+    "virNodeDevicePtr": ("._o", "virNodeDevice(%(p)s, _obj=%(o)s)", "virNodeDevice", "virConnect"),
+    "virNodeDevice *": ("._o", "virNodeDevice(%(p)s, _obj=%(o)s)", "virNodeDevice", "virConnect"),
+    "virSecretPtr": ("._o", "virSecret(%(p)s, _obj=%(o)s)", "virSecret", "virConnect"),
+    "virSecret *": ("._o", "virSecret(%(p)s, _obj=%(o)s)", "virSecret", "virConnect"),
+    "virNWFilterPtr": ("._o", "virNWFilter(%(p)s, _obj=%(o)s)", "virNWFilter", "virConnect"),
+    "virNWFilter *": ("._o", "virNWFilter(%(p)s, _obj=%(o)s)", "virNWFilter", "virConnect"),
+    "virNWFilterBindingPtr": ("._o", "virNWFilterBinding(%(p)s, _obj=%(o)s)", "virNWFilterBinding", "virConnect"),
+    "virNWFilterBinding *": ("._o", "virNWFilterBinding(%(p)s, _obj=%(o)s)", "virNWFilterBinding", "virConnect"),
+    "virStreamPtr": ("._o", "virStream(%(p)s, _obj=%(o)s)", "virStream", "virConnect"),
+    "virStream *": ("._o", "virStream(%(p)s, _obj=%(o)s)", "virStream", "virConnect"),
+    "virConnectPtr": ("._o", "virConnect(_obj=%(o)s)", "virConnect", ""),
+    "virConnect *": ("._o", "virConnect(_obj=%(o)s)", "virConnect", ""),
+    "virDomainCheckpointPtr": ("._o", "virDomainCheckpoint(%(p)s, _obj=%(o)s)", "virDomainCheckpoint", "virDomain"),
+    "virDomainCheckpoint *": ("._o", "virDomainCheckpoint(%(p)s, _obj=%(o)s)", "virDomainCheckpoint", "virDomain"),
+    "virDomainSnapshotPtr": ("._o", "virDomainSnapshot(%(p)s, _obj=%(o)s)", "virDomainSnapshot", "virDomain"),
+    "virDomainSnapshot *": ("._o", "virDomainSnapshot(%(p)s, _obj=%(o)s)", "virDomainSnapshot", "virDomain"),
 }
 
 primary_classes = ["virDomain", "virNetwork", "virNetworkPort",
@@ -1524,8 +1525,10 @@ def buildWrappers(module):
                      "    if ret is None:raise libvirtError('%s() failed')\n" %
                                       (name))
 
+                    r_type, r_info, r_field = ret
+                    tinfo = classes_type[r_type]
                     classes.write("    return ")
-                    classes.write(classes_type[ret[0]][1] % ("ret"))
+                    classes.write(tinfo[1] % {"o": "ret"})
                     classes.write("\n")
 
                 # For functions returning an integral type there are
@@ -1555,6 +1558,13 @@ def buildWrappers(module):
             classes.write("\n")
 
     for classname in classes_list:
+        PARENTS = {
+            "virConnect": "self._conn",
+            "virDomain": "self._dom",
+            "virNetwork": "self._net",
+            classname: "self",
+        }
+
         if classname == "None":
             pass
         else:
@@ -1580,9 +1590,7 @@ def buildWrappers(module):
                               "virNWFilter", "virNWFilterBinding" ]:
                 classes.write("        self._conn = conn\n")
             elif classname in [ "virStorageVol", "virStoragePool" ]:
-                classes.write("        self._conn = conn\n" + \
-                              "        if not isinstance(conn, virConnect):\n" + \
-                              "            self._conn = conn._conn\n")
+                classes.write("        self._conn = conn if isinstance(conn, virConnect) else conn._conn  # type: virConnect\n")
             elif classname in [ "virDomainCheckpoint", "virDomainSnapshot" ]:
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
@@ -1730,8 +1738,10 @@ def buildWrappers(module):
                         #
                         # generate the returned class wrapper for the object
                         #
+                        r_type, r_info, r_field = ret
+                        tinfo = classes_type[r_type]
                         classes.write("        __tmp = ")
-                        classes.write(classes_type[ret[0]][1] % ("ret"))
+                        classes.write(tinfo[1] % {"o": "ret", "p": PARENTS[tinfo[3]]})
                         classes.write("\n")
 
                         #

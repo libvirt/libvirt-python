@@ -6,6 +6,6 @@
 
         retlist = list()
         for volptr in ret:
-            retlist.append(virStorageVol(self, _obj=volptr))
+            retlist.append(virStorageVol(self._conn, _obj=volptr))
 
         return retlist
