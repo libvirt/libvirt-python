@@ -20,8 +20,9 @@ if len(sys.argv) != 2:
 dir = sys.argv[1]
 imgs = os.listdir(dir)
 
-conn = libvirt.open(None)
-if conn is None:
+try:
+    conn = libvirt.open(None)
+except libvirt.libvirtError:
     print('Failed to open connection to the hypervisor')
     sys.exit(1)
 

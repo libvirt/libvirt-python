@@ -97,9 +97,9 @@ uri = "esx://%s/?no_verify=1" % hostname
 # in order to log into the vCenter
 auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_NOECHOPROMPT],
         request_credentials, None]
-conn = libvirt.openAuth(uri, auth, 0)
-
-if conn is None:
+try:
+    conn = libvirt.openAuth(uri, auth, 0)
+except libvirt.libvirtError:
     print("Failed to open connection to %s" % hostname)
     sys.exit(1)
 
