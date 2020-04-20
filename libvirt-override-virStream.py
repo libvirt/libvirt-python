@@ -198,7 +198,7 @@
             if got == -2:
                 raise libvirtError("cannot use sparseRecvAll with "
                                    "nonblocking stream")
-            if got == -3:
+            elif got == -3:
                 length = self.recvHole()
                 if length is None:
                     self.abort()
@@ -208,6 +208,10 @@
                     self.abort()
                     raise RuntimeError("holeHandler handler returned %d" % ret_hole)
                 continue
+            elif isinstance(got, int):
+                raise ValueError(got)
+            elif not isinstance(got, bytes):
+                raise TypeError(type(got))
 
             if len(got) == 0:
                 break
