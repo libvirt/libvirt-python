@@ -14,6 +14,6 @@
 
         retlist = list()
         for chkptr in ret:
-            retlist.append(virDomainCheckpoint(self, _obj=chkptr))
+            retlist.append(virDomainCheckpoint(self.domain(), _obj=chkptr))
 
         return retlist
