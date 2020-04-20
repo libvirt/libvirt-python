@@ -928,7 +928,7 @@ def buildStubs(module, api_xml):
         parser.close()
     except IOError:
         msg = sys.exc_info()[1]
-        print(file, ":", msg)
+        print(api_xml, ":", msg)
         sys.exit(1)
 
     n = len(list(funcs.keys()))
@@ -948,7 +948,7 @@ def buildStubs(module, api_xml):
         parser.close()
     except IOError:
         msg = sys.exc_info()[1]
-        print(file, ":", msg)
+        print(override_api_xml, ":", msg)
 
     if not quiet:
         # XXX: This is not right, same function already in @functions
