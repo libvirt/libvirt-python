@@ -1394,8 +1394,7 @@ def buildWrappers(module: str) -> None:
     if "None" in function_classes:
         flist = function_classes["None"]
         oldfile = ""
-        for info in sorted(flist, key=functionSortKey):
-            (index, func, name, ret, args, file, mod) = info
+        for (index, func, name, ret, args, file, mod) in sorted(flist, key=functionSortKey):
             if file != oldfile:
                 classes.write("#\n# Functions from module %s\n#\n\n" % file)
                 oldfile = file
@@ -1542,8 +1541,7 @@ def buildWrappers(module: str) -> None:
 
             flist = function_classes[classname]
             oldfile = ""
-            for info in sorted(flist, key=functionSortKey):
-                (index, func, name, ret, args, file, mod) = info
+            for (index, func, name, ret, args, file, mod) in sorted(flist, key=functionSortKey):
                 #
                 # Do not provide as method the destructors for the class
                 # to avoid double free
