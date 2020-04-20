@@ -14,6 +14,6 @@
 
         retlist = list()
         for snapptr in ret:
-            retlist.append(virDomainSnapshot(self, _obj=snapptr))
+            retlist.append(virDomainSnapshot(self.domain(), _obj=snapptr))
 
         return retlist
