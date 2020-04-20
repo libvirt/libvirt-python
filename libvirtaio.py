@@ -320,9 +320,8 @@ class virEventAsyncIOImpl(object):
         This is a coroutine.
         '''
         self.log.debug('ff_callback(iden=%d, opaque=...)', iden)
-        ret = libvirt.virEventInvokeFreeCallback(opaque)
+        libvirt.virEventInvokeFreeCallback(opaque)
         self._pending_dec()
-        return ret
 
     @asyncio.coroutine
     def drain(self) -> Generator[Any, None, None]:
