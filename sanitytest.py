@@ -3,6 +3,7 @@
 import sys
 import lxml
 import lxml.etree
+from typing import Dict, List, Set, Tuple
 
 if len(sys.argv) >= 2:
     # Munge import path to insert build location for libvirt mod
@@ -31,10 +32,10 @@ with open(xml, "r") as fp:
 verbose = False
 fail = False
 
-enumvals = {}
-second_pass = []
-wantenums = []
-wantfunctions = []
+enumvals = {}  # type: Dict[str, Dict[str, int]]
+second_pass = []  # type: List[str]
+wantenums = []  # type: List[str]
+wantfunctions = []  # type: List[str]
 
 # Phase 1: Identify all functions and enums in public API
 wantfunctions = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
@@ -87,9 +88,9 @@ for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
     wantenums.append(n)
 
 # Phase 2: Identify all classes and methods in the 'libvirt' python module
-gotenums = []
-gottypes = []
-gotfunctions = {"libvirt": []}
+gotenums = []  # type: List[str]
+gottypes = []  # type: List[str]
+gotfunctions = {"libvirt": []}  # type: Dict[str, List[str]]
 
 for name in dir(libvirt):
     if name[0] == '_':
@@ -127,7 +128,7 @@ for klassname in gottypes:
 
 
 # Phase 3: First cut at mapping of C APIs to python classes + methods
-basicklassmap = {}
+basicklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
 
 for cname in wantfunctions:
     name = cname
@@ -206,7 +207,7 @@ for cname in wantfunctions:
 
 
 # Phase 4: Deal with oh so many special cases in C -> python mapping
-finalklassmap = {}
+finalklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
 
 for name in sorted(basicklassmap):
     klass = basicklassmap[name][0]
@@ -331,7 +332,7 @@ for name in sorted(basicklassmap):
 
 
 # Phase 5: Validate sure that every C API is mapped to a python API
-usedfunctions = {}
+usedfunctions = {}  # type: Dict[str, int]
 for name in sorted(finalklassmap):
     klass = finalklassmap[name][0]
     func = finalklassmap[name][1]
