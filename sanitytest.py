@@ -185,7 +185,7 @@ for cname in wantfunctions:
     if name[0:8] == "virEvent":
         if name[-4:] == "Func":
             continue
-        basicklassmap[name] = ["libvirt", name, cname]
+        basicklassmap[name] = ("libvirt", name, cname)
     else:
         found = False
         # To start with map APIs to classes based on the
@@ -196,24 +196,20 @@ for cname in wantfunctions:
             if name[0:klen] == klassname:
                 found = True
                 if name not in basicklassmap:
-                    basicklassmap[name] = [klassname, name[klen:], cname]
+                    basicklassmap[name] = (klassname, name[klen:], cname)
                 elif len(basicklassmap[name]) < klen:
-                    basicklassmap[name] = [klassname, name[klen:], cname]
+                    basicklassmap[name] = (klassname, name[klen:], cname)
 
         # Anything which can't map to a class goes into the
         # global namespaces
         if not found:
-            basicklassmap[name] = ["libvirt", name[3:], cname]
+            basicklassmap[name] = ("libvirt", name[3:], cname)
 
 
 # Phase 4: Deal with oh so many special cases in C -> python mapping
 finalklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
 
-for name in sorted(basicklassmap):
-    klass = basicklassmap[name][0]
-    func = basicklassmap[name][1]
-    cname = basicklassmap[name][2]
-
+for name, (klass, func, cname) in sorted(basicklassmap.items()):
     # The object lifecycle APIs are irrelevant since they're
     # used inside the object constructors/destructors.
     if func in ["Ref", "Free", "New", "GetConnect", "GetDomain", "GetNetwork"]:
