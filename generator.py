@@ -677,38 +677,38 @@ def print_function_wrapper(module, name, output, export, include):
     c_return = ""
     c_convert = ""
     num_bufs = 0
-    for arg in args:
+    for a_name, a_type, a_info in args:
         # This should be correct
-        if arg[1][0:6] == "const ":
-            arg[1] = arg[1][6:]
-        c_args += "    %s %s;\n" % (arg[1], arg[0])
-        if arg[1] in py_types:
-            (f, t, n, c) = py_types[arg[1]]
+        if a_type[0:6] == "const ":
+            a_type = a_type[6:]
+        c_args += "    %s %s;\n" % (a_type, a_name)
+        if a_type in py_types:
+            (f, t, n, c) = py_types[a_type]
             if f:
                 format += f
             if t:
-                format_args += ", &pyobj_%s" % (arg[0])
-                c_args += "    PyObject *pyobj_%s;\n" % (arg[0])
+                format_args += ", &pyobj_%s" % (a_name)
+                c_args += "    PyObject *pyobj_%s;\n" % (a_name)
                 c_convert += \
                     "    %s = (%s) Py%s_Get(pyobj_%s);\n" % (
-                        arg[0], arg[1], t, arg[0])
+                        a_name, a_type, t, a_name)
             else:
-                format_args += ", &%s" % (arg[0])
+                format_args += ", &%s" % (a_name)
             if f == 't#':
                 format_args += ", &py_buffsize%d" % num_bufs
                 c_args += "    int py_buffsize%d;\n" % num_bufs
                 num_bufs += 1
             if c_call != "":
                 c_call += ", "
-            c_call += "%s" % (arg[0])
+            c_call += "%s" % (a_name)
         else:
-            if arg[1] in skipped_types:
+            if a_type in skipped_types:
                 return 0
-            if arg[1] in unknown_types:
-                lst = unknown_types[arg[1]]
+            if a_type in unknown_types:
+                lst = unknown_types[a_type]
                 lst.append(name)
             else:
-                unknown_types[arg[1]] = [name]
+                unknown_types[a_type] = [name]
             return -1
     if format != "":
         format += ":%s" % (name)
@@ -726,11 +726,11 @@ def print_function_wrapper(module, name, output, export, include):
         else:
             c_call = "\n    %s(%s);\n" % (name, c_call)
         ret_convert = "    Py_INCREF(Py_None);\n    return Py_None;\n"
-    elif ret[0] in py_types:
-        (f, t, n, c) = py_types[ret[0]]
-        c_return = "    %s c_retval;\n" % (ret[0])
-        if file == "python_accessor" and ret[2]:
-            c_call = "\n    c_retval = %s->%s;\n" % (args[0][0], ret[2])
+    elif r_type in py_types:
+        (f, t, n, c) = py_types[r_type]
+        c_return = "    %s c_retval;\n" % (r_type)
+        if file == "python_accessor" and r_field:
+            c_call = "\n    c_retval = %s->%s;\n" % (args[0][0], r_field)
         else:
             c_call = "\n    c_retval = %s(%s);\n" % (name, c_call)
         ret_convert = "    py_retval = libvirt_%sWrap((%s) c_retval);\n" % (n, c)
@@ -738,13 +738,13 @@ def print_function_wrapper(module, name, output, export, include):
             ret_convert += "    free(c_retval);\n"
         ret_convert += "    return py_retval;\n"
     else:
-        if ret[0] in skipped_types:
+        if r_type in skipped_types:
             return 0
-        if ret[0] in unknown_types:
-            lst = unknown_types[ret[0]]
+        if r_type in unknown_types:
+            lst = unknown_types[r_type]
             lst.append(name)
         else:
-            unknown_types[ret[0]] = [name]
+            unknown_types[r_type] = [name]
         return -1
 
     if cond:
@@ -773,7 +773,7 @@ def print_function_wrapper(module, name, output, export, include):
             export.write("#endif\n")
             output.write("#endif\n")
         return 1
-    if file == "python_accessor" and ret[0] != "void" and not ret[2]:
+    if file == "python_accessor" and r_type != "void" and not r_field:
         # Those have been manually generated
         if cond:
             include.write("#endif\n")
@@ -792,7 +792,7 @@ def print_function_wrapper(module, name, output, export, include):
     if format == "":
         output.write(" ATTRIBUTE_UNUSED")
     output.write(") {\n")
-    if ret[0] != 'void':
+    if r_type != 'void':
         output.write("    PyObject *py_retval;\n")
     if c_return != "":
         output.write(c_return)
