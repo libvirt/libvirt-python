@@ -9,8 +9,6 @@ if len(sys.argv) >= 2:
     sys.path.insert(0, sys.argv[1])
 import libvirt
 
-if sys.version > '3':
-    long = int
 
 def get_libvirt_api_xml_path():
     import subprocess
@@ -99,7 +97,7 @@ for name in dir(libvirt):
     thing = getattr(libvirt, name)
     # Special-case libvirtError to deal with python 2.4 difference
     # in Exception class type reporting.
-    if isinstance(thing, (int, long)):
+    if isinstance(thing, int):
         gotenums.append(name)
     elif getattr(thing, "__module__", "") == "typing":
         continue
