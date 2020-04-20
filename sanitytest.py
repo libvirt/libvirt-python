@@ -109,8 +109,6 @@ for name in dir(libvirt):
         gotfunctions[name] = []
     elif callable(thing):
         gotfunctions["libvirt"].append(name)
-    else:
-       pass
 
 for enum in wantenums:
     if enum not in gotenums:
@@ -129,8 +127,6 @@ for klassname in gottypes:
         thing = getattr(klassobj, name)
         if callable(thing):
             gotfunctions[klassname].append(name)
-        else:
-            pass
 
 
 # Phase 3: First cut at mapping of C APIs to python classes + methods
