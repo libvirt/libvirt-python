@@ -328,10 +328,10 @@ for name, (klass, func, cname) in sorted(basicklassmap.items()):
 
 
 # Phase 5: Validate sure that every C API is mapped to a python API
-usedfunctions = {}  # type: Dict[str, int]
+usedfunctions = set()  # type: Set[str]
 for name, (klass, func, cname) in sorted(finalklassmap.items()):
     if func in gotfunctions[klass]:
-        usedfunctions["%s.%s" % (klass, func)] = 1
+        usedfunctions.add("%s.%s" % (klass, func))
         if verbose:
             print("PASS %s -> %s.%s" % (name, klass, func))
     else:
@@ -351,7 +351,7 @@ for klass in gotfunctions:
             continue
 
         key = "%s.%s" % (klass, func)
-        if not key in usedfunctions:
+        if key not in usedfunctions:
             print("FAIL %s.%s       (Python API not mapped to C)" % (klass, func))
             fail = True
         else:
