@@ -246,11 +246,12 @@ def qemu_enum(type, name, value):
 functions_failed = []
 lxc_functions_failed = []
 qemu_functions_failed = []
-functions_skipped = [
+
+functions_skipped = {
     "virConnectListDomains",
-]
-lxc_functions_skipped = []
-qemu_functions_skipped = []
+}
+lxc_functions_skipped = set()
+qemu_functions_skipped = set()
 
 skipped_types = {
     # 'int *': "usually a return type",
@@ -356,7 +357,7 @@ unknown_types = {}
 
 # Class methods which are written by hand in libvirt.c but the Python-level
 # code is still automatically generated (so they are not in skip_function()).
-skip_impl = (
+skip_impl = {
     'virConnectGetVersion',
     'virConnectGetLibVersion',
     'virConnectListDomainsID',
@@ -479,22 +480,22 @@ skip_impl = (
     'virNetworkPortGetParameters',
     'virNetworkPortSetParameters',
     'virDomainGetGuestInfo',
-)
+}
 
-lxc_skip_impl = (
+lxc_skip_impl = {
     'virDomainLxcOpenNamespace',
-)
+}
 
-qemu_skip_impl = (
+qemu_skip_impl = {
     'virDomainQemuMonitorCommand',
     'virDomainQemuAgentCommand',
-)
+}
 
 
 # These are functions which the generator skips completely - no python
 # or C code is generated. Generally should not be used for any more
 # functions than those already listed
-skip_function = (
+skip_function = {
     'virConnectListDomains',  # Python API is called virConnectListDomainsID for unknown reasons
     'virConnSetErrorFunc',  # Not used in Python API  XXX is this a bug ?
     'virResetError',  # Not used in Python API  XXX is this a bug ?
@@ -613,30 +614,30 @@ skip_function = (
     'virDomainFSInfoFree',  # only useful in C, python code uses list
     'virDomainIOThreadInfoFree',  # only useful in C, python code uses list
     'virDomainInterfaceFree',  # only useful in C, python code uses list
-)
+}
 
-lxc_skip_function = (
+lxc_skip_function = {
     "virDomainLxcEnterNamespace",
     "virDomainLxcEnterSecurityLabel",
-)
-qemu_skip_function = (
+}
+qemu_skip_function = {
     # "virDomainQemuAttach",
     'virConnectDomainQemuMonitorEventRegister',  # overridden in -qemu.py
     'virConnectDomainQemuMonitorEventDeregister',  # overridden in -qemu.py
-)
+}
 
 # Generate C code, but skip python impl
-function_skip_python_impl = (
+function_skip_python_impl = {
     "virStreamFree",  # Needed in custom virStream __del__, but free shouldn't
                       # be exposed in bindings
-)
+}
 
-lxc_function_skip_python_impl = ()
-qemu_function_skip_python_impl = ()
+lxc_function_skip_python_impl = set()  # type: Set[str]
+qemu_function_skip_python_impl = set()  # type: Set[str]
 
-function_skip_index_one = (
+function_skip_index_one = {
     "virDomainRevertToSnapshot",
-)
+}
 
 
 def print_function_wrapper(module, name, output, export, include):
@@ -926,7 +927,7 @@ def buildStubs(module, api_xml):
             del funcs[function]
         if ret == 0:
             skipped += 1
-            funcs_skipped.append(function)
+            funcs_skipped.add(function)
             del funcs[function]
         if ret == 1:
             nb_wrap += 1
