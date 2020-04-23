@@ -1029,33 +1029,33 @@ classes_destructors = {
 }
 
 class_skip_connect_impl = {
-    "virConnect": True,
+    "virConnect",
 }
 
 class_domain_impl = {
-    "virDomainCheckpoint": True,
-    "virDomainSnapshot": True,
+    "virDomainCheckpoint",
+    "virDomainSnapshot",
 }
 
 class_network_impl = {
-    "virNetworkPort": True,
+    "virNetworkPort",
 }
 
 functions_noexcept = {
-    'virDomainGetID': True,
-    'virDomainGetName': True,
-    'virNetworkGetName': True,
-    'virInterfaceGetName': True,
-    'virStoragePoolGetName': True,
-    'virStorageVolGetName': True,
-    'virStorageVolGetkey': True,
-    'virNodeDeviceGetName': True,
-    'virNodeDeviceGetParent': True,
-    'virSecretGetUsageType': True,
-    'virSecretGetUsageID': True,
-    'virNWFilterGetName': True,
-    'virNWFilterBindingGetFilterName': True,
-    'virNWFilterBindingGetPortDev': True,
+    'virDomainGetID',
+    'virDomainGetName',
+    'virNetworkGetName',
+    'virInterfaceGetName',
+    'virStoragePoolGetName',
+    'virStorageVolGetName',
+    'virStorageVolGetkey',
+    'virNodeDeviceGetName',
+    'virNodeDeviceGetParent',
+    'virSecretGetUsageType',
+    'virSecretGetUsageID',
+    'virNWFilterGetName',
+    'virNWFilterBindingGetFilterName',
+    'virNWFilterBindingGetPortDev',
 }
 
 function_classes = {
@@ -1319,24 +1319,24 @@ def buildWrappers(module):
     #
     ctypes = []
     classes_list = []
-    ctypes_processed = {}
-    classes_processed = {}
+    ctypes_processed = set()
+    classes_processed = set()
     for classe in primary_classes:
         classes_list.append(classe)
-        classes_processed[classe] = ()
+        classes_processed.add(classe)
         for type, tinfo in classes_type.items():
             if tinfo[2] == classe:
                 ctypes.append(type)
-                ctypes_processed[type] = ()
+                ctypes_processed.add(type)
     for type, tinfo in classes_type.items():
         if type in ctypes_processed:
             continue
         if tinfo[2] not in classes_processed:
             classes_list.append(tinfo[2])
-            classes_processed[tinfo[2]] = ()
+            classes_processed.add(tinfo[2])
 
         ctypes.append(type)
-        ctypes_processed[type] = ()
+        ctypes_processed.add(type)
 
     for name, (desc, ret, args, file, mod, cond) in functions.items():
         for type in ctypes:
