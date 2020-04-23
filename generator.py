@@ -267,18 +267,18 @@ skipped_types = {
 #######################################################################
 
 py_types = {
-    'void': (None, None, None, None),
-    'int': ('i', None, "int", "int"),
-    'long': ('l', None, "long", "long"),
-    'double': ('d', None, "double", "double"),
-    'unsigned int': ('I', None, "int", "int"),
-    'unsigned long': ('l', None, "long", "long"),
-    'long long': ('L', None, "longlong", "long long"),
-    'unsigned long long': ('L', None, "longlong", "long long"),
-    'unsigned char *': ('z', None, "charPtr", "char *"),
-    'char *': ('z', None, "charPtr", "char *"),
-    'const char *': ('z', None, "constcharPtr", "const char *"),
-    'size_t': ('n', None, "size_t", "size_t"),
+    'void': ('', '', '', ''),
+    'int': ('i', '', "int", "int"),
+    'long': ('l', '', "long", "long"),
+    'double': ('d', '', "double", "double"),
+    'unsigned int': ('I', '', "int", "int"),
+    'unsigned long': ('l', '', "long", "long"),
+    'long long': ('L', '', "longlong", "long long"),
+    'unsigned long long': ('L', '', "longlong", "long long"),
+    'unsigned char *': ('z', '', "charPtr", "char *"),
+    'char *': ('z', '', "charPtr", "char *"),
+    'const char *': ('z', '', "constcharPtr", "const char *"),
+    'size_t': ('n', '', "size_t", "size_t"),
 
     'virDomainPtr': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
     'virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
@@ -1774,7 +1774,7 @@ def qemuBuildWrappers(module):
     # Generate functions directly, no classes
     #
     for name, (desc, ret, args, file, mod, cond) in sorted(qemu_functions.items()):
-        func = nameFixup(name, 'None', None, None)
+        func = nameFixup(name, 'None', '', '')
         fd.write("def %s(" % func)
         for n, (a_name, a_type, a_info) in enumerate(args):
             if n != 0:
@@ -1877,7 +1877,7 @@ def lxcBuildWrappers(module):
     # Generate functions directly, no classes
     #
     for name, (desc, ret, args, file, mod, cond) in sorted(lxc_functions.items()):
-        func = nameFixup(name, 'None', None, None)
+        func = nameFixup(name, 'None', '', '')
         fd.write("def %s(" % func)
         for n, (a_name, a_type, a_info) in enumerate(args):
             if n != 0:
