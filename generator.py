@@ -1393,9 +1393,11 @@ def buildWrappers(module):
 
             for a_name, a_type, a_info in args:
                 if a_type in classes_type:
-                    classes.write("    if %s is None: %s__o = None\n" %
+                    classes.write("    if %s is None:\n"
+                                  "        %s__o = None\n" %
                                   (a_name, a_name))
-                    classes.write("    else: %s__o = %s%s\n" %
+                    classes.write("    else:\n"
+                                  "        %s__o = %s%s\n" %
                                   (a_name, a_name, classes_type[a_type][0]))
 
             r_type, r_info, r_field = ret
@@ -1418,10 +1420,12 @@ def buildWrappers(module):
                     # Raise an exception
                     #
                     if name in functions_noexcept:
-                        classes.write("    if ret is None:return None\n")
+                        classes.write("    if ret is None:\n"
+                                      "        return None\n")
                     else:
                         classes.write(
-                            "    if ret is None:raise libvirtError('%s() failed')\n" %
+                            "    if ret is None:\n"
+                            "        raise libvirtError('%s() failed')\n" %
                             (name))
 
                     tinfo = classes_type[r_type]
@@ -1436,14 +1440,16 @@ def buildWrappers(module):
                     if name not in functions_noexcept:
                         test = functions_int_exception_test.get(name, functions_int_default_test) % ("ret",)
                         classes.write(
-                            "    if %s: raise libvirtError ('%s() failed')\n" %
+                            "    if %s:\n"
+                            "        raise libvirtError('%s() failed')\n" %
                             (test, name))
                     classes.write("    return ret\n")
 
                 elif is_python_noninteger_type(r_type):
                     if name not in functions_noexcept:
                         classes.write(
-                            "    if ret is None: raise libvirtError ('%s() failed')\n" %
+                            "    if ret is None:\n"
+                            "        raise libvirtError('%s() failed')\n" %
                             (name,))
                     classes.write("    return ret\n")
 
@@ -1555,9 +1561,11 @@ def buildWrappers(module):
                 for n, (a_name, a_type, a_info) in enumerate(args):
                     if a_type in classes_type:
                         if n != index:
-                            classes.write("        if %s is None: %s__o = None\n" %
+                            classes.write("        if %s is None:\n"
+                                          "            %s__o = None\n" %
                                           (a_name, a_name))
-                            classes.write("        else: %s__o = %s%s\n" %
+                            classes.write("        else:\n"
+                                          "            %s__o = %s%s\n" %
                                           (a_name, a_name, classes_type[a_type][0]))
                 r_type, r_info, r_field = ret
                 if r_type != "void":
@@ -1589,10 +1597,12 @@ def buildWrappers(module):
                         #
                         if name in functions_noexcept:
                             classes.write(
-                                "        if ret is None:return None\n")
+                                "        if ret is None:\n"
+                                "            return None\n")
                         else:
                             classes.write(
-                                "        if ret is None:raise libvirtError('%s() failed')\n" %
+                                "        if ret is None:\n"
+                                "            raise libvirtError('%s() failed')\n" %
                                 (name,))
 
                         #
@@ -1615,7 +1625,8 @@ def buildWrappers(module):
                         if name not in functions_noexcept:
                             test = functions_int_exception_test.get(name, functions_int_default_test) % ("ret",)
                             classes.write(
-                                "        if %s: raise libvirtError('%s() failed')\n" %
+                                "        if %s:\n"
+                                "            raise libvirtError('%s() failed')\n" %
                                 (test, name))
 
                         classes.write("        return ret\n")
@@ -1623,7 +1634,8 @@ def buildWrappers(module):
                     elif is_python_noninteger_type(r_type):
                         if name not in functions_noexcept:
                             classes.write(
-                                "        if ret is None: raise libvirtError('%s() failed')\n" %
+                                "        if ret is None:\n"
+                                "            raise libvirtError('%s() failed')\n" %
                                 (name,))
 
                         classes.write("        return ret\n")
@@ -1807,7 +1819,8 @@ def qemuBuildWrappers(module):
         fd.write(")\n")
 
         if r_type != "void":
-            fd.write("    if ret is None: raise libvirt.libvirtError('%s() failed')\n" % (name,))
+            fd.write("    if ret is None:\n"
+                     "        raise libvirt.libvirtError('%s() failed')\n" % (name,))
             if r_type == "virDomainPtr":
                 fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
                 fd.write("    return __tmp\n")
@@ -1910,7 +1923,8 @@ def lxcBuildWrappers(module):
         fd.write(")\n")
 
         if r_type != "void":
-            fd.write("    if ret is None: raise libvirt.libvirtError('%s() failed')\n" % (name,))
+            fd.write("    if ret is None:\n"
+                     "        raise libvirt.libvirtError('%s() failed')\n" % (name,))
             if r_type == "virDomainPtr":
                 fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
                 fd.write("    return __tmp\n")
