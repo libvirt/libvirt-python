@@ -293,9 +293,6 @@ functions_skipped = [
 lxc_functions_skipped = []
 qemu_functions_skipped = []
 
-skipped_modules = {
-}
-
 skipped_types = {
     # 'int *': "usually a return type",
     'virConnectDomainEventCallback': "No function types in python",
@@ -702,9 +699,6 @@ def print_function_wrapper(module, name, output, export, include):
     except Exception:
         print("failed to get function %s infos" % name)
         return
-
-    if module in skipped_modules:
-        return 0
 
     if module == "libvirt":
         if name in skip_function:
