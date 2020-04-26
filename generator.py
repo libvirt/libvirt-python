@@ -1689,10 +1689,9 @@ def buildWrappers(module: str) -> None:
     #
     # Generate enum constants
     #
-    def enumsSortKey(data):
-        value = data[1]
+    def enumsSortKey(data: Tuple[str, EnumValue]) -> Tuple[Union[int, float], str]:
         try:
-            value = int(value)
+            value = int(data[1])  # type: Union[int, float]
         except ValueError:
             value = float('inf')
         return value, data[0]
