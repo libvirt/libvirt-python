@@ -276,18 +276,18 @@ skipped_types = {
 #######################################################################
 
 py_types = {
-    'void': ('', '', '', ''),
-    'int': ('i', '', "int", "int"),
-    'long': ('l', '', "long", "long"),
-    'double': ('d', '', "double", "double"),
-    'unsigned int': ('I', '', "int", "int"),
-    'unsigned long': ('l', '', "long", "long"),
-    'long long': ('L', '', "longlong", "long long"),
-    'unsigned long long': ('L', '', "longlong", "long long"),
-    'unsigned char *': ('z', '', "charPtr", "char *"),
-    'char *': ('z', '', "charPtr", "char *"),
-    'const char *': ('z', '', "constcharPtr", "const char *"),
-    'size_t': ('n', '', "size_t", "size_t"),
+    'void': ('', 'None', '', ''),
+    'int': ('i', 'int', "int", "int"),
+    'long': ('l', 'int', "long", "long"),
+    'double': ('d', 'float', "double", "double"),
+    'unsigned int': ('I', 'int', "int", "int"),
+    'unsigned long': ('l', 'int', "long", "long"),
+    'long long': ('L', 'int', "longlong", "long long"),
+    'unsigned long long': ('L', 'int', "longlong", "long long"),
+    'unsigned char *': ('z', 'str', "charPtr", "char *"),
+    'char *': ('z', 'str', "charPtr", "char *"),
+    'const char *': ('z', 'str', "constcharPtr", "const char *"),
+    'size_t': ('n', 'int', "size_t", "size_t"),
 
     'virDomainPtr': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
     'virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
@@ -696,7 +696,7 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
             (f, t, n, c) = py_types[a_type]
             if f:
                 format += f
-            if t:
+            if f == 'O':
                 format_args += ", &pyobj_%s" % (a_name)
                 c_args += "    PyObject *pyobj_%s;\n" % (a_name)
                 c_convert += \
