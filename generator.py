@@ -1907,7 +1907,7 @@ def buildWrappers(module):
         enumData.update(enum)
 
     if enumvals is not None:
-        enumvals.sort(key=lambda x: x[0])
+        enumvals.sort()
     for type, enum in enumvals:
         classes.write("# %s\n" % type)
         items = list(resolveEnum(enum, enumData).items())
