@@ -15,6 +15,10 @@ import select
 import errno
 import time
 import threading
+from typing import Any, Callable, Dict, List, Optional, TypeVar  # noqa F401
+_T = TypeVar("_T")
+_EventCallback = Callable[[int, int, int, _T], None]
+_TimerCallback = Callable[[int, _T], None]
 
 
 # This example can use three different event loop impls. It defaults
@@ -34,7 +38,7 @@ event_impl = "poll"
 do_debug = False
 
 
-def debug(msg):
+def debug(msg: str) -> None:
     if do_debug:
         print(msg)
 
@@ -50,26 +54,26 @@ class virEventLoopPoll:
     # This class contains the data we need to track for a
     # single file handle
     class virEventLoopPollHandle:
-        def __init__(self, handle, fd, events, cb, opaque):
+        def __init__(self, handle: int, fd: int, events: int, cb: _EventCallback, opaque: _T):
             self.handle = handle
             self.fd = fd
             self.events = events
             self.cb = cb
             self.opaque = opaque
 
-        def get_id(self):
+        def get_id(self) -> int:
             return self.handle
 
-        def get_fd(self):
+        def get_fd(self) -> int:
             return self.fd
 
-        def get_events(self):
+        def get_events(self) -> int:
             return self.events
 
-        def set_events(self, events):
+        def set_events(self, events: int):
             self.events = events
 
-        def dispatch(self, events):
+        def dispatch(self, events: int):
             self.cb(self.handle,
                     self.fd,
                     events,
@@ -78,29 +82,29 @@ class virEventLoopPoll:
     # This class contains the data we need to track for a
     # single periodic timer
     class virEventLoopPollTimer:
-        def __init__(self, timer, interval, cb, opaque):
+        def __init__(self, timer: int, interval: int, cb: _TimerCallback, opaque: _T):
             self.timer = timer
             self.interval = interval
             self.cb = cb
             self.opaque = opaque
             self.lastfired = 0
 
-        def get_id(self):
+        def get_id(self) -> int:
             return self.timer
 
-        def get_interval(self):
+        def get_interval(self) -> int:
             return self.interval
 
-        def set_interval(self, interval):
+        def set_interval(self, interval: int):
             self.interval = interval
 
-        def get_last_fired(self):
+        def get_last_fired(self) -> int:
             return self.lastfired
 
-        def set_last_fired(self, now):
+        def set_last_fired(self, now: int):
             self.lastfired = now
 
-        def dispatch(self):
+        def dispatch(self) -> None:
             self.cb(self.timer,
                     self.opaque)
 
@@ -111,8 +115,8 @@ class virEventLoopPoll:
         self.runningPoll = False
         self.nextHandleID = 1
         self.nextTimerID = 1
-        self.handles = []
-        self.timers = []
+        self.handles = []  # type: List[virEventLoopPollHandle]
+        self.timers = []  # type: List[virEventLoopPollTimer]
         self.cleanup = []
         self.quit = False
 
@@ -135,7 +139,7 @@ class virEventLoopPoll:
     # Calculate when the next timeout is due to occur, returning
     # the absolute timestamp for the next timeout, or 0 if there is
     # no timeout due
-    def next_timeout(self):
+    def next_timeout(self) -> int:
         next = 0
         for t in self.timers:
             last = t.get_last_fired()
@@ -148,14 +152,14 @@ class virEventLoopPoll:
         return next
 
     # Lookup a virEventLoopPollHandle object based on file descriptor
-    def get_handle_by_fd(self, fd):
+    def get_handle_by_fd(self, fd: int) -> Optional[virEventLoopPollHandle]:
         for h in self.handles:
             if h.get_fd() == fd:
                 return h
         return None
 
     # Lookup a virEventLoopPollHandle object based on its event loop ID
-    def get_handle_by_id(self, handleID):
+    def get_handle_by_id(self, handleID: int) -> Optional[virEventLoopPollHandle]:
         for h in self.handles:
             if h.get_id() == handleID:
                 return h
@@ -180,8 +184,8 @@ class virEventLoopPoll:
     # back around the loop with a crazy 5ms sleep. So when checking
     # if timeouts are due, we allow a margin of 20ms, to avoid
     # these pointless repeated tiny sleeps.
-    def run_once(self):
-        sleep = -1
+    def run_once(self) -> None:
+        sleep = -1  # type: float
         self.runningPoll = True
 
         for opaque in self.cleanup:
@@ -237,12 +241,12 @@ class virEventLoopPoll:
             self.runningPoll = False
 
     # Actually run the event loop forever
-    def run_loop(self):
+    def run_loop(self) -> None:
         self.quit = False
         while not self.quit:
             self.run_once()
 
-    def interrupt(self):
+    def interrupt(self) -> None:
         if self.runningPoll and not self.pendingWakeup:
             self.pendingWakeup = True
             os.write(self.pipetrick[1], 'c'.encode("UTF-8"))
@@ -251,7 +255,7 @@ class virEventLoopPoll:
     # event constants), firing the callback  cb() when an event occurs.
     # Returns a unique integer identier for this handle, that should be
     # used to later update/remove it
-    def add_handle(self, fd, events, cb, opaque):
+    def add_handle(self, fd: int, events: int, cb: _EventCallback, opaque: _T) -> int:
         handleID = self.nextHandleID + 1
         self.nextHandleID = self.nextHandleID + 1
 
@@ -270,7 +274,7 @@ class virEventLoopPoll:
     # then the timer is registered, but not enabled
     # Returns a unique integer identier for this handle, that should be
     # used to later update/remove it
-    def add_timer(self, interval, cb, opaque):
+    def add_timer(self, interval: int, cb: _TimerCallback, opaque: _T) -> int:
         timerID = self.nextTimerID + 1
         self.nextTimerID = self.nextTimerID + 1
 
@@ -283,7 +287,7 @@ class virEventLoopPoll:
         return timerID
 
     # Change the set of events to be monitored on the file handle
-    def update_handle(self, handleID, events):
+    def update_handle(self, handleID: int, events: int) -> None:
         h = self.get_handle_by_id(handleID)
         if h:
             h.set_events(events)
@@ -294,7 +298,7 @@ class virEventLoopPoll:
             debug("Update handle %d fd %d events %d" % (handleID, h.get_fd(), events))
 
     # Change the periodic frequency of the timer
-    def update_timer(self, timerID, interval):
+    def update_timer(self, timerID: int, interval: int) -> None:
         for h in self.timers:
             if h.get_id() == timerID:
                 h.set_interval(interval)
@@ -304,7 +308,7 @@ class virEventLoopPoll:
                 break
 
     # Stop monitoring for events on the file handle
-    def remove_handle(self, handleID):
+    def remove_handle(self, handleID: int) -> None:
         handles = []
         for h in self.handles:
             if h.get_id() == handleID:
@@ -317,7 +321,7 @@ class virEventLoopPoll:
         self.interrupt()
 
     # Stop firing the periodic timer
-    def remove_timer(self, timerID):
+    def remove_timer(self, timerID: int) -> None:
         timers = []
         for h in self.timers:
             if h.get_id() != timerID:
@@ -329,7 +333,7 @@ class virEventLoopPoll:
         self.interrupt()
 
     # Convert from libvirt event constants, to poll() events constants
-    def events_to_poll(self, events):
+    def events_to_poll(self, events: int) -> int:
         ret = 0
         if events & libvirt.VIR_EVENT_HANDLE_READABLE:
             ret |= select.POLLIN
@@ -342,7 +346,7 @@ class virEventLoopPoll:
         return ret
 
     # Convert from poll() event constants, to libvirt events constants
-    def events_from_poll(self, events):
+    def events_from_poll(self, events: int) -> int:
         ret = 0
         if events & select.POLLIN:
             ret |= libvirt.VIR_EVENT_HANDLE_READABLE
@@ -378,33 +382,33 @@ eventLoopThread = None
 # another event loop such as GLib's, or something like the python
 # Twisted event framework.
 
-def virEventAddHandleImpl(fd, events, cb, opaque):
+def virEventAddHandleImpl(fd: int, events: int, cb: _EventCallback, opaque: _T) -> int:
     return eventLoop.add_handle(fd, events, cb, opaque)
 
 
-def virEventUpdateHandleImpl(handleID, events):
+def virEventUpdateHandleImpl(handleID: int, events: int) -> None:
     return eventLoop.update_handle(handleID, events)
 
 
-def virEventRemoveHandleImpl(handleID):
+def virEventRemoveHandleImpl(handleID: int) -> None:
     return eventLoop.remove_handle(handleID)
 
 
-def virEventAddTimerImpl(interval, cb, opaque):
+def virEventAddTimerImpl(interval: int, cb: _TimerCallback, opaque: _T) -> int:
     return eventLoop.add_timer(interval, cb, opaque)
 
 
-def virEventUpdateTimerImpl(timerID, interval):
+def virEventUpdateTimerImpl(timerID: int, interval: int) -> None:
     return eventLoop.update_timer(timerID, interval)
 
 
-def virEventRemoveTimerImpl(timerID):
+def virEventRemoveTimerImpl(timerID: int) -> None:
     return eventLoop.remove_timer(timerID)
 
 
 # This tells libvirt what event loop implementation it
 # should use
-def virEventLoopPollRegister():
+def virEventLoopPollRegister() -> None:
     libvirt.virEventRegisterImpl(virEventAddHandleImpl,
                                  virEventUpdateHandleImpl,
                                  virEventRemoveHandleImpl,
@@ -414,23 +418,23 @@ def virEventLoopPollRegister():
 
 
 # Directly run the event loop in the current thread
-def virEventLoopPollRun():
+def virEventLoopPollRun() -> None:
     eventLoop.run_loop()
 
 
-def virEventLoopAIORun(loop):
+def virEventLoopAIORun(loop) -> None:
     import asyncio
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
 
-def virEventLoopNativeRun():
+def virEventLoopNativeRun() -> None:
     while True:
         libvirt.virEventRunDefaultImpl()
 
 
 # Spawn a background thread to run the event loop
-def virEventLoopPollStart():
+def virEventLoopPollStart() -> None:
     global eventLoopThread
     virEventLoopPollRegister()
     eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
@@ -438,7 +442,7 @@ def virEventLoopPollStart():
     eventLoopThread.start()
 
 
-def virEventLoopAIOStart():
+def virEventLoopAIOStart() -> None:
     global eventLoopThread
     import libvirtaio
     import asyncio
@@ -449,7 +453,7 @@ def virEventLoopAIOStart():
     eventLoopThread.start()
 
 
-def virEventLoopNativeStart():
+def virEventLoopNativeStart() -> None:
     global eventLoopThread
     libvirt.virEventRegisterDefaultImpl()
     eventLoopThread = threading.Thread(target=virEventLoopNativeRun, name="libvirtEventLoop")
@@ -463,14 +467,14 @@ def virEventLoopNativeStart():
 class Description(object):
     __slots__ = ('desc', 'args')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.desc = kwargs.get('desc')
         self.args = args
 
-    def __str__(self):  # type: () -> str
-        return self.desc
+    def __str__(self) -> str:
+        return self.desc or ''
 
-    def __getitem__(self, item):  # type: (int) -> str
+    def __getitem__(self, item: int) -> 'Description':
         try:
             data = self.args[item]
         except IndexError:
@@ -507,127 +511,127 @@ DISK_EVENTS = Description("Change missing on start", "Drop missing on start")
 TRAY_EVENTS = Description("Opened", "Closed")
 
 
-def myDomainEventCallback(conn, dom, event, detail, opaque):
+def myDomainEventCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, event: int, detail: int, opaque: _T) -> None:
     print("myDomainEventCallback%s EVENT: Domain %s(%s) %s %s" % (
         opaque, dom.name(), dom.ID(), DOM_EVENTS[event], DOM_EVENTS[event][detail]))
 
 
-def myDomainEventRebootCallback(conn, dom, opaque):
+def myDomainEventRebootCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, opaque: _T) -> None:
     print("myDomainEventRebootCallback: Domain %s(%s)" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque):
+def myDomainEventRTCChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, utcoffset: int, opaque: _T) -> None:
     print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (
         dom.name(), dom.ID(), utcoffset))
 
 
-def myDomainEventWatchdogCallback(conn, dom, action, opaque):
+def myDomainEventWatchdogCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, action: int, opaque: _T) -> None:
     print("myDomainEventWatchdogCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), WATCHDOG_ACTIONS[action]))
 
 
-def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
+def myDomainEventIOErrorCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, srcpath: str, devalias: str, action: int, opaque: _T) -> None:
     print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %s" % (
         dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action]))
 
 
-def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
+def myDomainEventIOErrorReasonCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, srcpath: str, devalias: str, action: int, reason: int, opaque: _T) -> None:
     print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %s %s" % (
         dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action], reason))
 
 
-def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
+def myDomainEventGraphicsCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, phase: int, localAddr: str, remoteAddr: str, authScheme: str, subject: str, opaque: _T) -> None:
     print("myDomainEventGraphicsCallback: Domain %s(%s) %s %s" % (
         dom.name(), dom.ID(), GRAPHICS_PHASES[phase], authScheme))
 
 
-def myDomainEventControlErrorCallback(conn, dom, opaque):
+def myDomainEventControlErrorCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, opaque: _T) -> None:
     print("myDomainEventControlErrorCallback: Domain %s(%s)" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
+def myDomainEventBlockJobCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, disk, type: int, status: int, opaque: _T) -> None:
     print("myDomainEventBlockJobCallback: Domain %s(%s) %s on disk %s %s" % (
         dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
 
 
-def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
+def myDomainEventDiskChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, oldSrcPath: str, newSrcPath: str, devAlias: str, reason: int, opaque: _T) -> None:
     print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
         dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, DISK_EVENTS[reason]))
 
 
-def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
+def myDomainEventTrayChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, devAlias: str, reason: int, opaque: _T) -> None:
     print("myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
         dom.name(), dom.ID(), devAlias, TRAY_EVENTS[reason]))
 
 
-def myDomainEventPMWakeupCallback(conn, dom, reason, opaque):
+def myDomainEventPMWakeupCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, reason: int, opaque: _T) -> None:
     print("myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventPMSuspendCallback(conn, dom, reason, opaque):
+def myDomainEventPMSuspendCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, reason: int, opaque: _T) -> None:
     print("myDomainEventPMSuspendCallback: Domain %s(%s) system pmsuspend" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventBalloonChangeCallback(conn, dom, actual, opaque):
+def myDomainEventBalloonChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, actual: int, opaque: _T) -> None:
     print("myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (
         dom.name(), dom.ID(), actual))
 
 
-def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
+def myDomainEventPMSuspendDiskCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, reason: int, opaque: _T) -> None:
     print("myDomainEventPMSuspendDiskCallback: Domain %s(%s) system pmsuspend_disk" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceRemovedCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, dev: str, opaque: _T) -> None:
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
+def myDomainEventBlockJob2Callback(conn: libvirt.virConnect, dom: libvirt.virDomain, disk: str, type: int, status: int, opaque: _T) -> None:
     print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (
         dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
 
 
-def myDomainEventTunableCallback(conn, dom, params, opaque):
+def myDomainEventTunableCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, params: Dict[str, Any], opaque: _T) -> None:
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), params))
 
 
-def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
+def myDomainEventAgentLifecycleCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, state: int, reason: int, opaque: _T) -> None:
     print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (
         dom.name(), dom.ID(), AGENT_STATES[state], AGENT_REASONS[reason]))
 
 
-def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceAddedCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, dev: str, opaque: _T) -> None:
     print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventMigrationIteration(conn, dom, iteration, opaque):
+def myDomainEventMigrationIteration(conn: libvirt.virConnect, dom: libvirt.virDomain, iteration: int, opaque: _T) -> None:
     print("myDomainEventMigrationIteration: Domain %s(%s) started migration iteration %d" % (
         dom.name(), dom.ID(), iteration))
 
 
-def myDomainEventJobCompletedCallback(conn, dom, params, opaque):
+def myDomainEventJobCompletedCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, params: Dict[str, Any], opaque: _T) -> None:
     print("myDomainEventJobCompletedCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), params))
 
 
-def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceRemovalFailedCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, dev: str, opaque: _T) -> None:
     print("myDomainEventDeviceRemovalFailedCallback: Domain %s(%s) failed to remove device: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventMetadataChangeCallback(conn, dom, mtype, nsuri, opaque):
+def myDomainEventMetadataChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, mtype: int, nsuri: str, opaque: _T) -> None:
     print("myDomainEventMetadataChangeCallback: Domain %s(%s) changed metadata mtype=%d nsuri=%s" % (
         dom.name(), dom.ID(), mtype, nsuri))
 
 
-def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess, opaque):
+def myDomainEventBlockThresholdCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, dev: str, path: str, threshold: int, excess: int, opaque: _T) -> None:
     print("myDomainEventBlockThresholdCallback: Domain %s(%s) block device %s(%s) threshold %d exceeded by %d" % (
         dom.name(), dom.ID(), dev, path, threshold, excess))
 
@@ -643,7 +647,7 @@ NET_EVENTS = Description(
 )
 
 
-def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
+def myNetworkEventLifecycleCallback(conn: libvirt.virConnect, net: libvirt.virNetwork, event: int, detail: int, opaque: _T) -> None:
     print("myNetworkEventLifecycleCallback: Network %s %s %s" % (
         net.name(), NET_EVENTS[event], NET_EVENTS[event][detail]))
 
@@ -661,12 +665,12 @@ STORAGE_EVENTS = Description(
 )
 
 
-def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
+def myStoragePoolEventLifecycleCallback(conn: libvirt.virConnect, pool: libvirt.virStoragePool, event: int, detail: int, opaque: _T) -> None:
     print("myStoragePoolEventLifecycleCallback: Storage pool %s %s %s" % (
         pool.name(), STORAGE_EVENTS[event], STORAGE_EVENTS[event][detail]))
 
 
-def myStoragePoolEventRefreshCallback(conn, pool, opaque):
+def myStoragePoolEventRefreshCallback(conn: libvirt.virConnect, pool: libvirt.virStoragePool, opaque: _T) -> None:
     print("myStoragePoolEventRefreshCallback: Storage pool %s" % pool.name())
 
 
@@ -679,12 +683,12 @@ DEVICE_EVENTS = Description(
 )
 
 
-def myNodeDeviceEventLifecycleCallback(conn, dev, event, detail, opaque):
+def myNodeDeviceEventLifecycleCallback(conn: libvirt.virConnect, dev: libvirt.virNodeDevice, event: int, detail: int, opaque: _T) -> None:
     print("myNodeDeviceEventLifecycleCallback: Node device  %s %s %s" % (
         dev.name(), DEVICE_EVENTS[event], DEVICE_EVENTS[event][detail]))
 
 
-def myNodeDeviceEventUpdateCallback(conn, dev, opaque):
+def myNodeDeviceEventUpdateCallback(conn: libvirt.virConnect, dev: libvirt.virNodeDevice, opaque: _T) -> None:
     print("myNodeDeviceEventUpdateCallback: Node device %s" % dev.name())
 
 
@@ -697,12 +701,12 @@ SECRET_EVENTS = Description(
 )
 
 
-def mySecretEventLifecycleCallback(conn, secret, event, detail, opaque):
+def mySecretEventLifecycleCallback(conn: libvirt.virConnect, secret: libvirt.virSecret, event: int, detail: int, opaque: _T) -> None:
     print("mySecretEventLifecycleCallback: Secret %s %s %s" % (
         secret.UUIDString(), SECRET_EVENTS[event], SECRET_EVENTS[event][detail]))
 
 
-def mySecretEventValueChanged(conn, secret, opaque):
+def mySecretEventValueChanged(conn: libvirt.virConnect, secret: libvirt.virSecret, opaque: _T) -> None:
     print("mySecretEventValueChanged: Secret %s" % secret.UUIDString())
 
 
@@ -714,14 +718,14 @@ run = True
 CONNECTION_EVENTS = Description("Error", "End-of-file", "Keepalive", "Client")
 
 
-def myConnectionCloseCallback(conn, reason, opaque):
+def myConnectionCloseCallback(conn: libvirt.virConnect, reason: int, opaque: _T) -> None:
     print("myConnectionCloseCallback: %s: %s" % (
         conn.getURI(), CONNECTION_EVENTS[reason]))
     global run
     run = False
 
 
-def usage():
+def usage() -> None:
     print("usage: %s [-hdl] [uri]" % (os.path.basename(__file__),))
     print("   uri will default to qemu:///system")
     print("   --help, -h   Print this help message")
@@ -730,7 +734,7 @@ def usage():
     print("   --timeout=SECS  Quit after SECS seconds running")
 
 
-def main():
+def main() -> None:
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hdl:", ["help", "debug", "loop=", "timeout="])
     except getopt.GetoptError as err:
@@ -770,7 +774,7 @@ def main():
     vc = libvirt.openReadOnly(uri)
 
     # Close connection on exit (to test cleanup paths)
-    def exit():
+    def exit() -> None:
         print("Closing " + vc.getURI())
         if run:
             vc.close()

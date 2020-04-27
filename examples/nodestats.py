@@ -8,11 +8,12 @@ import libvirt
 import sys
 from xml.dom import minidom
 import libxml2
+from typing import Any, Dict  # noqa F401
 
-def xpath_eval(ctxt, path):
+def xpath_eval(ctxt, path: str) -> str:
     res = ctxt.xpathEval(path)
     if res is None or len(res) == 0:
-        value = None
+        value = ''
     else:
         value = res[0].content
     return value
@@ -44,7 +45,7 @@ domsStrict = [ proc
                for proc in doms
                if proc.numaParameters()["numa_mode"] == libvirt.VIR_DOMAIN_NUMATUNE_MEM_STRICT ]
 
-domsStrictCfg = {}
+domsStrictCfg = {}  # type: Dict[libvirt.virDomain, Dict[str, Dict[str, Any]]]
 for dom in domsStrict:
     xmlStr = dom.XMLDesc()
     doc = libxml2.parseDoc(xmlStr)
@@ -67,8 +68,8 @@ for dom in domsStrict:
 
 print("NUMA stats")
 print("NUMA nodes:\t" + "\t".join(str(node) for node in nodesIDs))
-print("MemTotal:\t" + "\t".join(str(i.get("total") // 1024) for i in nodesMem))
-print("MemFree:\t" + "\t".join(str(i.get("free") // 1024) for i in nodesMem))
+print("MemTotal:\t" + "\t".join(str(i.get("total") // 1024) for i in nodesMem))  # type: ignore
+print("MemFree:\t" + "\t".join(str(i.get("free") // 1024) for i in nodesMem))  # type: ignore
 
 for dom, v in domsStrictCfg.items():
     print("Domain '%s':\t" % dom.name())

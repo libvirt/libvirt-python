@@ -6,11 +6,12 @@ import sys
 import os
 import libxml2
 import pdb
+from typing import Tuple
 
 # Parse the XML description of domU from FNAME
 # and return a tuple (name, xmldesc) where NAME
 # is the name of the domain, and xmldesc is the contetn of FNAME
-def read_domain(fname):
+def read_domain(fname: str) -> Tuple[str, str]:
     fp = open(fname, "r")
     xmldesc = fp.read()
     fp.close()
@@ -19,7 +20,7 @@ def read_domain(fname):
     name = doc.xpathNewContext().xpathEval("/domain/name")[0].content
     return (name, xmldesc)
 
-def usage():
+def usage() -> None:
    print('Usage: %s domain.xml' % sys.argv[0])
    print('       Check that the domain described by DOMAIN.XML is running')
    print('       If the domain is not running, create it')

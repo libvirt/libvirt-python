@@ -10,7 +10,7 @@ IPTYPE = {
 }
 
 
-def print_dom_ifaces(dom):
+def print_dom_ifaces(dom: libvirt.virDomain) -> None:
     ifaces = dom.interfaceAddresses(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE)
     if ifaces is None:
         print("Failed to get domain interfaces")
