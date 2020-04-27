@@ -44,6 +44,7 @@ def toIPAddrType(addrType):
         return "ipv4"
     elif addrType == libvirt.VIR_IP_ADDR_TYPE_IPV6:
         return "ipv6"
+    return "Unknown"
 
 print(" {0:20} {1:18} {2:9} {3:25} {4:15} {5}".format("Expiry Time",
                                                       "MAC address",
