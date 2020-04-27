@@ -370,13 +370,13 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventUpdateHandleFunc
         '''
         self.log.debug('update_handle(watch=%d, event=%d)', watch, event)
-        return self.callbacks[watch].update(event=event)
+        self.callbacks[watch].update(event=event)
 
     def _remove_handle(self, watch):
         '''Unregister a callback from a file handle.
 
         :param int watch: file descriptor watch to stop listening on
-        :returns: None (see source for explanation)
+        :returns: -1 on error, 0 on success
 
         .. seealso::
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventRemoveHandleFunc
@@ -386,12 +386,13 @@ class virEventAsyncIOImpl(object):
             callback = self.callbacks.pop(watch)
         except KeyError as err:
             self.log.warning('remove_handle(): no such handle: %r', err.args[0])
-            raise
+            return -1
         fd = callback.descriptor.fd
         assert callback is self.descriptors[fd].remove_handle(watch)
         if len(self.descriptors[fd].callbacks) == 0:
             del self.descriptors[fd]
         callback.close()
+        return 0
 
     def _add_timeout(self, timeout, cb, opaque):
         '''Register a callback for a timer event
@@ -425,20 +426,25 @@ class virEventAsyncIOImpl(object):
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventUpdateTimeoutFunc
         '''
         self.log.debug('update_timeout(timer=%d, timeout=%d)', timer, timeout)
-        return self.callbacks[timer].update(timeout=timeout)
+        self.callbacks[timer].update(timeout=timeout)
 
     def _remove_timeout(self, timer):
         '''Unregister a callback for a timer
 
         :param int timer: the timer to remove
-        :returns: None (see source for explanation)
+        :returns: -1 on error, 0 on success
 
         .. seealso::
             https://libvirt.org/html/libvirt-libvirt-event.html#virEventRemoveTimeoutFunc
         '''
         self.log.debug('remove_timeout(timer=%d)', timer)
-        callback = self.callbacks.pop(timer)
+        try:
+            callback = self.callbacks.pop(timer)
+        except KeyError as err:
+            self.log.warning('remove_timeout(): no such timeout: %r', err.args[0])
+            return -1
         callback.close()
+        return 0
 
 
 _current_impl = None
