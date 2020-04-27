@@ -6,6 +6,7 @@
 # Start off by implementing a general purpose event loop for anyone's use
 ##############################################################################
 
+import atexit
 import sys
 import getopt
 import os
@@ -14,6 +15,7 @@ import select
 import errno
 import time
 import threading
+
 
 # This example can use three different event loop impls. It defaults
 # to a portable pure-python impl based on poll that is implemented
@@ -768,16 +770,12 @@ def main():
     vc = libvirt.openReadOnly(uri)
 
     # Close connection on exit (to test cleanup paths)
-    old_exitfunc = getattr(sys, 'exitfunc', None)
-
     def exit():
         print("Closing " + vc.getURI())
         if run:
             vc.close()
-        if (old_exitfunc):
-            old_exitfunc()
 
-    sys.exitfunc = exit
+    atexit.register(exit)
 
     vc.registerCloseCallback(myConnectionCloseCallback, None)
 
