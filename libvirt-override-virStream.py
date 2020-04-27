@@ -51,12 +51,11 @@
                 if type(ret) is int and ret < 0:
                     raise RuntimeError("recvAll handler returned %d" % ret)
             except Exception:
-                e = sys.exc_info()[1]
                 try:
                     self.abort()
                 except Exception:
                     pass
-                raise e
+                raise
 
     def sendAll(self, handler, opaque):
         """
@@ -76,12 +75,11 @@
             try:
                 got = handler(self, virStorageVol.streamBufSize, opaque)
             except Exception:
-                e = sys.exc_info()[1]
                 try:
                     self.abort()
                 except Exception:
                     pass
-                raise e
+                raise
 
             if not got:
                 break
