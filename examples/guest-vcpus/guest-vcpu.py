@@ -19,8 +19,8 @@ def usage():
 
 uri = "qemu:///system"
 flags = 0
-live = False;
-config = False;
+live = False
+config = False
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "hcl", ["help", "config", "live"])
