@@ -55,7 +55,7 @@ def stream_callback(stream: libvirt.virStream, events: int, console: Console) ->
     try:
         assert console.stream
         received_data = console.stream.recv(1024)
-    except:
+    except Exception:
         return
     os.write(0, received_data)
 
