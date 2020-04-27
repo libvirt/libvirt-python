@@ -701,7 +701,7 @@ def print_function_wrapper(module, name, output, export, include):
             (desc, ret, args, file, mod, cond) = lxc_functions[name]
         if module == "libvirt-qemu":
             (desc, ret, args, file, mod, cond) = qemu_functions[name]
-    except:
+    except Exception:
         print("failed to get function %s infos" % name)
         return
 
@@ -1889,7 +1889,7 @@ def buildWrappers(module):
                     classes.writelines(cached)
                 classes.write("\n")
                 extra.close()
-            except:
+            except Exception:
                 pass
 
     #
