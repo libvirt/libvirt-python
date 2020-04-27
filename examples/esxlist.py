@@ -32,7 +32,7 @@ def request_credentials(credentials, user_data):
     for credential in credentials:
         if credential[0] == libvirt.VIR_CRED_AUTHNAME:
             # prompt the user to input a authname. display the provided message
-            credential[4] = raw_input(credential[1] + ": ")
+            credential[4] = input(credential[1] + ": ")
 
             # if the user just hits enter raw_input() returns an empty string.
             # in this case return the default result through the last item of
