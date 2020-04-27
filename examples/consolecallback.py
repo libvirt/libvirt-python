@@ -23,6 +23,7 @@ class Console(object):
         self.connection.domainEventRegister(lifecycle_callback, self)
         self.stream = None
         self.run_console = True
+        self.stdin_watch = -1
         logging.info("%s initial state %d, reason %d",
                      self.uuid, self.state[0], self.state[1])
 
