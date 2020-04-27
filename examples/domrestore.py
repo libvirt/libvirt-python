@@ -5,7 +5,7 @@ import libvirt
 import sys
 import os
 
-def usage():
+def usage() -> None:
     print('Usage: %s DIR' % sys.argv[0])
     print('       Restore all the domains contained in DIR')
     print('       It is assumed that all files in DIR are')

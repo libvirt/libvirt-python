@@ -8,11 +8,13 @@ import libvirt
 import sys
 from xml.dom import minidom
 import libxml2
+from typing import Any, Dict  # noqa F401
 
-def xpath_eval(ctxt, path):
+
+def xpath_eval(ctxt, path: str) -> str:
     res = ctxt.xpathEval(path)
     if res is None or len(res) == 0:
-        value = None
+        value = ''
     else:
         value = res[0].content
     return value
@@ -50,7 +52,7 @@ domsStrict = [
     if proc.numaParameters()["numa_mode"] == libvirt.VIR_DOMAIN_NUMATUNE_MEM_STRICT
 ]
 
-domsStrictCfg = {}
+domsStrictCfg = {}  # type: Dict[libvirt.virDomain, Dict[str, Dict[str, Any]]]
 for dom in domsStrict:
     xmlStr = dom.XMLDesc()
     doc = libxml2.parseDoc(xmlStr)

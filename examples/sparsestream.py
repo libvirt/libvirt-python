@@ -8,24 +8,24 @@ import libvirt
 import sys
 import os
 
-def bytesWriteHandler(stream, buf, opaque):
+def bytesWriteHandler(stream: libvirt.virStream, buf: bytes, opaque: int) -> int:
     fd = opaque
     return os.write(fd, buf)
 
-def bytesReadHandler(stream, nbytes, opaque):
+def bytesReadHandler(stream: libvirt.virStream, nbytes: int, opaque: int) -> bytes:
     fd = opaque
     return os.read(fd, nbytes)
 
-def recvSkipHandler(stream, length, opaque):
+def recvSkipHandler(stream: libvirt.virStream, length: int, opaque: int) -> None:
     fd = opaque
     cur = os.lseek(fd, length, os.SEEK_CUR)
     return os.ftruncate(fd, cur)
 
-def sendSkipHandler(stream, length, opaque):
+def sendSkipHandler(stream: libvirt.virStream, length: int, opaque: int) -> int:
     fd = opaque
     return os.lseek(fd, length, os.SEEK_CUR)
 
-def holeHandler(stream, opaque):
+def holeHandler(stream: libvirt.virStream, opaque: int):
     fd = opaque
     cur = os.lseek(fd, 0, os.SEEK_CUR)
 
@@ -75,7 +75,7 @@ def holeHandler(stream, opaque):
     os.lseek(fd, cur, os.SEEK_SET)
     return [inData, sectionLen]
 
-def download(vol, st, filename):
+def download(vol: libvirt.virStorageVol, st: libvirt.virStream, filename: str) -> None:
     offset = 0
     length = 0
 
@@ -85,7 +85,7 @@ def download(vol, st, filename):
 
     os.close(fd)
 
-def upload(vol, st, filename):
+def upload(vol: libvirt.virStorageVol, st: libvirt.virStream, filename: str) -> None:
     offset = 0
     length = 0
 

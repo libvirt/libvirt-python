@@ -6,9 +6,10 @@ import libvirt
 import sys
 import libxml2
 import getpass
+from typing import Any, List
 
 
-def usage():
+def usage() -> None:
     print("Usage: %s HOSTNAME" % sys.argv[0])
     print("       List active domains of HOSTNAME and print some info")
 
@@ -27,7 +28,7 @@ def usage():
 #
 # The user_data argument is the user data item of the auth argument (see below)
 # passed to libvirt.openAuth().
-def request_credentials(credentials, user_data):
+def request_credentials(credentials: List[List], user_data: Any) -> int:
     for credential in credentials:
         if credential[0] == libvirt.VIR_CRED_AUTHNAME:
             # prompt the user to input a authname. display the provided message
@@ -49,16 +50,16 @@ def request_credentials(credentials, user_data):
     return 0
 
 
-def print_section(title):
+def print_section(title: str) -> None:
     print("\n%s" % title)
     print("=" * 60)
 
 
-def print_entry(key, value):
+def print_entry(key: str, value: str) -> None:
     print("%-10s %-10s" % (key, value))
 
 
-def print_xml(key, ctx, path):
+def print_xml(key: str, ctx, path: str) -> str:
     res = ctx.xpathEval(path)
 
     if res is None or len(res) == 0:

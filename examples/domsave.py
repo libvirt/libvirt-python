@@ -5,7 +5,7 @@ import libvirt
 import sys
 import os
 
-def usage():
+def usage() -> None:
     print('Usage: %s DIR' % sys.argv[0])
     print('       Save all currently running domU\'s into DIR')
     print('       DIR must exist and be writable by this process')

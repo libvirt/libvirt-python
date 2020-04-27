@@ -34,7 +34,7 @@ event_impl = "poll"
 do_debug = False
 
 
-def debug(msg):
+def debug(msg: str) -> None:
     if do_debug:
         print(msg)
 
@@ -379,7 +379,7 @@ eventLoopThread = None
 # another event loop such as GLib's, or something like the python
 # Twisted event framework.
 
-def virEventAddHandleImpl(fd, events, cb, opaque):
+def virEventAddHandleImpl(fd, events, cb, opaque) -> int:
     return eventLoop.add_handle(fd, events, cb, opaque)
 
 
@@ -387,11 +387,11 @@ def virEventUpdateHandleImpl(handleID, events):
     return eventLoop.update_handle(handleID, events)
 
 
-def virEventRemoveHandleImpl(handleID):
+def virEventRemoveHandleImpl(handleID) -> int:
     return eventLoop.remove_handle(handleID)
 
 
-def virEventAddTimerImpl(interval, cb, opaque):
+def virEventAddTimerImpl(interval, cb, opaque) -> int:
     return eventLoop.add_timer(interval, cb, opaque)
 
 
@@ -399,13 +399,13 @@ def virEventUpdateTimerImpl(timerID, interval):
     return eventLoop.update_timer(timerID, interval)
 
 
-def virEventRemoveTimerImpl(timerID):
+def virEventRemoveTimerImpl(timerID) -> int:
     return eventLoop.remove_timer(timerID)
 
 
 # This tells libvirt what event loop implementation it
 # should use
-def virEventLoopPollRegister():
+def virEventLoopPollRegister() -> None:
     libvirt.virEventRegisterImpl(virEventAddHandleImpl,
                                  virEventUpdateHandleImpl,
                                  virEventRemoveHandleImpl,
@@ -415,23 +415,23 @@ def virEventLoopPollRegister():
 
 
 # Directly run the event loop in the current thread
-def virEventLoopPollRun():
+def virEventLoopPollRun() -> None:
     eventLoop.run_loop()
 
 
-def virEventLoopAIORun(loop):
+def virEventLoopAIORun(loop) -> None:
     import asyncio
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
 
-def virEventLoopNativeRun():
+def virEventLoopNativeRun() -> None:
     while True:
         libvirt.virEventRunDefaultImpl()
 
 
 # Spawn a background thread to run the event loop
-def virEventLoopPollStart():
+def virEventLoopPollStart() -> None:
     global eventLoopThread
     virEventLoopPollRegister()
     eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
@@ -439,7 +439,7 @@ def virEventLoopPollStart():
     eventLoopThread.start()
 
 
-def virEventLoopAIOStart():
+def virEventLoopAIOStart() -> None:
     global eventLoopThread
     import libvirtaio
     import asyncio
@@ -450,7 +450,7 @@ def virEventLoopAIOStart():
     eventLoopThread.start()
 
 
-def virEventLoopNativeStart():
+def virEventLoopNativeStart() -> None:
     global eventLoopThread
     libvirt.virEventRegisterDefaultImpl()
     eventLoopThread = threading.Thread(target=virEventLoopNativeRun, name="libvirtEventLoop")
@@ -464,14 +464,14 @@ def virEventLoopNativeStart():
 class Description(object):
     __slots__ = ('desc', 'args')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.desc = kwargs.get('desc')
         self.args = args
 
-    def __str__(self):  # type: () -> str
-        return self.desc
+    def __str__(self) -> str:
+        return self.desc or ''
 
-    def __getitem__(self, item):  # type: (int) -> str
+    def __getitem__(self, item: int) -> 'Description':
         try:
             data = self.args[item]
         except IndexError:
@@ -508,127 +508,127 @@ DISK_EVENTS = Description("Change missing on start", "Drop missing on start")
 TRAY_EVENTS = Description("Opened", "Closed")
 
 
-def myDomainEventCallback(conn, dom, event, detail, opaque):
+def myDomainEventCallback(conn, dom, event, detail, opaque) -> None:
     print("myDomainEventCallback%s EVENT: Domain %s(%s) %s %s" % (
         opaque, dom.name(), dom.ID(), DOM_EVENTS[event], DOM_EVENTS[event][detail]))
 
 
-def myDomainEventRebootCallback(conn, dom, opaque):
+def myDomainEventRebootCallback(conn, dom, opaque) -> None:
     print("myDomainEventRebootCallback: Domain %s(%s)" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque):
+def myDomainEventRTCChangeCallback(conn, dom, utcoffset, opaque) -> None:
     print("myDomainEventRTCChangeCallback: Domain %s(%s) %d" % (
         dom.name(), dom.ID(), utcoffset))
 
 
-def myDomainEventWatchdogCallback(conn, dom, action, opaque):
+def myDomainEventWatchdogCallback(conn, dom, action, opaque) -> None:
     print("myDomainEventWatchdogCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), WATCHDOG_ACTIONS[action]))
 
 
-def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque):
+def myDomainEventIOErrorCallback(conn, dom, srcpath, devalias, action, opaque) -> None:
     print("myDomainEventIOErrorCallback: Domain %s(%s) %s %s %s" % (
         dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action]))
 
 
-def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque):
+def myDomainEventIOErrorReasonCallback(conn, dom, srcpath, devalias, action, reason, opaque) -> None:
     print("myDomainEventIOErrorReasonCallback: Domain %s(%s) %s %s %s %s" % (
         dom.name(), dom.ID(), srcpath, devalias, ERROR_EVENTS[action], reason))
 
 
-def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque):
+def myDomainEventGraphicsCallback(conn, dom, phase, localAddr, remoteAddr, authScheme, subject, opaque) -> None:
     print("myDomainEventGraphicsCallback: Domain %s(%s) %s %s" % (
         dom.name(), dom.ID(), GRAPHICS_PHASES[phase], authScheme))
 
 
-def myDomainEventControlErrorCallback(conn, dom, opaque):
+def myDomainEventControlErrorCallback(conn, dom, opaque) -> None:
     print("myDomainEventControlErrorCallback: Domain %s(%s)" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque):
+def myDomainEventBlockJobCallback(conn, dom, disk, type, status, opaque) -> None:
     print("myDomainEventBlockJobCallback: Domain %s(%s) %s on disk %s %s" % (
         dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
 
 
-def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque):
+def myDomainEventDiskChangeCallback(conn, dom, oldSrcPath, newSrcPath, devAlias, reason, opaque) -> None:
     print("myDomainEventDiskChangeCallback: Domain %s(%s) disk change oldSrcPath: %s newSrcPath: %s devAlias: %s reason: %s" % (
         dom.name(), dom.ID(), oldSrcPath, newSrcPath, devAlias, DISK_EVENTS[reason]))
 
 
-def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque):
+def myDomainEventTrayChangeCallback(conn, dom, devAlias, reason, opaque) -> None:
     print("myDomainEventTrayChangeCallback: Domain %s(%s) tray change devAlias: %s reason: %s" % (
         dom.name(), dom.ID(), devAlias, TRAY_EVENTS[reason]))
 
 
-def myDomainEventPMWakeupCallback(conn, dom, reason, opaque):
+def myDomainEventPMWakeupCallback(conn, dom, reason, opaque) -> None:
     print("myDomainEventPMWakeupCallback: Domain %s(%s) system pmwakeup" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventPMSuspendCallback(conn, dom, reason, opaque):
+def myDomainEventPMSuspendCallback(conn, dom, reason, opaque) -> None:
     print("myDomainEventPMSuspendCallback: Domain %s(%s) system pmsuspend" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventBalloonChangeCallback(conn, dom, actual, opaque):
+def myDomainEventBalloonChangeCallback(conn, dom, actual, opaque) -> None:
     print("myDomainEventBalloonChangeCallback: Domain %s(%s) %d" % (
         dom.name(), dom.ID(), actual))
 
 
-def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque):
+def myDomainEventPMSuspendDiskCallback(conn, dom, reason, opaque) -> None:
     print("myDomainEventPMSuspendDiskCallback: Domain %s(%s) system pmsuspend_disk" % (
         dom.name(), dom.ID()))
 
 
-def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceRemovedCallback(conn, dom, dev, opaque) -> None:
     print("myDomainEventDeviceRemovedCallback: Domain %s(%s) device removed: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque):
+def myDomainEventBlockJob2Callback(conn, dom, disk, type, status, opaque) -> None:
     print("myDomainEventBlockJob2Callback: Domain %s(%s) %s on disk %s %s" % (
         dom.name(), dom.ID(), BLOCK_JOB_TYPES[type], disk, BLOCK_JOB_STATUS[status]))
 
 
-def myDomainEventTunableCallback(conn, dom, params, opaque):
+def myDomainEventTunableCallback(conn, dom, params, opaque) -> None:
     print("myDomainEventTunableCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), params))
 
 
-def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque):
+def myDomainEventAgentLifecycleCallback(conn, dom, state, reason, opaque) -> None:
     print("myDomainEventAgentLifecycleCallback: Domain %s(%s) %s %s" % (
         dom.name(), dom.ID(), AGENT_STATES[state], AGENT_REASONS[reason]))
 
 
-def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceAddedCallback(conn, dom, dev, opaque) -> None:
     print("myDomainEventDeviceAddedCallback: Domain %s(%s) device added: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventMigrationIteration(conn, dom, iteration, opaque):
+def myDomainEventMigrationIteration(conn, dom, iteration, opaque) -> None:
     print("myDomainEventMigrationIteration: Domain %s(%s) started migration iteration %d" % (
         dom.name(), dom.ID(), iteration))
 
 
-def myDomainEventJobCompletedCallback(conn, dom, params, opaque):
+def myDomainEventJobCompletedCallback(conn, dom, params, opaque) -> None:
     print("myDomainEventJobCompletedCallback: Domain %s(%s) %s" % (
         dom.name(), dom.ID(), params))
 
 
-def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque):
+def myDomainEventDeviceRemovalFailedCallback(conn, dom, dev, opaque) -> None:
     print("myDomainEventDeviceRemovalFailedCallback: Domain %s(%s) failed to remove device: %s" % (
         dom.name(), dom.ID(), dev))
 
 
-def myDomainEventMetadataChangeCallback(conn, dom, mtype, nsuri, opaque):
+def myDomainEventMetadataChangeCallback(conn, dom, mtype, nsuri, opaque) -> None:
     print("myDomainEventMetadataChangeCallback: Domain %s(%s) changed metadata mtype=%d nsuri=%s" % (
         dom.name(), dom.ID(), mtype, nsuri))
 
 
-def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess, opaque):
+def myDomainEventBlockThresholdCallback(conn, dom, dev, path, threshold, excess, opaque) -> None:
     print("myDomainEventBlockThresholdCallback: Domain %s(%s) block device %s(%s) threshold %d exceeded by %d" % (
         dom.name(), dom.ID(), dev, path, threshold, excess))
 
@@ -644,7 +644,7 @@ NET_EVENTS = Description(
 )
 
 
-def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque):
+def myNetworkEventLifecycleCallback(conn, net, event, detail, opaque) -> None:
     print("myNetworkEventLifecycleCallback: Network %s %s %s" % (
         net.name(), NET_EVENTS[event], NET_EVENTS[event][detail]))
 
@@ -662,12 +662,12 @@ STORAGE_EVENTS = Description(
 )
 
 
-def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque):
+def myStoragePoolEventLifecycleCallback(conn, pool, event, detail, opaque) -> None:
     print("myStoragePoolEventLifecycleCallback: Storage pool %s %s %s" % (
         pool.name(), STORAGE_EVENTS[event], STORAGE_EVENTS[event][detail]))
 
 
-def myStoragePoolEventRefreshCallback(conn, pool, opaque):
+def myStoragePoolEventRefreshCallback(conn, pool, opaque) -> None:
     print("myStoragePoolEventRefreshCallback: Storage pool %s" % pool.name())
 
 
@@ -680,12 +680,12 @@ DEVICE_EVENTS = Description(
 )
 
 
-def myNodeDeviceEventLifecycleCallback(conn, dev, event, detail, opaque):
+def myNodeDeviceEventLifecycleCallback(conn, dev, event, detail, opaque) -> None:
     print("myNodeDeviceEventLifecycleCallback: Node device  %s %s %s" % (
         dev.name(), DEVICE_EVENTS[event], DEVICE_EVENTS[event][detail]))
 
 
-def myNodeDeviceEventUpdateCallback(conn, dev, opaque):
+def myNodeDeviceEventUpdateCallback(conn, dev, opaque) -> None:
     print("myNodeDeviceEventUpdateCallback: Node device %s" % dev.name())
 
 
@@ -698,12 +698,12 @@ SECRET_EVENTS = Description(
 )
 
 
-def mySecretEventLifecycleCallback(conn, secret, event, detail, opaque):
+def mySecretEventLifecycleCallback(conn, secret, event, detail, opaque) -> None:
     print("mySecretEventLifecycleCallback: Secret %s %s %s" % (
         secret.UUIDString(), SECRET_EVENTS[event], SECRET_EVENTS[event][detail]))
 
 
-def mySecretEventValueChanged(conn, secret, opaque):
+def mySecretEventValueChanged(conn, secret, opaque) -> None:
     print("mySecretEventValueChanged: Secret %s" % secret.UUIDString())
 
 
@@ -715,14 +715,14 @@ run = True
 CONNECTION_EVENTS = Description("Error", "End-of-file", "Keepalive", "Client")
 
 
-def myConnectionCloseCallback(conn, reason, opaque):
+def myConnectionCloseCallback(conn, reason, opaque) -> None:
     print("myConnectionCloseCallback: %s: %s" % (
         conn.getURI(), CONNECTION_EVENTS[reason]))
     global run
     run = False
 
 
-def usage():
+def usage() -> None:
     print("usage: %s [-hdl] [uri]" % (os.path.basename(__file__),))
     print("   uri will default to qemu:///system")
     print("   --help, -h   Print this help message")
@@ -731,7 +731,7 @@ def usage():
     print("   --timeout=SECS  Quit after SECS seconds running")
 
 
-def main():
+def main() -> None:
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hdl:", ["help", "debug", "loop=", "timeout="])
     except getopt.GetoptError as err:

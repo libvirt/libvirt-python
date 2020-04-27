@@ -5,18 +5,18 @@ import libvirt
 import sys
 import libxml2
 
-def usage():
+def usage() -> None:
     print('Usage: %s DOMAIN' % sys.argv[0])
     print('       Print information about the domain DOMAIN')
 
-def print_section(title):
+def print_section(title: str) -> None:
     print("\n%s" % title)
     print("=" * 60)
 
-def print_entry(key, value):
+def print_entry(key: str, value: str) -> None:
     print("%-10s %-10s" % (key, value))
 
-def print_xml(key, ctx, path):
+def print_xml(key: str, ctx, path: str) -> str:
     res = ctx.xpathEval(path)
     if res is None or len(res) == 0:
         value = "Unknown"
