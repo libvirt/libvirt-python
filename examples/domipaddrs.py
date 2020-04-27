@@ -21,8 +21,9 @@ else:
     usage()
     sys.exit(2)
 
-conn = libvirt.open(uri)
-if conn == None:
+try:
+    conn = libvirt.open(uri)
+except libvirt.libvirtError:
     print "Unable to open connection to libvirt"
     sys.exit(1)
 
