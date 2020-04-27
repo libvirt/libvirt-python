@@ -43,7 +43,7 @@ def check_console(console):
 
 def stdin_callback(watch, fd, events, console):
     readbuf = os.read(fd, 1024)
-    if readbuf.startswith(""):
+    if readbuf.startswith(b""):
         console.run_console = False
         return
     if console.stream:
@@ -51,6 +51,7 @@ def stdin_callback(watch, fd, events, console):
 
 def stream_callback(stream, events, console):
     try:
+        assert console.stream
         received_data = console.stream.recv(1024)
     except:
         return
