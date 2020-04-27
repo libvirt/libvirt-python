@@ -8,13 +8,14 @@ import re
 import sys
 import xml.sax
 from contextlib import closing
+from collections import defaultdict
 
 functions = {}
 lxc_functions = {}
 qemu_functions = {}
-enums = {}  # { enumType: { enumConstant: enumValue } }
-lxc_enums = {}  # { enumType: { enumConstant: enumValue } }
-qemu_enums = {}  # { enumType: { enumConstant: enumValue } }
+enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
+lxc_enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
+qemu_enums = defaultdict(dict)  # { enumType: { enumConstant: enumValue } }
 event_ids = []
 params = []  # [ (paramName, paramValue)... ]
 
@@ -186,8 +187,6 @@ def lxc_function(name, desc, ret, args, file, module, cond):
 
 
 def enum(type, name, value):
-    if type not in enums:
-        enums[type] = {}
     if (name.startswith('VIR_DOMAIN_EVENT_ID_') or
             name.startswith('VIR_NETWORK_EVENT_ID_')):
         event_ids.append(name)
@@ -215,16 +214,12 @@ def enum(type, name, value):
 
 
 def lxc_enum(type, name, value):
-    if type not in lxc_enums:
-        lxc_enums[type] = {}
     if onlyOverrides and name not in lxc_enums[type]:
         return
     lxc_enums[type][name] = value
 
 
 def qemu_enum(type, name, value):
-    if type not in qemu_enums:
-        qemu_enums[type] = {}
     if value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_BLOCK':
         value = -2
     elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_DEFAULT':
@@ -342,7 +337,7 @@ py_types = {
     'const virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
 }
 
-unknown_types = {}
+unknown_types = defaultdict(list)
 
 #######################################################################
 #
@@ -701,11 +696,7 @@ def print_function_wrapper(module, name, output, export, include):
         else:
             if a_type in skipped_types:
                 return 0
-            if a_type in unknown_types:
-                lst = unknown_types[a_type]
-                lst.append(name)
-            else:
-                unknown_types[a_type] = [name]
+            unknown_types[a_type].append(name)
             return -1
     if format:
         format += ":%s" % (name)
@@ -738,11 +729,7 @@ def print_function_wrapper(module, name, output, export, include):
     else:
         if r_type in skipped_types:
             return 0
-        if r_type in unknown_types:
-            lst = unknown_types[r_type]
-            lst.append(name)
-        else:
-            unknown_types[r_type] = [name]
+        unknown_types[r_type].append(name)
         return -1
 
     if cond:
