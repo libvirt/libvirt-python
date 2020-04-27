@@ -33,7 +33,7 @@ def holeHandler(stream, opaque):
         if e.errno != 6:
             raise e
         else:
-            data = -1;
+            data = -1
     # There are three options:
     # 1) data == cur;  @cur is in data
     # 2) data > cur; @cur is in a hole, next data at @data

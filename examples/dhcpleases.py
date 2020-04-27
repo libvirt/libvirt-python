@@ -34,7 +34,7 @@ except libvirt.libvirtError:
     print("Network %s not found" % network)
     sys.exit(0)
 
-leases = net.DHCPLeases();
+leases = net.DHCPLeases()
 if (leases == None):
     print("Failed to get leases for %s" % net.name())
     sys.exit(0)
