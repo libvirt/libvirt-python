@@ -51,11 +51,11 @@
                 ret = handler(self, got, opaque)
                 if type(ret) is int and ret < 0:
                     raise RuntimeError("recvAll handler returned %d" % ret)
-            except Exception:
+            except BaseException:
                 e = sys.exc_info()[1]
                 try:
                     self.abort()
-                except:
+                except Exception:
                     pass
                 raise e
 
@@ -76,11 +76,11 @@
         while True:
             try:
                 got = handler(self, virStorageVol.streamBufSize, opaque)
-            except:
+            except BaseException:
                 e = sys.exc_info()[1]
                 try:
                     self.abort()
-                except:
+                except Exception:
                     pass
                 raise e
 
