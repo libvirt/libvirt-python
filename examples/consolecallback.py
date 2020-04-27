@@ -53,7 +53,7 @@ def stream_callback(stream, events, console):
     try:
         assert console.stream
         received_data = console.stream.recv(1024)
-    except:
+    except Exception:
         return
     os.write(0, received_data)
 

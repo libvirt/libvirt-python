@@ -84,13 +84,13 @@ def processAgentConnect(dom):
                 libvirt.VIR_DOMAIN_AFFECT_LIVE)
         doc = minidom.parseString(cpus)
         ncpus = int(doc.getElementsByTagName('ncpus')[0].getAttribute('count'))
-    except:
+    except Exception:
         return
 
     try:
         dom.setVcpusFlags(ncpus, libvirt.VIR_DOMAIN_AFFECT_LIVE | libvirt.VIR_DOMAIN_VCPU_GUEST)
         print("set vcpu count for domain " + dom.name() + " to " + str(ncpus))
-    except:
+    except Exception:
         print("failed to set vcpu count for domain " + dom.name())
 
 def work():
@@ -102,7 +102,7 @@ def work():
         if not data.hasConn():
             try:
                 conn = libvirt.open(uri)
-            except:
+            except libvirt.libvirtError:
                 print('Failed to connect to ' + uri + ', retry in ' + str(connectRetryTimeout)) + ' seconds'
                 time.sleep(connectRetryTimeout)
                 continue

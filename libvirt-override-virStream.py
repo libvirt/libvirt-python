@@ -54,7 +54,7 @@
                 e = sys.exc_info()[1]
                 try:
                     self.abort()
-                except:
+                except Exception:
                     pass
                 raise e
 
@@ -75,11 +75,11 @@
         while True:
             try:
                 got = handler(self, virStorageVol.streamBufSize, opaque)
-            except:
+            except Exception:
                 e = sys.exc_info()[1]
                 try:
                     self.abort()
-                except:
+                except Exception:
                     pass
                 raise e
 
