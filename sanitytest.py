@@ -73,7 +73,11 @@ for n in second_pass:
             val = int(v[val])
             break
 
-    if type(val) != int:
+    # Version 4.0.0 was broken as missing VIR_TYPED_PARAM enums
+    # constants. This is harmless from POV of validating API
+    # coverage so ignore this error.
+    if (type(val) != int and
+        not val.startswith("VIR_TYPED_PARAM_")):
         fail = True
         print("Cannot get a value of enum %s (originally %s)" % (val, name))
     enumvals[typ][name] = val
