@@ -85,7 +85,7 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 %{__python3} setup.py test
 
 %files -n python3-libvirt
-%doc ChangeLog AUTHORS NEWS README COPYING COPYING.LESSER examples/
+%doc ChangeLog AUTHORS README COPYING COPYING.LESSER examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
 %{python3_sitearch}/libvirt_qemu.py*

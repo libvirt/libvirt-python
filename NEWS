@@ -1,9 +1,0 @@
- Libvirt Python News
- ===================
-
-
-Release 1.2.0
-=============
-
- - Split off from main libvirt package
- - Allow to compile against multiple versions of libvirt
