@@ -18,11 +18,6 @@ nodestats.py - print total memory and free memory for each host NUMA node and
                the memory strictly bound to certain host nodes for each running
                domain.
 
-The XML files in this directory are examples of the XML format that libvirt
-expects, and will have to be adapted for your setup. They are only needed
-for domstart.py
-
-
 Some additional notes for the esxlist.py example:
 
 You may see remote errors complaining about missing certificates:
