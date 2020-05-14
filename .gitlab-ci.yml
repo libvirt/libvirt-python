@@ -44,6 +44,8 @@ stages:
     - popd
     - $PYTHON setup.py build
     - $PYTHON setup.py test
+    - $PYTHON setup.py sdist
+    - if test -x /usr/bin/rpmbuild && test $NAME != "opensuse-151" ; then rpmbuild --nodeps -ta dist/libvirt-python*tar.gz ; fi
 
 .dist_build_job_template: &dist_build_job_definition
   image: $CI_REGISTRY_IMAGE/ci-$NAME:latest
@@ -53,6 +55,8 @@ stages:
   script:
     - $PYTHON setup.py build
     - $PYTHON setup.py test
+    - $PYTHON setup.py sdist
+    - if test -x /usr/bin/rpmbuild && test $NAME != "opensuse-151" ; then rpmbuild --nodeps -ta dist/libvirt-python*tar.gz ; fi
 
 # Check that all commits are signed-off for the DCO.
 # Skip on "libvirt" namespace, since we only need to run
