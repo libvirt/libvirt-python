@@ -13,6 +13,7 @@ include examples/event-test.py
 include examples/guest-vcpus/guest-vcpu-daemon.py
 include examples/guest-vcpus/guest-vcpu.py
 include examples/nodestats.py
+include examples/sparsestream.py
 include examples/topology.py
 include generator.py
 include libvirt-lxc-override-api.xml
