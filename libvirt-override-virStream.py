@@ -39,7 +39,7 @@
                 return os.write(fd, buf)
         """
         while True:
-            got = self.recv(1024*64)
+            got = self.recv(virStorageVol.streamBufSize)
             if got == -2:
                 raise libvirtError("cannot use recvAll with "
                                    "nonblocking stream")
@@ -74,7 +74,7 @@
         """
         while True:
             try:
-                got = handler(self, 1024*64, opaque)
+                got = handler(self, virStorageVol.streamBufSize, opaque)
             except:
                 e = sys.exc_info()[1]
                 try:
@@ -189,7 +189,7 @@
                                              # actually allocate the hole
         """
         while True:
-            want = 64 * 1024
+            want = virStorageVol.streamBufSize
             got = self.recvFlags(want, VIR_STREAM_RECV_STOP_AT_HOLE)
             if got == -2:
                 raise libvirtError("cannot use sparseRecvAll with "
@@ -251,7 +251,7 @@
                     self.abort()
                 continue
 
-            want = 64 * 1024
+            want = virStorageVol.streamBufSize
             if (want > sectionLen):
                 want = sectionLen
 

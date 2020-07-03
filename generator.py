@@ -1559,6 +1559,12 @@ def buildWrappers(module):
             pass
         else:
             classes.write("class %s(object):\n" % (classname))
+            if classname is "virStorageVol":
+                classes.write("    # The size (in bytes) of buffer used in sendAll(),\n")
+                classes.write("    # recvAll(), sparseSendAll() and sparseRecvAll()\n")
+                classes.write("    # methods. This corresponds to the size of payload\n")
+                classes.write("    # of a stream packet.\n")
+                classes.write("    streamBufSize = 262120\n\n")
             if classname in [ "virDomain", "virNetwork", "virInterface", "virStoragePool",
                               "virStorageVol", "virNodeDevice", "virSecret","virStream",
                               "virNWFilter", "virNWFilterBinding" ]:
