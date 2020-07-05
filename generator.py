@@ -1559,7 +1559,7 @@ def buildWrappers(module):
             pass
         else:
             classes.write("class %s(object):\n" % (classname))
-            if classname is "virStorageVol":
+            if classname == "virStorageVol":
                 classes.write("    # The size (in bytes) of buffer used in sendAll(),\n")
                 classes.write("    # recvAll(), sparseSendAll() and sparseRecvAll()\n")
                 classes.write("    # methods. This corresponds to the size of payload\n")
