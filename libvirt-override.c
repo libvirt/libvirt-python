@@ -17,6 +17,7 @@
 /* We want to see *_LAST enums.  */
 #define VIR_ENUM_SENTINELS
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
@@ -3040,7 +3041,7 @@ libvirt_virDomainLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     PyObject *pyobj_conn;
     unsigned char * uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virDomainLookupByUUID",
                           &pyobj_conn, &uuid, &len))
@@ -3283,7 +3284,7 @@ libvirt_virNetworkLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     PyObject *pyobj_conn;
     unsigned char * uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virNetworkLookupByUUID",
                           &pyobj_conn, &uuid, &len))
@@ -3992,7 +3993,7 @@ libvirt_virStoragePoolLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     PyObject *pyobj_conn;
     unsigned char * uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virStoragePoolLookupByUUID",
                           &pyobj_conn, &uuid, &len))
@@ -4233,7 +4234,7 @@ libvirt_virSecretLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     PyObject *pyobj_conn;
     unsigned char * uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virSecretLookupByUUID",
                           &pyobj_conn, &uuid, &len))
@@ -4393,7 +4394,7 @@ libvirt_virSecretSetValue(PyObject *self ATTRIBUTE_UNUSED,
     virSecretPtr secret;
     PyObject *pyobj_secret;
     const char *value;
-    int size;
+    Py_ssize_t size;
     unsigned int flags;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#I:virSecretSetValue", &pyobj_secret,
@@ -4402,8 +4403,8 @@ libvirt_virSecretSetValue(PyObject *self ATTRIBUTE_UNUSED,
     secret = (virSecretPtr) PyvirSecret_Get(pyobj_secret);
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
-    c_retval = virSecretSetValue(secret, (const unsigned char *)value, size,
-                                 flags);
+    c_retval = virSecretSetValue(secret, (const unsigned char *)value,
+                                 (size_t) size, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
     return libvirt_intWrap(c_retval);
@@ -4471,7 +4472,7 @@ libvirt_virNWFilterLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virConnectPtr conn;
     PyObject *pyobj_conn;
     unsigned char * uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virNWFilterLookupByUUID",
                           &pyobj_conn, &uuid, &len))
@@ -10247,7 +10248,7 @@ libvirt_virNetworkPortLookupByUUID(PyObject *self ATTRIBUTE_UNUSED,
     virNetworkPtr net;
     PyObject *pyobj_net;
     unsigned char *uuid;
-    int len;
+    Py_ssize_t len;
 
     if (!PyArg_ParseTuple(args, (char *)"Oz#:virNetworkPortLookupByUUID",
                           &pyobj_net, &uuid, &len))
