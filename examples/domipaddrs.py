@@ -4,55 +4,59 @@
 import libvirt
 import sys
 
-def usage():
-    print "Usage: %s [URI] DOMAIN" % sys.argv[0]
-    print "        Print domain interfaces along with their MAC and IP addresses"
+IPTYPE = {
+    libvirt.VIR_IP_ADDR_TYPE_IPV4: "ipv4",
+    libvirt.VIR_IP_ADDR_TYPE_IPV6: "ipv6",
+}
 
-uri = None
-name = None
-args = len(sys.argv)
 
-if args == 2:
-    name = sys.argv[1]
-elif args == 3:
-    uri = sys.argv[1]
-    name = sys.argv[2]
-else:
-    usage()
-    sys.exit(2)
+def print_dom_ifaces(dom):
+    ifaces = dom.interfaceAddresses(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE)
+    if (ifaces == None):
+        print("Failed to get domain interfaces")
+        sys.exit(0)
 
-try:
-    conn = libvirt.open(uri)
-except libvirt.libvirtError:
-    print "Unable to open connection to libvirt"
-    sys.exit(1)
+    print(" {0:10} {1:20} {2:12} {3}".format(
+        "Interface", "MAC address", "Protocol", "Address"))
 
-try:
-    dom = conn.lookupByName(name)
-except libvirt.libvirtError:
-    print "Domain %s not found" % name
-    sys.exit(0)
+    for (name, val) in ifaces.items():
+        if val['addrs']:
+            for addr in val['addrs']:
+                print (" {0:10} {1:19} {2:12} {3}/{4}".format(
+                    name,
+                    val['hwaddr'],
+                    IPTYPE[addr['type']],
+                    addr['addr'],
+                    addr['prefix']))
+        else:
+            print(" {0:10} {1:19} {2:12} {3}".format(name, val['hwaddr'], "N/A", "N/A"))
 
-ifaces = dom.interfaceAddresses(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE);
-if (ifaces == None):
-    print "Failed to get domain interfaces"
-    sys.exit(0)
 
-print " {0:10} {1:20} {2:12} {3}".format("Interface", "MAC address", "Protocol", "Address")
+if __name__ == "__main__":
+    uri = None
+    name = None
+    args = len(sys.argv)
 
-def toIPAddrType(addrType):
-    if addrType == libvirt.VIR_IP_ADDR_TYPE_IPV4:
-        return "ipv4"
-    elif addrType == libvirt.VIR_IP_ADDR_TYPE_IPV6:
-        return "ipv6"
-
-for (name, val) in ifaces.iteritems():
-    if val['addrs']:
-        for addr in val['addrs']:
-           print " {0:10} {1:19}".format(name, val['hwaddr']),
-           print " {0:12} {1}/{2} ".format(toIPAddrType(addr['type']), addr['addr'], addr['prefix']),
-           print
+    if args == 2:
+        name = sys.argv[1]
+    elif args == 3:
+        uri = sys.argv[1]
+        name = sys.argv[2]
     else:
-        print " {0:10} {1:19}".format(name, val['hwaddr']),
-        print " {0:12} {1}".format("N/A", "N/A"),
-        print
+        print("Usage: %s [URI] DOMAIN" % sys.argv[0])
+        print("        Print domain interfaces along with their MAC and IP addresses")
+        sys.exit(2)
+
+    try:
+        conn = libvirt.open(uri)
+    except libvirt.libvirtError:
+        raise SystemExit("Unable to open connection to libvirt")
+
+    try:
+        dom = conn.lookupByName(name)
+    except libvirt.libvirtError:
+        print("Domain %s not found" % name)
+        sys.exit(0)
+
+    print_dom_ifaces(dom)
+    conn.close()
