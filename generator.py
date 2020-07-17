@@ -10,7 +10,7 @@ enums = {} # { enumType: { enumConstant: enumValue } }
 lxc_enums = {} # { enumType: { enumConstant: enumValue } }
 qemu_enums = {} # { enumType: { enumConstant: enumValue } }
 event_ids = []
-params = [] # [ (parameName, paramValue)... ]
+params = [] # [ (paramName, paramValue)... ]
 
 import os
 import sys
@@ -145,7 +145,7 @@ class docParser(xml.sax.handler.ContentHandler):
         if debug:
             print("end %s" % tag)
         if tag == 'function':
-            # fuctions come from source files, hence 'virerror.c'
+            # functions come from source files, hence 'virerror.c'
             if self.function is not None:
                 if self.function_module in libvirt_headers + \
                             ["event", "virevent", "virerror", "virterror"]:
@@ -274,7 +274,7 @@ def qemu_enum(type, name, value):
 
 #######################################################################
 #
-#  Some filtering rukes to drop functions/types which should not
+#  Some filtering rules to drop functions/types which should not
 #  be exposed as-is on the Python interface
 #
 #######################################################################
@@ -389,7 +389,7 @@ unknown_types = {}
 #######################################################################
 #
 #  This part writes the C <-> Python stubs libvirt.[ch] and
-#  the table libvirt-export.c to add when registrering the Python module
+#  the table libvirt-export.c to add when registering the Python module
 #
 #######################################################################
 
@@ -530,11 +530,11 @@ qemu_skip_impl = (
 )
 
 
-# These are functions which the generator skips completly - no python
+# These are functions which the generator skips completely - no python
 # or C code is generated. Generally should not be used for any more
 # functions than those already listed
 skip_function = (
-    'virConnectListDomains', # Python API is called virConectListDomainsID for unknown reasons
+    'virConnectListDomains', # Python API is called virConnectListDomainsID for unknown reasons
     'virConnSetErrorFunc', # Not used in Python API  XXX is this a bug ?
     'virResetError', # Not used in Python API  XXX is this a bug ?
     'virGetVersion', # Python C code is manually written
@@ -572,7 +572,7 @@ skip_function = (
     'virConnectListAllNWFilterBindings', # overridden in virConnect.py
     'virConnectListAllSecrets', # overridden in virConnect.py
     'virConnectGetAllDomainStats', # overridden in virConnect.py
-    'virDomainListGetStats', # overriden in virConnect.py
+    'virDomainListGetStats', # overridden in virConnect.py
 
     'virStreamRecvAll', # Pure python libvirt-override-virStream.py
     'virStreamSendAll', # Pure python libvirt-override-virStream.py
