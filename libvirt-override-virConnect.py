@@ -467,11 +467,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllDomains() failed")
 
-        retlist = list()
-        for domptr in ret:
-            retlist.append(virDomain(self, _obj=domptr))
-
-        return retlist
+        return [virDomain(self, _obj=domptr) for domptr in ret]
 
     def listAllStoragePools(self, flags: int = 0) -> List['virStoragePool']:
         """Returns a list of storage pool objects"""
@@ -479,11 +475,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllStoragePools() failed")
 
-        retlist = list()
-        for poolptr in ret:
-            retlist.append(virStoragePool(self, _obj=poolptr))
-
-        return retlist
+        return [virStoragePool(self, _obj=poolptr) for poolptr in ret]
 
     def listAllNetworks(self, flags: int = 0) -> List['virNetwork']:
         """Returns a list of network objects"""
@@ -491,11 +483,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllNetworks() failed")
 
-        retlist = list()
-        for netptr in ret:
-            retlist.append(virNetwork(self, _obj=netptr))
-
-        return retlist
+        return [virNetwork(self, _obj=netptr) for netptr in ret]
 
     def listAllInterfaces(self, flags: int = 0) -> List['virInterface']:
         """Returns a list of interface objects"""
@@ -503,11 +491,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllInterfaces() failed")
 
-        retlist = list()
-        for ifaceptr in ret:
-            retlist.append(virInterface(self, _obj=ifaceptr))
-
-        return retlist
+        return [virInterface(self, _obj=ifaceptr) for ifaceptr in ret]
 
     def listAllDevices(self, flags: int = 0) -> List['virNodeDevice']:
         """Returns a list of host node device objects"""
@@ -515,11 +499,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllNodeDevices() failed")
 
-        retlist = list()
-        for devptr in ret:
-            retlist.append(virNodeDevice(self, _obj=devptr))
-
-        return retlist
+        return [virNodeDevice(self, _obj=devptr) for devptr in ret]
 
     def listAllNWFilters(self, flags: int = 0) -> List['virNWFilter']:
         """Returns a list of network filter objects"""
@@ -527,11 +507,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllNWFilters() failed")
 
-        retlist = list()
-        for filter_ptr in ret:
-            retlist.append(virNWFilter(self, _obj=filter_ptr))
-
-        return retlist
+        return [virNWFilter(self, _obj=filter_ptr) for filter_ptr in ret]
 
     def listAllNWFilterBindings(self, flags: int = 0) -> List['virNWFilterBinding']:
         """Returns a list of network filter binding objects"""
@@ -539,11 +515,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllNWFilterBindings() failed")
 
-        retlist = list()
-        for filter_ptr in ret:
-            retlist.append(virNWFilterBinding(self, _obj=filter_ptr))
-
-        return retlist
+        return [virNWFilterBinding(self, _obj=filter_ptr) for filter_ptr in ret]
 
     def listAllSecrets(self, flags: int = 0) -> List['virSecret']:
         """Returns a list of secret objects"""
@@ -551,11 +523,7 @@
         if ret is None:
             raise libvirtError("virConnectListAllSecrets() failed")
 
-        retlist = list()
-        for secret_ptr in ret:
-            retlist.append(virSecret(self, _obj=secret_ptr))
-
-        return retlist
+        return [virSecret(self, _obj=secret_ptr) for secret_ptr in ret]
 
     def _dispatchCloseCallback(self, reason: int, cbData: Dict[str, Any]) -> int:
         """Dispatches events to python user close callback"""
@@ -657,12 +625,7 @@
         if ret is None:
             raise libvirtError("virConnectGetAllDomainStats() failed")
 
-        retlist = list()
-        for elem in ret:
-            record = (virDomain(self, _obj=elem[0]), elem[1])
-            retlist.append(record)
-
-        return retlist
+        return [(virDomain(self, _obj=elem[0]), elem[1]) for elem in ret]
 
     def domainListGetStats(self, doms: List['virDomain'], stats: int = 0, flags: int = 0) -> List[Tuple['virDomain', Dict[str, Any]]]:
         """ Query statistics for given domains.
@@ -704,9 +667,4 @@
         if ret is None:
             raise libvirtError("virDomainListGetStats() failed")
 
-        retlist = list()
-        for elem in ret:
-            record = (virDomain(self, _obj=elem[0]), elem[1])
-            retlist.append(record)
-
-        return retlist
+        return [(virDomain(self, _obj=elem[0]), elem[1]) for elem in ret]

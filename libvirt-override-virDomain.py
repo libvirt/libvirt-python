@@ -4,11 +4,7 @@
         if ret is None:
             raise libvirtError("virDomainListAllSnapshots() failed")
 
-        retlist = list()
-        for snapptr in ret:
-            retlist.append(virDomainSnapshot(self, _obj=snapptr))
-
-        return retlist
+        return [virDomainSnapshot(self, _obj=snapptr) for snapptr in ret]
 
     def listAllCheckpoints(self, flags: int = 0) -> List['virDomainCheckpoint']:
         """List all checkpoints and returns a list of checkpoint objects"""
@@ -16,11 +12,7 @@
         if ret is None:
             raise libvirtError("virDomainListAllCheckpoints() failed")
 
-        retlist = list()
-        for chkptr in ret:
-            retlist.append(virDomainCheckpoint(self, _obj=chkptr))
-
-        return retlist
+        return [virDomainCheckpoint(self, _obj=chkptr) for chkptr in ret]
 
     def createWithFiles(self, files: List[int], flags: int = 0) -> 'virDomain':
         """Launch a defined domain. If the call succeeds the domain moves from the

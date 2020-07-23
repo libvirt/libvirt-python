@@ -4,8 +4,4 @@
         if ret is None:
             raise libvirtError("virNetworkListAllPorts() failed")
 
-        retlist = list()
-        for domptr in ret:
-            retlist.append(virNetworkPort(self, _obj=domptr))
-
-        return retlist
+        return [virNetworkPort(self, _obj=domptr) for domptr in ret]

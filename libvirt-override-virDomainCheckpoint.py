@@ -12,8 +12,4 @@
         if ret is None:
             raise libvirtError("virDomainCheckpointListAllChildren() failed")
 
-        retlist = list()
-        for chkptr in ret:
-            retlist.append(virDomainCheckpoint(self.domain(), _obj=chkptr))
-
-        return retlist
+        return [virDomainCheckpoint(self.domain(), _obj=chkptr) for chkptr in ret]

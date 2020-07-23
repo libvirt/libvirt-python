@@ -4,8 +4,4 @@
         if ret is None:
             raise libvirtError("virStoragePoolListAllVolumes() failed")
 
-        retlist = list()
-        for volptr in ret:
-            retlist.append(virStorageVol(self._conn, _obj=volptr))
-
-        return retlist
+        return [virStorageVol(self._conn, _obj=volptr) for volptr in ret]

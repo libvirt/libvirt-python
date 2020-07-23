@@ -12,8 +12,4 @@
         if ret is None:
             raise libvirtError("virDomainSnapshotListAllChildren() failed")
 
-        retlist = list()
-        for snapptr in ret:
-            retlist.append(virDomainSnapshot(self.domain(), _obj=snapptr))
-
-        return retlist
+        return [virDomainSnapshot(self.domain(), _obj=snapptr) for snapptr in ret]
