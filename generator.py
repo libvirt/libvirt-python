@@ -1139,7 +1139,7 @@ def is_integral_type(name):
 
 
 def is_optional_arg(info):
-    return re.search("^\(?optional\)?", info) is not None
+    return re.search(r"^\(?optional\)?", info) is not None
 
 
 def is_python_noninteger_type(name):
