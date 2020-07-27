@@ -243,10 +243,6 @@ def qemu_enum(type, name, value):
 #
 #######################################################################
 
-functions_failed = []
-lxc_functions_failed = []
-qemu_functions_failed = []
-
 functions_skipped = {
     "virConnectListDomains",
 }
@@ -860,15 +856,12 @@ def buildStubs(module, api_xml):
 
     if module == "libvirt":
         funcs = functions
-        funcs_failed = functions_failed
         funcs_skipped = functions_skipped
     elif module == "libvirt-lxc":
         funcs = lxc_functions
-        funcs_failed = lxc_functions_failed
         funcs_skipped = lxc_functions_skipped
     elif module == "libvirt-qemu":
         funcs = qemu_functions
-        funcs_failed = qemu_functions_failed
         funcs_skipped = qemu_functions_skipped
 
     try:
@@ -900,6 +893,7 @@ def buildStubs(module, api_xml):
     nb_wrap = 0
     failed = 0
     skipped = 0
+    funcs_failed = []
 
     header_file = "build/%s.h" % module
     export_file = "build/%s-export.c" % module
