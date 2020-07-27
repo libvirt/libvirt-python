@@ -36,7 +36,7 @@ extern PyObject *PyInit_cygvirtmod_qemu(void);
     printf(fmt, __VA_ARGS__)
 #else
 # define DEBUG(fmt, ...)            \
-    do {} while (0)
+    while (0) {printf(fmt, __VA_ARGS__);}
 #endif
 
 /*******************************************

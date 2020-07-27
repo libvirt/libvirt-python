@@ -276,3 +276,7 @@ PyObject * libvirt_virDomainSnapshotPtrWrap(virDomainSnapshotPtr node);
   if (PyEval_ThreadsInitialized())			       \
     PyGILState_Release(_save);				       \
   } LIBVIRT_STMT_END
+
+#ifndef NULLSTR
+#define NULLSTR(s) ((s) ? (s) : "<null>")
+#endif
