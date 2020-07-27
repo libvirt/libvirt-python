@@ -632,35 +632,30 @@ function_skip_index_one = {
 
 
 def print_function_wrapper(module, name, output, export, include):
+    """
+    :returns: -1 on failure, 0 on skip, 1 on success.
+    """
     try:
         if module == "libvirt":
             (desc, ret, args, file, mod, cond) = functions[name]
-        if module == "libvirt-lxc":
+            skip_function2, skip_impl2 = skip_function, skip_impl
+        elif module == "libvirt-lxc":
             (desc, ret, args, file, mod, cond) = lxc_functions[name]
-        if module == "libvirt-qemu":
+            skip_function2, skip_impl2 = lxc_skip_function, lxc_skip_impl
+        elif module == "libvirt-qemu":
             (desc, ret, args, file, mod, cond) = qemu_functions[name]
+            skip_function2, skip_impl2 = qemu_skip_function, qemu_skip_impl
+        else:
+            raise ValueError(module)
     except Exception:
         print("failed to get function %s infos" % name)
         return -1
 
-    if module == "libvirt":
-        if name in skip_function:
-            return 0
-        if name in skip_impl:
-            # Don't delete the function entry in the caller.
-            return 1
-    elif module == "libvirt-lxc":
-        if name in lxc_skip_function:
-            return 0
-        if name in lxc_skip_impl:
-            # Don't delete the function entry in the caller.
-            return 1
-    elif module == "libvirt-qemu":
-        if name in qemu_skip_function:
-            return 0
-        if name in qemu_skip_impl:
-            # Don't delete the function entry in the caller.
-            return 1
+    if name in skip_function2:
+        return 0
+    if name in skip_impl2:
+        # Don't delete the function entry in the caller.
+        return 1
 
     c_call = ""
     format = ""
