@@ -1,37 +1,29 @@
 #!/usr/bin/env python3
-# netdhcpleases - print leases info for given virtual network
+"""
+Print leases info for a given virtual network
+"""
 
 import libvirt
 import sys
 import time
+from argparse import ArgumentParser
 
-def usage() -> None:
-    print("Usage: %s [URI] NETWORK" % sys.argv[0])
-    print("        Print leases info for a given virtual network")
 
-uri = None
-network = None
-args = len(sys.argv)
-
-if args == 2:
-    network = sys.argv[1]
-elif args == 3:
-    uri = sys.argv[1]
-    network = sys.argv[2]
-else:
-    usage()
-    sys.exit(2)
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("uri", nargs="?", default=None)
+parser.add_argument("network")
+args = parser.parse_args()
 
 try:
-    conn = libvirt.open(uri)
+    conn = libvirt.open(args.uri)
 except libvirt.libvirtError:
     print("Unable to open connection to libvirt")
     sys.exit(1)
 
 try:
-    net = conn.networkLookupByName(network)
+    net = conn.networkLookupByName(args.network)
 except libvirt.libvirtError:
-    print("Network %s not found" % network)
+    print("Network %s not found" % args.network)
     sys.exit(0)
 
 leases = net.DHCPLeases()

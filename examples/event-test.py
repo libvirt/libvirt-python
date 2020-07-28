@@ -7,14 +7,13 @@
 ##############################################################################
 
 import atexit
-import sys
-import getopt
 import os
 import libvirt
 import select
 import errno
 import time
 import threading
+from argparse import ArgumentParser
 from typing import Any, Callable, Dict, List, Optional, TypeVar  # noqa F401
 _T = TypeVar("_T")
 _EventCallback = Callable[[int, int, int, _T], None]
@@ -725,53 +724,29 @@ def myConnectionCloseCallback(conn: libvirt.virConnect, reason: int, opaque: _T)
     run = False
 
 
-def usage() -> None:
-    print("usage: %s [-hdl] [uri]" % (os.path.basename(__file__),))
-    print("   uri will default to qemu:///system")
-    print("   --help, -h   Print this help message")
-    print("   --debug, -d  Print debug output")
-    print("   --loop=TYPE, -l   Choose event-loop-implementation (native, poll, asyncio)")
-    print("   --timeout=SECS  Quit after SECS seconds running")
-
-
 def main() -> None:
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hdl:", ["help", "debug", "loop=", "timeout="])
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(str(err))  # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
-    timeout = None
-    for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        if o in ("-d", "--debug"):
+    parser = ArgumentParser()
+    parser.add_argument("--debug", "-d", action="store_true", help="Print debug output")
+    parser.add_argument("--loop", "-l", choices=("native", "poll", "asyncio"), default=event_impl, help="Choose event-loop-implementation")
+    parser.add_argument("--timeout", type=int, default=None, help="Quit after SECS seconds running")
+    parser.add_argument("uri", nargs="?", default="qemu:///system")
+    args = parser.parse_args()
+
+    if args.debug:
             global do_debug
             do_debug = True
-        if o in ("-l", "--loop"):
-            global event_impl
-            event_impl = a
-        if o in ("--timeout"):
-            timeout = int(a)
 
-    if len(args) >= 1:
-        uri = args[0]
-    else:
-        uri = "qemu:///system"
-
-    print("Using uri '%s' and event loop '%s'" % (uri, event_impl))
+    print("Using uri '%s' and event loop '%s'" % (args.uri, args.loop))
 
     # Run a background thread with the event loop
-    if event_impl == "poll":
+    if args.loop == "poll":
         virEventLoopPollStart()
-    elif event_impl == "asyncio":
+    elif args.loop == "asyncio":
         virEventLoopAIOStart()
     else:
         virEventLoopNativeStart()
 
-    vc = libvirt.openReadOnly(uri)
+    vc = libvirt.openReadOnly(args.uri)
 
     # Close connection on exit (to test cleanup paths)
     def exit() -> None:
@@ -839,7 +814,7 @@ def main() -> None:
     # run the event loop in your main thread if your app is
     # totally event based.
     count = 0
-    while run and (timeout is None or count < timeout):
+    while run and (args.timeout is None or count < args.timeout):
         count = count + 1
         time.sleep(1)
 

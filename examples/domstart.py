@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-# domstart - make sure a given domU is running, if not start it
+"""
+Check that the domain described by DOMAIN.XML is running.
+If the domain is not running, create it.
+"""
 
 import libvirt
 import sys
 import os
 import libxml2
 import pdb
+from argparse import ArgumentParser
 from typing import Tuple
 
 # Parse the XML description of domU from FNAME
@@ -20,18 +24,12 @@ def read_domain(fname: str) -> Tuple[str, str]:
     name = doc.xpathNewContext().xpathEval("/domain/name")[0].content
     return (name, xmldesc)
 
-def usage() -> None:
-   print('Usage: %s domain.xml' % sys.argv[0])
-   print('       Check that the domain described by DOMAIN.XML is running')
-   print('       If the domain is not running, create it')
-   print('       DOMAIN.XML must be a XML description of the domain')
-   print('       in libvirt\'s XML format')
 
-if len(sys.argv) != 2:
-    usage()
-    sys.exit(2)
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("file", metavar="DOMAIN.XML", help="XML configuration of the domain in libvirt's XML format")
+args = parser.parse_args()
 
-(name, xmldesc) = read_domain(sys.argv[1])
+(name, xmldesc) = read_domain(args.file)
 
 try:
     conn = libvirt.open(None)

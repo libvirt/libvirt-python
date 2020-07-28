@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-# dominfo - print some information about a domain
+"""
+Print information about the domain DOMAIN
+"""
 
 import libvirt
 import sys
 import os
 import libxml2
 import pdb
+from argparse import ArgumentParser
 from typing import Any
 
-def usage() -> None:
-   print('Usage: %s DOMAIN' % sys.argv[0])
-   print('       Print information about the domain DOMAIN')
+
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("domain")
+args = parser.parse_args()
+
 
 def print_section(title: str) -> None:
     print("\n%s" % title)
@@ -28,11 +33,6 @@ def print_xml(key: str, ctx, path: str) -> str:
     print_entry(key, value)
     return value
 
-if len(sys.argv) != 2:
-    usage()
-    sys.exit(2)
-
-name = sys.argv[1]
 
 # Connect to libvirt
 try:
@@ -42,10 +42,10 @@ except libvirt.libvirtError:
     sys.exit(1)
 
 try:
-    dom = conn.lookupByName(name)
+    dom = conn.lookupByName(args.domain)
     # Annoyiingly, libvirt prints its own error message here
 except libvirt.libvirtError:
-    print("Domain %s is not running" % name)
+    print("Domain %s is not running" % args.domain)
     sys.exit(0)
 
 info = dom.info()

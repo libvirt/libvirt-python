@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-# domstart - make sure a given domU is running, if not start it
+"""
+Save all currently running domU's into DIR.
+DIR must exist and be writable by this process.
+"""
 
 import libvirt
 import sys
 import os
 import libxml2
 import pdb
+from argparse import ArgumentParser
 
-def usage() -> None:
-   print('Usage: %s DIR' % sys.argv[0])
-   print('       Save all currently running domU\'s into DIR')
-   print('       DIR must exist and be writable by this process')
 
-if len(sys.argv) != 2:
-    usage()
-    sys.exit(2)
-
-dir = sys.argv[1]
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("dir")
+args = parser.parse_args()
 
 try:
     conn = libvirt.open(None)
@@ -30,7 +28,7 @@ for id in doms:
         continue
     dom = conn.lookupByID(id)
     print("Saving %s[%d] ... " % (dom.name(), id))
-    path = os.path.join(dir, dom.name())
+    path = os.path.join(args.dir, dom.name())
     ret = dom.save(path)
     if ret == 0:
         print("done")

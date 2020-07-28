@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+"""
+Either uploads local FILE to libvirt VOLUME, or downloads libvirt
+VOLUME into local FILE while preserving FILE/VOLUME sparseness
+"""
 # Example of sparse streams usage
 #
 # Authors:
 #   Michal Privoznik <mprivozn@redhat.com>
 
 import libvirt, sys, os
+from argparse import ArgumentParser
 
 def bytesWriteHandler(stream: libvirt.virStream, buf: bytes, opaque: int) -> int:
     fd = opaque
@@ -94,24 +99,22 @@ def upload(vol: libvirt.virStorageVol, st: libvirt.virStream, filename: str) -> 
     os.close(fd)
 
 # main
-if len(sys.argv) != 5:
-    print("Usage: ", sys.argv[0], " URI --upload/--download VOLUME FILE")
-    print("Either uploads local FILE to libvirt VOLUME, or downloads libvirt ")
-    print("VOLUME into local FILE while preserving FILE/VOLUME sparseness")
-    sys.exit(1)
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("uri")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("--upload", action="store_const", const=upload, dest="operation")
+group.add_argument("--download", action="store_const", const=download, dest="operation")
+parser.add_argument("volume")
+parser.add_argument("file")
+args = parser.parse_args()
 
-conn = libvirt.open(sys.argv[1])
-vol = conn.storageVolLookupByKey(sys.argv[3])
+
+conn = libvirt.open(args.uri)
+vol = conn.storageVolLookupByKey(args.volume)
 
 st = conn.newStream()
 
-if sys.argv[2] == "--download":
-    download(vol, st, sys.argv[4])
-elif sys.argv[2] == "--upload":
-    upload(vol, st, sys.argv[4])
-else:
-    print("Unknown operation: %s " % sys.argv[1])
-    sys.exit(1)
+args.operation(vol, st, args.file)
 
 st.finish()
 conn.close()

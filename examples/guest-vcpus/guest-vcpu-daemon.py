@@ -1,25 +1,21 @@
 #!/usr/bin/env python3
+"""
+This service waits for the guest agent lifecycle event and reissues
+guest agent calls to modify the cpu count according to the metadata
+set by guest-vcpu.py example
+"""
 
 import libvirt
 import threading
 from xml.dom import minidom
 import time
 import sys
-import getopt
 import os
+from argparse import ArgumentParser
 
 uri = "qemu:///system"
 customXMLuri = "guest-cpu.python.libvirt.org"
 connectRetryTimeout = 5
-
-def usage():
-    print("usage: "+os.path.basename(sys.argv[0])+" [-h] [uri]")
-    print("   uri will default to qemu:///system")
-    print("   --help, -h   Print(this help message")
-    print("")
-    print("This service waits for the guest agent lifecycle event and reissues " +
-           "guest agent calls to modify the cpu count according to the metadata " +
-           "set by guest-vcpu.py example")
 
 class workerData:
     def __init__(self):
@@ -140,21 +136,10 @@ def main():
        time.sleep(1)
 
 if __name__ == "__main__":
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "h", ["help"])
-    except getopt.GetoptError as err:
-        print(str(err))
-        usage()
-        sys.exit(2)
-    for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("uri", nargs="?", default=uri)
+    args = parser.parse_args()
 
-    if len(args) > 1:
-        usage()
-        sys.exit(1)
-    elif len(args) == 1:
-        uri = args[0]
+    uri = args.uri
 
     main()

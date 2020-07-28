@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-# esxlist - list active domains of an ESX host and print some info.
-#           also demonstrates how to use the libvirt.openAuth() method
+"""
+List active domains of an ESX host and print some info.
+"""
+# also demonstrates how to use the libvirt.openAuth() method
 
 import libvirt
 import sys
 import os
 import libxml2
 import getpass
+from argparse import ArgumentParser
 from typing import Any, List
-
-
-def usage() -> None:
-    print("Usage: %s HOSTNAME" % sys.argv[0])
-    print("       List active domains of HOSTNAME and print some info")
 
 
 # This is the callback method passed to libvirt.openAuth() (see below).
@@ -73,15 +71,12 @@ def print_xml(key: str, ctx, path: str) -> str:
     return value
 
 
-if len(sys.argv) != 2:
-    usage()
-    sys.exit(2)
-
-
-hostname = sys.argv[1]
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("hostname")
+args = parser.parse_args()
 
 # Connect to libvirt
-uri = "esx://%s/?no_verify=1" % hostname
+uri = "esx://%s/?no_verify=1" % args.hostname
 
 # The auth argument is a list that contains 3 items:
 #   - a list of supported credential types
@@ -101,7 +96,7 @@ auth = [[libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_NOECHOPROMPT],
 try:
     conn = libvirt.openAuth(uri, auth, 0)
 except libvirt.libvirtError:
-    print("Failed to open connection to %s" % hostname)
+    print("Failed to open connection to %s" % args.hostname)
     sys.exit(1)
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",

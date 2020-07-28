@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-# domipaddrs - print domain interfaces along with their MAC and IP addresses
+"""
+Print domain interfaces along with their MAC and IP addresses
+"""
 
 import libvirt
 import sys
+from argparse import ArgumentParser
 
 IPTYPE = {
     libvirt.VIR_IP_ADDR_TYPE_IPV4: "ipv4",
@@ -33,29 +36,20 @@ def print_dom_ifaces(dom: libvirt.virDomain) -> None:
 
 
 if __name__ == "__main__":
-    uri = None
-    name = None
-    args = len(sys.argv)
-
-    if args == 2:
-        name = sys.argv[1]
-    elif args == 3:
-        uri = sys.argv[1]
-        name = sys.argv[2]
-    else:
-        print("Usage: %s [URI] DOMAIN" % sys.argv[0])
-        print("        Print domain interfaces along with their MAC and IP addresses")
-        sys.exit(2)
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("uri", nargs="?", default=None)
+    parser.add_argument("domain")
+    args = parser.parse_args()
 
     try:
-        conn = libvirt.open(uri)
+        conn = libvirt.open(args.uri)
     except libvirt.libvirtError:
         raise SystemExit("Unable to open connection to libvirt")
 
     try:
-        dom = conn.lookupByName(name)
+        dom = conn.lookupByName(args.domain)
     except libvirt.libvirtError:
-        print("Domain %s not found" % name)
+        print("Domain %s not found" % args.domain)
         sys.exit(0)
 
     print_dom_ifaces(dom)

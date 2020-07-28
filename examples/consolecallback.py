@@ -2,6 +2,7 @@
 # consolecallback - provide a persistent console that survives guest reboots
 
 import sys, os, logging, libvirt, tty, termios, atexit
+from argparse import ArgumentParser
 from typing import Optional  # noqa F401
 
 def reset_term() -> None:
@@ -64,18 +65,15 @@ def lifecycle_callback(connection: libvirt.virConnect, domain: libvirt.virDomain
                  console.uuid, console.state[0], console.state[1])
 
 # main
-if len(sys.argv) != 3:
-    print("Usage:", sys.argv[0], "URI UUID")
-    print("for example:", sys.argv[0], "'qemu:///system' '32ad945f-7e78-c33a-e96d-39f25e025d81'")
-    sys.exit(1)
-
-uri = sys.argv[1]
-uuid = sys.argv[2]
+parser = ArgumentParser(epilog="Example: %(prog)s 'qemu:///system' '32ad945f-7e78-c33a-e96d-39f25e025d81'")
+parser.add_argument("uri")
+parser.add_argument("uuid")
+args = parser.parse_args()
 
 print("Escape character is ^]")
 logging.basicConfig(filename='msg.log', level=logging.DEBUG)
-logging.info("URI: %s", uri)
-logging.info("UUID: %s", uuid)
+logging.info("URI: %s", args.uri)
+logging.info("UUID: %s", args.uuid)
 
 libvirt.virEventRegisterDefaultImpl()
 libvirt.registerErrorHandler(error_handler, None)
@@ -84,7 +82,7 @@ atexit.register(reset_term)
 attrs = termios.tcgetattr(0)
 tty.setraw(0)
 
-console = Console(uri, uuid)
+console = Console(args.uri, args.uuid)
 console.stdin_watch = libvirt.virEventAddHandle(0, libvirt.VIR_EVENT_HANDLE_READABLE, stdin_callback, console)
 
 while check_console(console):

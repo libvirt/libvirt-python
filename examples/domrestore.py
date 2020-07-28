@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
-# domstart - make sure a given domU is running, if not start it
+"""
+Restore all the domains contained in DIR.
+It is assumed that all files in DIR are images of domU's previously created with save.
+"""
 
 import libvirt
 import sys
 import os
 import libxml2
 import pdb
+from argparse import ArgumentParser
 
-def usage() -> None:
-   print('Usage: %s DIR' % sys.argv[0])
-   print('       Restore all the domains contained in DIR')
-   print('       It is assumed that all files in DIR are')
-   print('       images of domU\'s previously created with save')
 
-if len(sys.argv) != 2:
-    usage()
-    sys.exit(2)
+parser = ArgumentParser(description=__doc__)
+parser.add_argument("dir")
+args = parser.parse_args()
 
-dir = sys.argv[1]
-imgs = os.listdir(dir)
+imgs = os.listdir(args.dir)
 
 try:
     conn = libvirt.open(None)
@@ -27,7 +25,7 @@ except libvirt.libvirtError:
     sys.exit(1)
 
 for img in imgs:
-    file = os.path.join(dir, img)
+    file = os.path.join(args.dir, img)
     print("Restoring %s ... " % img)
     ret = conn.restore(file)
     if ret == 0:
