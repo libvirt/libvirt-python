@@ -5,7 +5,6 @@ If the domain is not running, create it.
 """
 
 import libvirt
-import sys
 import libxml2
 from argparse import ArgumentParser
 from typing import Tuple
@@ -33,7 +32,7 @@ try:
     conn = libvirt.open(None)
 except libvirt.libvirtError:
     print('Failed to open connection to the hypervisor')
-    sys.exit(1)
+    exit(1)
 
 try:
     dom = conn.lookupByName(name)
@@ -42,6 +41,6 @@ except libvirt.libvirtError:
     dom = conn.createLinux(xmldesc, 0)
     if dom is None:
         print("failed")
-        sys.exit(1)
+        exit(1)
     else:
         print("done")

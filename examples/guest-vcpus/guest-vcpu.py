@@ -5,7 +5,6 @@ used by guest-vcpu-daemon.py example
 """
 
 import libvirt
-import sys
 from argparse import ArgumentParser
 
 customXMLuri = "guest-cpu.python.libvirt.org"
@@ -28,14 +27,14 @@ if flags == 0 or args.config:
 
     if confvcpus < args.count:
         print("Persistent domain configuration has only " + str(confvcpus) + " vcpus configured")
-        sys.exit(1)
+        exit(1)
 
 if flags == 0 or args.live:
     livevcpus = dom.vcpusFlags(libvirt.VIR_DOMAIN_AFFECT_LIVE)
 
     if livevcpus < args.count:
         print("Live domain configuration has only " + str(livevcpus) + " vcpus configured")
-        sys.exit(1)
+        exit(1)
 
 if flags == 0 or args.live:
     dom.setVcpusFlags(args.count, libvirt.VIR_DOMAIN_AFFECT_LIVE | libvirt.VIR_DOMAIN_VCPU_GUEST)

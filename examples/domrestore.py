@@ -5,7 +5,6 @@ It is assumed that all files in DIR are images of domU's previously created with
 """
 
 import libvirt
-import sys
 import os
 from argparse import ArgumentParser
 
@@ -20,7 +19,7 @@ try:
     conn = libvirt.open(None)
 except libvirt.libvirtError:
     print('Failed to open connection to the hypervisor')
-    sys.exit(1)
+    exit(1)
 
 for img in imgs:
     file = os.path.join(args.dir, img)

@@ -4,7 +4,6 @@ Print leases info for a given virtual network
 """
 
 import libvirt
-import sys
 import time
 from argparse import ArgumentParser
 
@@ -18,18 +17,18 @@ try:
     conn = libvirt.open(args.uri)
 except libvirt.libvirtError:
     print("Unable to open connection to libvirt")
-    sys.exit(1)
+    exit(1)
 
 try:
     net = conn.networkLookupByName(args.network)
 except libvirt.libvirtError:
     print("Network %s not found" % args.network)
-    sys.exit(0)
+    exit(0)
 
 leases = net.DHCPLeases()
 if not leases:
     print("Failed to get leases for %s" % net.name())
-    sys.exit(0)
+    exit(0)
 
 def toIPAddrType(addrType: int) -> str:
     if addrType == libvirt.VIR_IP_ADDR_TYPE_IPV4:

@@ -5,7 +5,6 @@ List active domains of an ESX host and print some info.
 # also demonstrates how to use the libvirt.openAuth() method
 
 import libvirt
-import sys
 import libxml2
 import getpass
 from argparse import ArgumentParser
@@ -96,7 +95,7 @@ try:
     conn = libvirt.openAuth(uri, auth, 0)
 except libvirt.libvirtError:
     print("Failed to open connection to %s" % args.hostname)
-    sys.exit(1)
+    exit(1)
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
                 libvirt.VIR_DOMAIN_BLOCKED  : "idle",

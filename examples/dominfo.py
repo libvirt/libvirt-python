@@ -4,7 +4,6 @@ Print information about the domain DOMAIN
 """
 
 import libvirt
-import sys
 import libxml2
 from argparse import ArgumentParser
 from typing import Any
@@ -37,14 +36,14 @@ try:
     conn = libvirt.openReadOnly(None)
 except libvirt.libvirtError:
     print('Failed to open connection to the hypervisor')
-    sys.exit(1)
+    exit(1)
 
 try:
     dom = conn.lookupByName(args.domain)
     # Annoyiingly, libvirt prints its own error message here
 except libvirt.libvirtError:
     print("Domain %s is not running" % args.domain)
-    sys.exit(0)
+    exit(0)
 
 info = dom.info()
 print_section("Domain info")

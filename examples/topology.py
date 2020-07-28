@@ -7,20 +7,19 @@
 #   Peter Krempa <pkrempa@redhat.com>
 
 import libvirt
-import sys
 from xml.dom import minidom
 
 try:
     conn = libvirt.openReadOnly(None)
 except libvirt.libvirtError:
     print('Failed to connect to the hypervisor')
-    sys.exit(1)
+    exit(1)
 
 try:
     capsXML = conn.getCapabilities()
 except libvirt.libvirtError:
     print('Failed to request capabilities')
-    sys.exit(1)
+    exit(1)
 
 caps = minidom.parseString(capsXML)
 host = caps.getElementsByTagName('host')[0]

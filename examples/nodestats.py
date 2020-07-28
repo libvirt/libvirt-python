@@ -5,7 +5,6 @@
 #   Michal Privoznik <mprivozn@redhat.com>
 
 import libvirt
-import sys
 from xml.dom import minidom
 import libxml2
 from typing import Any, Dict  # noqa F401
@@ -22,13 +21,13 @@ try:
     conn = libvirt.openReadOnly(None)
 except libvirt.libvirtError:
     print("Failed to connect to the hypervisor")
-    sys.exit(1)
+    exit(1)
 
 try:
     capsXML = conn.getCapabilities()
 except libvirt.libvirtError:
     print("Failed to request capabilities")
-    sys.exit(1)
+    exit(1)
 
 caps = minidom.parseString(capsXML)
 cells = caps.getElementsByTagName("cells")[0]

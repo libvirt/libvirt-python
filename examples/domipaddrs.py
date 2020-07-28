@@ -4,7 +4,6 @@ Print domain interfaces along with their MAC and IP addresses
 """
 
 import libvirt
-import sys
 from argparse import ArgumentParser
 
 IPTYPE = {
@@ -17,7 +16,7 @@ def print_dom_ifaces(dom: libvirt.virDomain) -> None:
     ifaces = dom.interfaceAddresses(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE)
     if ifaces is None:
         print("Failed to get domain interfaces")
-        sys.exit(0)
+        exit(0)
 
     print(" {0:10} {1:20} {2:12} {3}".format(
         "Interface", "MAC address", "Protocol", "Address"))
@@ -50,7 +49,7 @@ if __name__ == "__main__":
         dom = conn.lookupByName(args.domain)
     except libvirt.libvirtError:
         print("Domain %s not found" % args.domain)
-        sys.exit(0)
+        exit(0)
 
     print_dom_ifaces(dom)
     conn.close()
