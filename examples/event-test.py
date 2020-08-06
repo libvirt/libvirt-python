@@ -307,7 +307,7 @@ class virEventLoopPoll:
                 break
 
     # Stop monitoring for events on the file handle
-    def remove_handle(self, handleID: int) -> None:
+    def remove_handle(self, handleID: int) -> int:
         handles = []
         for h in self.handles:
             if h.get_id() == handleID:
@@ -318,9 +318,10 @@ class virEventLoopPoll:
                 handles.append(h)
         self.handles = handles
         self.interrupt()
+        return 0
 
     # Stop firing the periodic timer
-    def remove_timer(self, timerID: int) -> None:
+    def remove_timer(self, timerID: int) -> int:
         timers = []
         for h in self.timers:
             if h.get_id() != timerID:
@@ -330,6 +331,7 @@ class virEventLoopPoll:
                 self.cleanup.append(h.opaque)
         self.timers = timers
         self.interrupt()
+        return 0
 
     # Convert from libvirt event constants, to poll() events constants
     def events_to_poll(self, events: int) -> int:
@@ -389,7 +391,7 @@ def virEventUpdateHandleImpl(handleID: int, events: int) -> None:
     return eventLoop.update_handle(handleID, events)
 
 
-def virEventRemoveHandleImpl(handleID: int) -> None:
+def virEventRemoveHandleImpl(handleID: int) -> int:
     return eventLoop.remove_handle(handleID)
 
 
@@ -401,7 +403,7 @@ def virEventUpdateTimerImpl(timerID: int, interval: int) -> None:
     return eventLoop.update_timer(timerID, interval)
 
 
-def virEventRemoveTimerImpl(timerID: int) -> None:
+def virEventRemoveTimerImpl(timerID: int) -> int:
     return eventLoop.remove_timer(timerID)
 
 
