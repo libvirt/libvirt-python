@@ -1482,7 +1482,7 @@ def buildWrappers(module: str) -> None:
                 classes.write("    def __init__(self, conn, _obj=None):\n")
                 classes.write("        self._conn = conn\n")
             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
-                classes.write("    def __init__(self, net, _obj=None):\n")
+                classes.write("    def __init__(self, dom, _obj=None):\n")
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
             elif classname in ["virNetworkPort"]:
