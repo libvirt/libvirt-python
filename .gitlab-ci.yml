@@ -34,6 +34,7 @@ stages:
     - export LD_LIBRARY_PATH="$LIBDIR"
     - export PATH="$VROOT/bin:$PATH"
     - export PKG_CONFIG_PATH="$LIBDIR/pkgconfig"
+    - export CFLAGS="-Werror"
   script:
     - pushd "$PWD"
     - mkdir -p "$SCRATCH_DIR"
@@ -54,6 +55,7 @@ stages:
   stage: builds
   before_script:
     - export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
+    - export CFLAGS="-Werror"
   script:
     - $PYTHON setup.py build
     - $PYTHON setup.py install
