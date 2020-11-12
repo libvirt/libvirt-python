@@ -255,27 +255,47 @@ PyObject * libvirt_virDomainSnapshotPtrWrap(virDomainSnapshotPtr node);
 # endif /* !(__GNUC__ && !__STRICT_ANSI__ && !__cplusplus) */
 #endif
 
-#define LIBVIRT_BEGIN_ALLOW_THREADS			\
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 7
+# define LIBVIRT_BEGIN_ALLOW_THREADS			\
   LIBVIRT_STMT_START {					\
     PyThreadState *_save = NULL;			\
     if (PyEval_ThreadsInitialized())			\
       _save = PyEval_SaveThread();
 
-#define LIBVIRT_END_ALLOW_THREADS                           \
+# define LIBVIRT_END_ALLOW_THREADS                           \
   if (PyEval_ThreadsInitialized())			    \
     PyEval_RestoreThread(_save);			    \
     } LIBVIRT_STMT_END
 
-#define LIBVIRT_ENSURE_THREAD_STATE			\
+# define LIBVIRT_ENSURE_THREAD_STATE			\
   LIBVIRT_STMT_START {					\
     PyGILState_STATE _save = PyGILState_UNLOCKED;	\
     if (PyEval_ThreadsInitialized())			\
       _save = PyGILState_Ensure();
 
-#define LIBVIRT_RELEASE_THREAD_STATE                           \
+# define LIBVIRT_RELEASE_THREAD_STATE                           \
   if (PyEval_ThreadsInitialized())			       \
     PyGILState_Release(_save);				       \
   } LIBVIRT_STMT_END
+
+#else
+
+# define LIBVIRT_BEGIN_ALLOW_THREADS			\
+  LIBVIRT_STMT_START {					\
+    PyThreadState *_save = PyEval_SaveThread();
+
+# define LIBVIRT_END_ALLOW_THREADS                           \
+    PyEval_RestoreThread(_save);			    \
+  } LIBVIRT_STMT_END
+
+# define LIBVIRT_ENSURE_THREAD_STATE			\
+  LIBVIRT_STMT_START {					\
+    PyGILState_STATE _save = PyGILState_Ensure();
+
+# define LIBVIRT_RELEASE_THREAD_STATE                           \
+    PyGILState_Release(_save);				       \
+  } LIBVIRT_STMT_END
+#endif
 
 #ifndef NULLSTR
 #define NULLSTR(s) ((s) ? (s) : "<null>")
