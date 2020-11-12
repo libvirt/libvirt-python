@@ -1856,7 +1856,7 @@ libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx,
         VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap((long)err->int2), cleanup);
 
         /* TODO pass conn and dom if available */
-        result = PyEval_CallObject(libvirt_virPythonErrorFuncHandler, list);
+        result = PyObject_Call(libvirt_virPythonErrorFuncHandler, list, NULL);
         Py_XDECREF(result);
     }
 
@@ -1961,7 +1961,7 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
     VIR_PY_TUPLE_SET_GOTO(list, 1, pycbdata, cleanup);
 
     PyErr_Clear();
-    pyret = PyEval_CallObject(pycb, list);
+    pyret = PyObject_Call(pycb, list, NULL);
     if (PyErr_Occurred()) {
         PyErr_Print();
         goto cleanup;
@@ -5505,7 +5505,7 @@ libvirt_virEventAddHandleFunc(int fd,
     VIR_PY_TUPLE_SET_GOTO(cb_args, 1, libvirt_virVoidPtrWrap(opaque), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 2, libvirt_virFreeCallbackWrap(ff), cleanup);
 
-    result = PyEval_CallObject(addHandleObj, pyobj_args);
+    result = PyObject_Call(addHandleObj, pyobj_args, NULL);
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
@@ -5538,7 +5538,7 @@ libvirt_virEventUpdateHandleFunc(int watch,
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(watch), cleanup);
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 1, libvirt_intWrap(event), cleanup);
 
-    result = PyEval_CallObject(updateHandleObj, pyobj_args);
+    result = PyObject_Call(updateHandleObj, pyobj_args, NULL);
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
@@ -5566,7 +5566,7 @@ libvirt_virEventRemoveHandleFunc(int watch)
 
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(watch), cleanup);
 
-    result = PyEval_CallObject(removeHandleObj, pyobj_args);
+    result = PyObject_Call(removeHandleObj, pyobj_args, NULL);
     if (result) {
         retval = 0;
     } else {
@@ -5623,7 +5623,7 @@ libvirt_virEventAddTimeoutFunc(int timeout,
     VIR_PY_TUPLE_SET_GOTO(cb_args, 1, libvirt_virVoidPtrWrap(opaque), cleanup);
     VIR_PY_TUPLE_SET_GOTO(cb_args, 2, libvirt_virFreeCallbackWrap(ff), cleanup);
 
-    result = PyEval_CallObject(addTimeoutObj, pyobj_args);
+    result = PyObject_Call(addTimeoutObj, pyobj_args, NULL);
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
@@ -5654,7 +5654,7 @@ libvirt_virEventUpdateTimeoutFunc(int timer,
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(timer), cleanup);
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 1, libvirt_intWrap(timeout), cleanup);
 
-    result = PyEval_CallObject(updateTimeoutObj, pyobj_args);
+    result = PyObject_Call(updateTimeoutObj, pyobj_args, NULL);
     if (!result) {
         PyErr_Print();
         PyErr_Clear();
@@ -5681,7 +5681,7 @@ libvirt_virEventRemoveTimeoutFunc(int timer)
 
     VIR_PY_TUPLE_SET_GOTO(pyobj_args, 0, libvirt_intWrap(timer), cleanup);
 
-    result = PyEval_CallObject(removeTimeoutObj, pyobj_args);
+    result = PyObject_Call(removeTimeoutObj, pyobj_args, NULL);
     if (result) {
         retval = 0;
     } else {
