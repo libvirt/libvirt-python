@@ -261,6 +261,15 @@
         cb(self, virDomain(self, _obj=dom), dev, path, threshold, excess, opaque)
         return 0
 
+    def _dispatchDomainEventMemoryFailureCallback(self, dom: 'virDomain', recipient: int, action: int, flags: int, cbData: Dict[str, Any]) -> int:
+        """Dispatches event to python user domain memory failure event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virDomain(self, _obj=dom), recipient, action, flags, opaque)
+        return 0
+
     def domainEventDeregisterAny(self, callbackID: int) -> None:
         """Removes a Domain Event Callback. De-registering for a
            domain callback will disable delivery of this event type """

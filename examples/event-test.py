@@ -636,6 +636,10 @@ def myDomainEventBlockThresholdCallback(conn: libvirt.virConnect, dom: libvirt.v
     print("myDomainEventBlockThresholdCallback: Domain %s(%s) block device %s(%s) threshold %d exceeded by %d" % (
         dom.name(), dom.ID(), dev, path, threshold, excess))
 
+def myDomainEventMemoryFailureCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, recipient: int, action: int, flags: int, opaque: _T) -> None:
+    print("myDomainEventMemoryFailureCallback: Domain %s(%s) memory failure recipient %d action %d flags %d" % (
+        dom.name(), dom.ID(), recipient, action, flags))
+
 
 ##########################################################################
 # Network events
@@ -788,6 +792,7 @@ def main() -> None:
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, myDomainEventDeviceRemovalFailedCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_METADATA_CHANGE, myDomainEventMetadataChangeCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, myDomainEventBlockThresholdCallback, None),
+        vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE, myDomainEventMemoryFailureCallback, None),
     ]
 
     netcallbacks = [

@@ -7254,6 +7254,62 @@ libvirt_virConnectDomainEventBlockThresholdCallback(virConnectPtr conn ATTRIBUTE
 #endif /* VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD */
 
 
+#ifdef VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE
+static int
+libvirt_virConnectDomainEventMemoryFailureCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                   virDomainPtr dom,
+                                                   int recipient,
+                                                   int action,
+                                                   unsigned int flags,
+                                                   void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dom;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virDomainPtr */
+    virDomainRef(dom);
+    if (!(pyobj_dom = libvirt_virDomainPtrWrap(dom))) {
+        virDomainFree(dom);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchDomainEventMemoryFailureCallback",
+                                    (char*)"OiiiO",
+                                    pyobj_dom, recipient, action, flags,
+                                    pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dom);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+#endif /* VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE */
+
+
 static PyObject *
 libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                          PyObject *args)
@@ -7379,6 +7435,11 @@ libvirt_virConnectDomainEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
         cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventBlockThresholdCallback);
         break;
 #endif /* VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD */
+#ifdef VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE
+    case VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE:
+        cb = VIR_DOMAIN_EVENT_CALLBACK(libvirt_virConnectDomainEventMemoryFailureCallback);
+        break;
+#endif /* VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE */
     case VIR_DOMAIN_EVENT_ID_LAST:
         break;
     }
