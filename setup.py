@@ -283,7 +283,9 @@ class my_test(Command):
         if self.plat_name is None:
             self.plat_name = get_platform()
 
-        plat_specifier = ".%s-%s" % (self.plat_name, sys.version[0:3])
+        plat_specifier = ".%s-%d.%d" % (self.plat_name,
+                                        sys.version_info[0],
+                                        sys.version_info[1])
 
         if hasattr(sys, 'gettotalrefcount'):
             plat_specifier += '-pydebug'
