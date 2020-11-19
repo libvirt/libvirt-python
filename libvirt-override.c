@@ -10423,6 +10423,98 @@ libvirt_virConnectSetIdentity(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(5, 8, 0) */
 
 
+#if LIBVIR_CHECK_VERSION(6, 10, 0)
+static PyObject *
+libvirt_virDomainAuthorizedSSHKeysGet(PyObject *self ATTRIBUTE_UNUSED,
+                                      PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    virDomainPtr dom = NULL;
+    const char *user = NULL;
+    char **keys = NULL;
+    int nkeys;
+    size_t i;
+    unsigned int flags;
+    PyObject *ret = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"OsI:virDomainAuthorizedSSHKeysGet",
+                          &pyobj_dom, &user, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    nkeys = virDomainAuthorizedSSHKeysGet(dom, user, &keys, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (nkeys < 0)
+        return VIR_PY_NONE;
+
+    if ((ret = PyList_New(nkeys)) == NULL)
+        goto error;
+
+    for (i = 0; i < nkeys; i++)
+        VIR_PY_LIST_SET_GOTO(ret, i, libvirt_constcharPtrWrap(keys[i]), error);
+
+ done:
+    for (i = 0; i < nkeys; i++)
+        VIR_FREE(keys[i]);
+    VIR_FREE(keys);
+    return ret;
+
+ error:
+    Py_CLEAR(ret);
+    goto done;
+}
+
+
+static PyObject *
+libvirt_virDomainAuthorizedSSHKeysSet(PyObject *self ATTRIBUTE_UNUSED,
+                                      PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    virDomainPtr dom = NULL;
+    const  char *user = NULL;
+    PyObject *pyobj_keys = NULL;
+    char **keys = NULL;
+    int nkeys = 0;
+    size_t i;
+    unsigned int flags;
+    int c_retval;
+    PyObject *py_retval = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"OsOI:virDomainAuthorizedSSHKeysSet",
+                          &pyobj_dom, &user, &pyobj_keys, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    if (PyList_Check(pyobj_keys)) {
+        nkeys = PyList_Size(pyobj_keys);
+
+        if (VIR_ALLOC_N(keys, nkeys) < 0)
+            return PyErr_NoMemory();
+
+        for (i = 0; i < nkeys; i++) {
+            if (libvirt_charPtrUnwrap(PyList_GetItem(pyobj_keys, i),
+                                      &(keys[i])) < 0)
+                goto cleanup;
+        }
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainAuthorizedSSHKeysSet(dom, user, (const char **)keys, nkeys, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    py_retval = libvirt_intWrap(c_retval);
+ cleanup:
+    for (i = 0 ; i < nkeys ; i++)
+        VIR_FREE(keys[i]);
+    VIR_FREE(keys);
+
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(6, 10, 0) */
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -10687,6 +10779,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(5, 8, 0)
     {(char *) "virConnectSetIdentity", libvirt_virConnectSetIdentity, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(5, 8, 0) */
+#if LIBVIR_CHECK_VERSION(6, 10, 0)
+    {(char *) "virDomainAuthorizedSSHKeysGet", libvirt_virDomainAuthorizedSSHKeysGet, METH_VARARGS, NULL},
+    {(char *) "virDomainAuthorizedSSHKeysSet", libvirt_virDomainAuthorizedSSHKeysSet, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(6, 10, 0) */
     {NULL, NULL, 0, NULL}
 };
 

@@ -477,6 +477,8 @@ skip_impl = {
     'virNetworkPortGetParameters',
     'virNetworkPortSetParameters',
     'virDomainGetGuestInfo',
+    'virDomainAuthorizedSSHKeysGet',
+    'virDomainAuthorizedSSHKeysSet',
 }
 
 lxc_skip_impl = {

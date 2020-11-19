@@ -819,5 +819,20 @@
       <arg name='params' type='virTypedParameterPtr' info='parameters containing the identity attributes'/>
       <arg name='flags' type='unsigned int' info='currently unused, pass 0'/>
     </function>
+    <function name='virDomainAuthorizedSSHKeysGet' file='python'>
+      <info>Fetch list of public SSH authorized keys for given user in domain.</info>
+      <return type='char *' info='list of authorized keys'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+      <arg name='user' type='const char *' info='user'/>
+      <arg name='flags' type='unsigned int' info='optional fine-tuning flags, currently unused, pass 0.'/>
+    </function>
+    <function name='virDomainAuthorizedSSHKeysSet' file='python'>
+      <info>Manipulate set of public SSH authorized keys for given user in domain.</info>
+      <return type='int' info='0 in case of success, -1 in case of failure.'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+      <arg name='user' type='const char *' info='user'/>
+      <arg name='keys' type='char *' info='optional list of authorized keys to set/append/remove'/>
+      <arg name='flags' type='int' info='optional OR&apos;ed set of virDomainAuthorizedSSHKeysSetFlags'/>
+    </function>
   </symbols>
 </api>
