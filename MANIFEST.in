@@ -36,6 +36,7 @@ include libvirt-utils.h
 include libvirt-utils.c
 include libvirtaio.py
 include MANIFEST
+include MANIFEST.in
 include README
 include sanitytest.py
 include setup.py
