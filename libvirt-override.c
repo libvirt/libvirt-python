@@ -10433,7 +10433,7 @@ libvirt_virDomainAuthorizedSSHKeysGet(PyObject *self ATTRIBUTE_UNUSED,
     const char *user = NULL;
     char **keys = NULL;
     int nkeys;
-    size_t i;
+    int i;
     unsigned int flags;
     PyObject *ret = NULL;
 
@@ -10477,7 +10477,7 @@ libvirt_virDomainAuthorizedSSHKeysSet(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *pyobj_keys = NULL;
     char **keys = NULL;
     int nkeys = 0;
-    size_t i;
+    int i;
     unsigned int flags;
     int c_retval;
     PyObject *py_retval = NULL;
