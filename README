@@ -1,5 +1,5 @@
-     Libvirt Python Binding README
-     =============================
+Libvirt Python Binding README
+=============================
 
 This package provides a python binding to the libvirt.so,
 libvirt-qemu.so and libvirt-lxc.so library APIs.
@@ -9,6 +9,15 @@ is 0.9.11 or newer.
 
 This code is distributed under the terms of the LGPL version
 2 or later.
+
+Requirements
+------------
+
+To build the libvirt python binary requires the GCC and pkg-config
+tools, and development headers for the libvirt and python libraries.
+
+Building and installing
+-----------------------
 
 The module can be built by following the normal python module
 build process
