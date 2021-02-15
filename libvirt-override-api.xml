@@ -834,5 +834,11 @@
       <arg name='keys' type='char *' info='optional list of authorized keys to set/append/remove'/>
       <arg name='flags' type='int' info='optional OR&apos;ed set of virDomainAuthorizedSSHKeysSetFlags'/>
     </function>
+    <function name='virDomainGetMessages' file='python'>
+      <info>Fetch list of messages reported against domain.</info>
+      <return type='char *' info='list of messages'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+      <arg name='flags' type='unsigned int' info='optional fine-tuning flags'/>
+    </function>
   </symbols>
 </api>

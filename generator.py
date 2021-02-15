@@ -479,6 +479,7 @@ skip_impl = {
     'virDomainGetGuestInfo',
     'virDomainAuthorizedSSHKeysGet',
     'virDomainAuthorizedSSHKeysSet',
+    'virDomainGetMessages',
 }
 
 lxc_skip_impl = {

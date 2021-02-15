@@ -10514,6 +10514,49 @@ libvirt_virDomainAuthorizedSSHKeysSet(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(6, 10, 0) */
 
+#if LIBVIR_CHECK_VERSION(7, 1, 0)
+static PyObject *
+libvirt_virDomainGetMessages(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    virDomainPtr dom = NULL;
+    char **msgs = NULL;
+    int nmsgs;
+    int i;
+    unsigned int flags;
+    PyObject *ret = NULL;
+
+    if (!PyArg_ParseTuple(args, (char *)"OI:virDomainGetMessages",
+                          &pyobj_dom, &flags))
+        return NULL;
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    nmsgs = virDomainGetMessages(dom, &msgs, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (nmsgs < 0)
+        return VIR_PY_NONE;
+
+    if ((ret = PyList_New(nmsgs)) == NULL)
+        goto error;
+
+    for (i = 0; i < nmsgs; i++)
+        VIR_PY_LIST_SET_GOTO(ret, i, libvirt_constcharPtrWrap(msgs[i]), error);
+
+ done:
+    for (i = 0; i < nmsgs; i++)
+        VIR_FREE(msgs[i]);
+    VIR_FREE(msgs);
+    return ret;
+
+ error:
+    Py_CLEAR(ret);
+    goto done;
+}
+#endif /* LIBVIR_CHECK_VERSION(7, 1, 0) */
+
 
 /************************************************************************
  *									*
@@ -10783,6 +10826,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainAuthorizedSSHKeysGet", libvirt_virDomainAuthorizedSSHKeysGet, METH_VARARGS, NULL},
     {(char *) "virDomainAuthorizedSSHKeysSet", libvirt_virDomainAuthorizedSSHKeysSet, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(6, 10, 0) */
+#if LIBVIR_CHECK_VERSION(7, 1, 0)
+    {(char *) "virDomainGetMessages", libvirt_virDomainGetMessages, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(7, 1, 0) */
     {NULL, NULL, 0, NULL}
 };
 
