@@ -2,7 +2,8 @@
 #
 #  $ lcitool dockerfile fedora-32 libvirt+dist,libvirt-python
 #
-# https://gitlab.com/libvirt/libvirt-ci/-/commit/b098ec6631a85880f818f2dd25c437d509e53680
+# https://gitlab.com/libvirt/libvirt-ci/-/commit/94c25bde639eb31ff2071fb6abfd3d5c777f4ab2
+
 FROM registry.fedoraproject.org/fedora:32
 
 RUN dnf install -y nosync && \
