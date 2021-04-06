@@ -2,7 +2,7 @@
 #
 #  $ lcitool dockerfile centos-8 libvirt+minimal,libvirt+dist,libvirt-python
 #
-# https://gitlab.com/libvirt/libvirt-ci/-/commit/94c25bde639eb31ff2071fb6abfd3d5c777f4ab2
+# https://gitlab.com/libvirt/libvirt-ci/-/commit/12ad4d56d2d3a3c77ae957b2a49d34758fb3e614
 
 FROM docker.io/library/centos:8
 
@@ -14,6 +14,7 @@ RUN dnf update -y && \
     dnf install -y \
         ca-certificates \
         ccache \
+        cpp \
         gcc \
         gettext \
         git \
@@ -35,8 +36,8 @@ RUN dnf update -y && \
         python3-devel \
         python3-docutils \
         python3-lxml \
-        python3-nose \
         python3-pip \
+        python3-pytest \
         python3-setuptools \
         python3-wheel \
         rpcgen \
@@ -46,10 +47,10 @@ RUN dnf update -y && \
     rpm -qa | sort > /packages.txt && \
     mkdir -p /usr/libexec/ccache-wrappers && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc && \
-    ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/$(basename /usr/bin/gcc)
+    ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
 
 RUN pip3 install \
-         meson==0.55.3
+         meson==0.56.0
 
 ENV LANG "en_US.UTF-8"
 ENV MAKE "/usr/bin/make"
