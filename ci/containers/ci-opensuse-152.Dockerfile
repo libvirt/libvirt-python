@@ -1,9 +1,10 @@
 # THIS FILE WAS AUTO-GENERATED
 #
-#  $ lcitool dockerfile opensuse-151 libvirt+dist,libvirt-python
+#  $ lcitool dockerfile opensuse-152 libvirt+dist,libvirt-python
 #
-# https://gitlab.com/libvirt/libvirt-ci/-/commit/b098ec6631a85880f818f2dd25c437d509e53680
-FROM registry.opensuse.org/opensuse/leap:15.1
+# https://gitlab.com/libvirt/libvirt-ci/-/commit/94c25bde639eb31ff2071fb6abfd3d5c777f4ab2
+
+FROM registry.opensuse.org/opensuse/leap:15.2
 
 RUN zypper update -y && \
     zypper install -y \
@@ -14,7 +15,7 @@ RUN zypper update -y && \
            glibc-locale \
            libvirt-devel \
            pkgconfig \
-           python3 \
+           python3-base \
            python3-devel \
            python3-lxml \
            python3-nose \
