@@ -286,13 +286,13 @@ class my_test(Command):
             self.build_platlib = os.path.join(self.build_base,
                                               'lib' + plat_specifier)
 
-    def find_nosetests_path(self):
+    def find_pytest_path(self):
         binaries = [
-            "nosetests-%d.%d" % (sys.version_info[0],
+            "pytest-%d.%d" % (sys.version_info[0],
                                  sys.version_info[1]),
-            "nosetests-%d" % (sys.version_info[0]),
-            "nosetests%d" % (sys.version_info[0]),
-            "nosetests",
+            "pytest-%d" % (sys.version_info[0]),
+            "pytest%d" % (sys.version_info[0]),
+            "pytest",
         ]
 
         for binary in binaries:
@@ -300,7 +300,7 @@ class my_test(Command):
             if path is not None:
                 return path
 
-        raise Exception("Cannot find any nosetests binary")
+        raise Exception("Cannot find any pytest binary")
 
     def run(self):
         """
@@ -314,8 +314,8 @@ class my_test(Command):
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
         self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
-        nose = self.find_nosetests_path()
-        self.spawn([sys.executable, nose])
+        pytest = self.find_pytest_path()
+        self.spawn([sys.executable, pytest])
 
 
 class my_clean(clean):
