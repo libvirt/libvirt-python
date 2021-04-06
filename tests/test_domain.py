@@ -13,7 +13,7 @@ class TestLibvirtDomain(unittest.TestCase):
 
     def testDomainSchedParams(self):
         params = self.dom.schedulerParameters()
-        self.assertEquals(len(params), 1)
+        self.assertEqual(len(params), 1)
         self.assertTrue("weight" in params)
         params["weight"] = 100
         self.dom.setSchedulerParameters(params)
