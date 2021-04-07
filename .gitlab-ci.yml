@@ -5,7 +5,7 @@ stages:
   - builds
   - docs
 
-.container_job_template: &container_job_definition
+.container_job:
   image: docker:stable
   stage: containers
   needs: []
@@ -23,7 +23,7 @@ stages:
   after_script:
     - docker logout
 
-.git_build_job_template: &git_build_job_definition
+.git_build_job:
   image: $CI_REGISTRY_IMAGE/ci-$NAME:latest
   stage: builds
   before_script:
@@ -50,7 +50,7 @@ stages:
     - $PYTHON setup.py sdist
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ; then rpmbuild --nodeps -ta dist/libvirt-python*tar.gz ; fi
 
-.dist_build_job_template: &dist_build_job_definition
+.dist_build_job:
   image: $CI_REGISTRY_IMAGE/ci-$NAME:latest
   stage: builds
   before_script:
@@ -77,64 +77,64 @@ check-dco:
       - $CI_PROJECT_NAMESPACE == 'libvirt'
 
 centos-7-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: centos-7
 
 centos-8-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: centos-8
 
 centos-stream-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: centos-stream
 
 debian-10-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: debian-10
 
 debian-sid-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: debian-sid
 
 fedora-32-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: fedora-32
 
 fedora-33-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: fedora-33
 
 fedora-rawhide-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: fedora-rawhide
 
 opensuse-152-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: opensuse-152
     RPM: skip
 
 ubuntu-1804-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: ubuntu-1804
 
 ubuntu-2004-container:
-  <<: *container_job_definition
+  extends: .container_job
   variables:
     NAME: ubuntu-2004
 
 
 centos-8-git-build:
-  <<: *git_build_job_definition
+  extends: .git_build_job
   needs:
     - centos-8-container
   variables:
@@ -142,63 +142,63 @@ centos-8-git-build:
 
 
 centos-7-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - centos-7-container
   variables:
     NAME: centos-7
 
 centos-8-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - centos-8-container
   variables:
     NAME: centos-8
 
 centos-stream-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - centos-stream-container
   variables:
     NAME: centos-stream
 
 debian-10-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - debian-10-container
   variables:
     NAME: debian-10
 
 debian-sid-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - debian-sid-container
   variables:
     NAME: debian-sid
 
 fedora-32-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - fedora-32-container
   variables:
     NAME: fedora-32
 
 fedora-33-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - fedora-33-container
   variables:
     NAME: fedora-33
 
 fedora-rawhide-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - fedora-rawhide-container
   variables:
     NAME: fedora-rawhide
 
 opensuse-152-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - opensuse-152-container
   variables:
@@ -206,14 +206,14 @@ opensuse-152-dist-build:
     RPM: skip
 
 ubuntu-1804-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - ubuntu-1804-container
   variables:
     NAME: ubuntu-1804
 
 ubuntu-2004-dist-build:
-  <<: *dist_build_job_definition
+  extends: .dist_build_job
   needs:
     - ubuntu-2004-container
   variables:
