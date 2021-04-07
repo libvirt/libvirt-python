@@ -1,9 +1,9 @@
 
 stages:
-  - prebuild
   - containers
   - builds
   - docs
+  - sanity_checks
 
 .container_job:
   image: docker:stable
@@ -68,7 +68,8 @@ stages:
 # this test on developer's personal forks from which
 # merge requests are submitted
 check-dco:
-  stage: prebuild
+  stage: sanity_checks
+  needs: []
   image: registry.gitlab.com/libvirt/libvirt-ci/check-dco:master
   script:
     - /check-dco
