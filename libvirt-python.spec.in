@@ -22,10 +22,10 @@ License: LGPLv2+
 BuildRequires: libvirt-devel == %{version}
 BuildRequires: python3-devel
 %if 0%{?rhel} == 7
-BuildRequires: python36-nose
+BuildRequires: python36-pytest
 BuildRequires: python36-lxml
 %else
-BuildRequires: python3-nose
+BuildRequires: python3-pytest
 BuildRequires: python3-lxml
 %endif
 BuildRequires: gcc
