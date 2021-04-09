@@ -313,7 +313,9 @@ class my_test(Command):
             os.environ["PYTHONPATH"] = self.build_platlib + ":" + os.environ["PYTHONPATH"]
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
-        self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
+
+        if "LIBVIRT_API_COVERAGE" in os.environ:
+            self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
         pytest = self.find_pytest_path()
         self.spawn([sys.executable, pytest])
 
