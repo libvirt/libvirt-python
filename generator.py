@@ -1240,7 +1240,9 @@ def nameFixup(name: str, classe: str, type: str, file: str) -> str:
     elif name[0:13] == "virNodeDevice":
         if name[13:16] == "Get":
             func = name[16].lower() + name[17:]
-        elif name[13:19] == "Lookup" or name[13:19] == "Create":
+        elif name[13:19] == "Lookup" or name[13:22] == "CreateXML":
+            func = name[3].lower() + name[4:]
+        elif name[13:19] == "Define":
             func = name[3].lower() + name[4:]
         else:
             func = name[13].lower() + name[14:]
