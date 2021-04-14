@@ -1237,15 +1237,16 @@ def nameFixup(name: str, classe: str, type: str, file: str) -> str:
     elif name[0:13] == "virStorageVol":
         func = name[13:]
         func = func[0:1].lower() + func[1:]
+    elif name[0:16] == "virNodeDeviceGet":
+        func = name[16].lower() + name[17:]
+    elif name[0:19] == "virNodeDeviceLookup":
+        func = name[3].lower() + name[4:]
+    elif name[0:22] == "virNodeDeviceCreateXML":
+        func = name[3].lower() + name[4:]
+    elif name[0:19] == "virNodeDeviceDefine":
+        func = name[3].lower() + name[4:]
     elif name[0:13] == "virNodeDevice":
-        if name[13:16] == "Get":
-            func = name[16].lower() + name[17:]
-        elif name[13:19] == "Lookup" or name[13:22] == "CreateXML":
-            func = name[3].lower() + name[4:]
-        elif name[13:19] == "Define":
-            func = name[3].lower() + name[4:]
-        else:
-            func = name[13].lower() + name[14:]
+        func = name[13].lower() + name[14:]
     elif name[0:7] == "virNode":
         func = name[7:]
         func = func[0:1].lower() + func[1:]
