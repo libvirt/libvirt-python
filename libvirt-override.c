@@ -1625,10 +1625,14 @@ libvirt_virDomainGetIOThreadInfo(PyObject *self ATTRIBUTE_UNUSED,
         VIR_PY_TUPLE_SET_GOTO(iothrtpl, 1, iothrmap, cleanup);
 
         for (pcpu = 0; pcpu < cpunum; pcpu++)
-            VIR_PY_LIST_SET_GOTO(iothrmap, pcpu,
-                                 PyBool_FromLong(VIR_CPU_USED(iothr->cpumap,
-                                                              pcpu)),
-                                 cleanup);
+            if (VIR_CPU_MAPLEN(pcpu + 1) > iothr->cpumaplen) {
+                VIR_PY_LIST_SET_GOTO(iothrmap, pcpu, PyBool_FromLong(0), cleanup);
+            } else {
+                VIR_PY_LIST_SET_GOTO(iothrmap, pcpu,
+                                     PyBool_FromLong(VIR_CPU_USED(iothr->cpumap,
+                                                                  pcpu)),
+                                     cleanup);
+            }
     }
 
     py_retval = py_iothrinfo;
