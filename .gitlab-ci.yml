@@ -105,6 +105,11 @@ fedora-33-container:
   variables:
     NAME: fedora-33
 
+fedora-34-container:
+  extends: .container_job
+  variables:
+    NAME: fedora-34
+
 fedora-rawhide-container:
   extends: .container_job
   variables:
@@ -174,6 +179,13 @@ fedora-33-dist-build:
     - fedora-33-container
   variables:
     NAME: fedora-33
+
+fedora-34-dist-build:
+  extends: .dist_build_job
+  needs:
+    - fedora-34-container
+  variables:
+    NAME: fedora-34
 
 fedora-rawhide-dist-build:
   extends: .dist_build_job
