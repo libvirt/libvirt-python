@@ -121,6 +121,11 @@ opensuse-leap-152-container:
     NAME: opensuse-leap-152
     RPM: skip
 
+opensuse-tumbleweed-container:
+  extends: .container_job
+  variables:
+    NAME: opensuse-tumbleweed
+
 ubuntu-1804-container:
   extends: .container_job
   variables:
@@ -200,6 +205,14 @@ opensuse-leap-152-dist-build:
     - opensuse-leap-152-container
   variables:
     NAME: opensuse-leap-152
+    RPM: skip
+
+opensuse-tumbleweed-dist-build:
+  extends: .dist_build_job
+  needs:
+    - opensuse-tumbleweed-container
+  variables:
+    NAME: opensuse-tumbleweed
     RPM: skip
 
 ubuntu-1804-dist-build:
