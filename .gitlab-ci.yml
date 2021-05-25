@@ -110,10 +110,10 @@ fedora-rawhide-container:
   variables:
     NAME: fedora-rawhide
 
-opensuse-152-container:
+opensuse-leap-152-container:
   extends: .container_job
   variables:
-    NAME: opensuse-152
+    NAME: opensuse-leap-152
     RPM: skip
 
 ubuntu-1804-container:
@@ -182,12 +182,12 @@ fedora-rawhide-dist-build:
   variables:
     NAME: fedora-rawhide
 
-opensuse-152-dist-build:
+opensuse-leap-152-dist-build:
   extends: .dist_build_job
   needs:
-    - opensuse-152-container
+    - opensuse-leap-152-container
   variables:
-    NAME: opensuse-152
+    NAME: opensuse-leap-152
     RPM: skip
 
 ubuntu-1804-dist-build:
