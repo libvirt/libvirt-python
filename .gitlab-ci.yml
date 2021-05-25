@@ -80,11 +80,6 @@ check-dco:
     variables:
       - $CI_PROJECT_NAMESPACE == 'libvirt'
 
-centos-7-container:
-  extends: .container_job
-  variables:
-    NAME: centos-7
-
 centos-8-container:
   extends: .container_job
   variables:
@@ -149,13 +144,6 @@ centos-8-git-build:
       - scratch
       - build
 
-
-centos-7-dist-build:
-  extends: .dist_build_job
-  needs:
-    - centos-7-container
-  variables:
-    NAME: centos-7
 
 centos-8-dist-build:
   extends: .dist_build_job
