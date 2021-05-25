@@ -119,7 +119,6 @@ opensuse-leap-152-container:
   extends: .container_job
   variables:
     NAME: opensuse-leap-152
-    RPM: skip
 
 opensuse-tumbleweed-container:
   extends: .container_job
