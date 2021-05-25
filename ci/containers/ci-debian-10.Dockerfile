@@ -2,7 +2,7 @@
 #
 #  $ lcitool dockerfile debian-10 libvirt+dist,libvirt-python
 #
-# https://gitlab.com/libvirt/libvirt-ci/-/commit/12ad4d56d2d3a3c77ae957b2a49d34758fb3e614
+# https://gitlab.com/libvirt/libvirt-ci/-/commit/1c5d87ecd2283614a8b0c31cead0b6d7883afd28
 
 FROM docker.io/library/debian:10-slim
 
