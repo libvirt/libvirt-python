@@ -7236,7 +7236,7 @@ libvirt_virConnectDomainEventBlockThresholdCallback(virConnectPtr conn ATTRIBUTE
     /* Call the Callback Dispatcher */
     pyobj_ret = PyObject_CallMethod(pyobj_conn,
                                     (char*)"_dispatchDomainEventBlockThresholdCallback",
-                                    (char*)"OssLLO",
+                                    (char*)"OssKKO",
                                     pyobj_dom, dev, path, threshold, excess,
                                     pyobj_cbData);
 
