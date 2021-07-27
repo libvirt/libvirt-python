@@ -10,7 +10,8 @@ stages:
   stage: containers
   needs: []
   services:
-    - docker:dind
+    - name: registry.gitlab.com/libvirt/libvirt-ci/docker-dind:master
+      alias: docker
   before_script:
     - export TAG="$CI_REGISTRY_IMAGE/ci-$NAME:latest"
     - export COMMON_TAG="$CI_REGISTRY/libvirt/libvirt-python/ci-$NAME:latest"
