@@ -3,8 +3,8 @@
 # This spec file assumes you are building on a Fedora or RHEL version
 # that's still supported by the vendor. It may work on other distros
 # or versions, but no effort will be made to ensure that going forward
-%define min_rhel 7
-%define min_fedora 29
+%define min_rhel 8
+%define min_fedora 33
 
 %if (0%{?fedora} && 0%{?fedora} >= %{min_fedora}) || (0%{?rhel} && 0%{?rhel} >= %{min_rhel})
     %define supported_platform 1
@@ -21,13 +21,8 @@ Url: https://libvirt.org
 License: LGPLv2+
 BuildRequires: libvirt-devel == %{version}
 BuildRequires: python3-devel
-%if 0%{?rhel} == 7
-BuildRequires: python36-pytest
-BuildRequires: python36-lxml
-%else
 BuildRequires: python3-pytest
 BuildRequires: python3-lxml
-%endif
 BuildRequires: gcc
 
 # Don't want provides for python shared objects
@@ -68,18 +63,10 @@ echo "This RPM requires either Fedora >= %{min_fedora} or RHEL >= %{min_rhel}"
 exit 1
 %endif
 
-%if 0%{?fedora} || 0%{?rhel} >= 8
 %py3_build
-%else
-CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
-%endif
 
 %install
-%if 0%{?fedora} || 0%{?rhel} >= 8
 %py3_install
-%else
-%{__python3} setup.py install --skip-build --root=%{buildroot}
-%endif
 
 %check
 %{__python3} setup.py test
