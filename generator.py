@@ -480,6 +480,7 @@ skip_impl = {
     'virDomainAuthorizedSSHKeysGet',
     'virDomainAuthorizedSSHKeysSet',
     'virDomainGetMessages',
+    'virNodeDeviceGetAutostart',
 }
 
 lxc_skip_impl = {

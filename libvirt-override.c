@@ -3355,6 +3355,32 @@ libvirt_virNetworkGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
     return libvirt_intWrap(autostart);
 }
 
+#if LIBVIR_CHECK_VERSION(7, 8, 0)
+static PyObject *
+libvirt_virNodeDeviceGetAutostart(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
+    int c_retval, autostart;
+    virNodeDevicePtr dev;
+    PyObject *pyobj_dev;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virNodeDeviceGetAutostart",
+                          &pyobj_dev))
+        return NULL;
+
+    dev = (virNodeDevicePtr) PyvirNodeDevice_Get(pyobj_dev);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virNodeDeviceGetAutostart(dev, &autostart);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_INT_FAIL;
+
+    return libvirt_intWrap(autostart);
+}
+#endif /* LIBVIR_CHECK_VERSION(7, 8, 0) */
+
 static PyObject *
 libvirt_virNodeGetCellsFreeMemory(PyObject *self ATTRIBUTE_UNUSED,
                                   PyObject *args)
@@ -10833,6 +10859,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(7, 1, 0)
     {(char *) "virDomainGetMessages", libvirt_virDomainGetMessages, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(7, 1, 0) */
+#if LIBVIR_CHECK_VERSION(7, 8, 0)
+    {(char *) "virNodeDeviceGetAutostart", libvirt_virNodeDeviceGetAutostart, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(7, 8, 0) */
     {NULL, NULL, 0, NULL}
 };
 

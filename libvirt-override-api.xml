@@ -194,6 +194,11 @@
       <return type='int' info='the autostart flag, or None in case of error'/>
       <arg name='pool' type='virStoragePoolPtr' info='a storage pool object'/>
     </function>
+    <function name='virNodeDeviceGetAutostart' file='python'>
+      <info>Extract the autostart flag for a node device.</info>
+      <return type='int' info='the autostart flag, or None in case of error'/>
+      <arg name='dev' type='virNodeDevicePtr' info='a node device object'/>
+    </function>
     <function name='virDomainBlockStats' file='python'>
       <info>Extracts block device statistics for a domain</info>
       <return type='char *' info='a tuple of statistics'/>
