@@ -30,7 +30,7 @@ or to install as non-root
   python setup.py build
   python setup.py install --user
 
-If python-nose is installed, you can test the package with
+If python-pytest is installed, you can test the package with
 
   python setup.py test
 
