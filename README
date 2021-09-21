@@ -47,16 +47,5 @@ automate this by using libvirt's run script:
 
   /path/to/libvirt/run python setup.py build
 
-Patches for this code should be sent to the main libvirt
-development mailing list
-
-  http://libvirt.org/contact.html#email
-
-To send patches, it is strongly recommended to use the
-'git send-email' command.
-
-Make sure the mails mention that the patch is for the python
-binding. This can be done by setting a config parameter in the
-local git checkout
-
-  git config format.subjectprefix "PATCH python"
+Patches for this code should be submitted as merge requests to the
+project page on gitlab. See CONTRIBUTING.rst for more information.
