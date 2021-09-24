@@ -253,7 +253,8 @@ for name, (klass, func, cname) in sorted(basicklassmap.items()):
                 "LookupByMACString", "LookupByUsage", "LookupByVolume",
                 "LookupByTargetPath", "LookupSCSIHostByWWN", "LookupByPortDev",
                 "Restore", "RestoreFlags",
-                "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags"]:
+                "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags",
+                "CreateXMLFlags"]:
         if klass != "virDomain":
             func = klass[3:] + func
 
