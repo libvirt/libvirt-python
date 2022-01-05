@@ -10647,6 +10647,54 @@ libvirt_virDomainGetMessages(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(7, 1, 0) */
 
+#if LIBVIR_CHECK_VERSION(8, 0, 0)
+
+static virPyTypedParamsHint virPyDomainSetLaunchSecurityStateParams[] = {
+    { VIR_DOMAIN_LAUNCH_SECURITY_SEV_SECRET, VIR_TYPED_PARAM_STRING },
+    { VIR_DOMAIN_LAUNCH_SECURITY_SEV_SECRET_HEADER, VIR_TYPED_PARAM_STRING },
+    { VIR_DOMAIN_LAUNCH_SECURITY_SEV_SECRET_SET_ADDRESS, VIR_TYPED_PARAM_ULLONG },
+};
+
+static PyObject *
+libvirt_virDomainSetLaunchSecurityState(PyObject *self ATTRIBUTE_UNUSED,
+                                        PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *pyobj_dict = NULL;
+
+    virDomainPtr dom;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainSetLaunchSecurityState",
+                          &pyobj_dom, &pyobj_dict, &flags))
+        return NULL;
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSetLaunchSecurityStateParams,
+                                   VIR_N_ELEMENTS(virPyDomainSetLaunchSecurityStateParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError, "Launch security state params must be "
+                     "a dictionary");
+        return NULL;
+    }
+
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainSetLaunchSecurityState(dom, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    virTypedParamsFree(params, nparams);
+
+    return libvirt_intWrap(c_retval);
+}
+#endif /* LIBVIR_CHECK_VERSION(8, 0, 0) */
 
 /************************************************************************
  *									*
@@ -10922,6 +10970,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(7, 8, 0)
     {(char *) "virNodeDeviceGetAutostart", libvirt_virNodeDeviceGetAutostart, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(7, 8, 0) */
+#if LIBVIR_CHECK_VERSION(8, 0, 0)
+    {(char *) "virDomainSetLaunchSecurityState", libvirt_virDomainSetLaunchSecurityState, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(8, 0, 0) */
     {NULL, NULL, 0, NULL}
 };
 

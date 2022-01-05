@@ -473,6 +473,7 @@ skip_impl = {
     'virDomainGetGuestVcpus',
     'virConnectBaselineHypervisorCPU',
     'virDomainGetLaunchSecurityInfo',
+    'virDomainSetLaunchSecurityState',
     'virNodeGetSEVInfo',
     'virNetworkPortGetParameters',
     'virNetworkPortSetParameters',
