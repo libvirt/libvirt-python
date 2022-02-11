@@ -310,8 +310,19 @@ class my_test(Command):
             os.environ["PYTHONPATH"] = self.build_platlib
 
         pytest = self.find_pytest_path()
-        subprocess.check_call([pytest])
 
+        # Run the normal tests.
+        subprocess.check_call([pytest, "-m", "not separate_process"])
+
+        # Run the tests that require their own process.
+        testlist = subprocess.run(
+            [pytest, "--collect-only", "--quiet", "-m", "separate_process"],
+            check=True, stdout=subprocess.PIPE)
+        testlist = testlist.stdout.decode("utf-8").splitlines()
+        testlist = filter(
+            lambda test: test and "tests collected" not in test, testlist)
+        for test in testlist:
+            subprocess.check_call([pytest, test])
 
 class my_clean(Command):
     def run(self):
