@@ -626,6 +626,7 @@ qemu_skip_function = {
     # "virDomainQemuAttach",
     'virConnectDomainQemuMonitorEventRegister',  # overridden in -qemu.py
     'virConnectDomainQemuMonitorEventDeregister',  # overridden in -qemu.py
+    'virDomainQemuMonitorCommandWithFiles', # overridden in -qemu.py
 }
 
 # Generate C code, but skip python impl

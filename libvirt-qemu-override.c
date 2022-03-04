@@ -20,6 +20,9 @@
 #include "typewrappers.h"
 #include "libvirt-utils.h"
 #include "build/libvirt-qemu.h"
+#ifndef __CYGWIN__
+# include <fcntl.h>
+#endif
 
 #ifndef __CYGWIN__
 extern PyObject *PyInit_libvirtmod_qemu(void);
@@ -325,6 +328,118 @@ libvirt_qemu_virConnectDomainQemuMonitorEventDeregister(PyObject *self ATTRIBUTE
 }
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 3) */
 
+#if LIBVIR_CHECK_VERSION(8, 2, 0)
+static PyObject *
+libvirt_qemu_virDomainQemuMonitorCommandWithFiles(PyObject *self ATTRIBUTE_UNUSED,
+                                                  PyObject *args)
+{
+    PyObject *pyobj_domain;
+    const char *cmd;
+    PyObject *pyobj_files;
+    unsigned int flags;
+    virDomainPtr domain;
+    unsigned int ninfiles;
+    int *infiles = NULL;
+    unsigned int noutfiles = 0;
+    int *outfiles = NULL;
+    char *result = NULL;
+    ssize_t i;
+    PyObject *py_outfiles = NULL;
+    PyObject *py_retval = NULL;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args,
+                          (char *) "Os|OI:virDomainQemuMonitorCommandWithFiles",
+                          &pyobj_domain, &cmd, &pyobj_files, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    ninfiles = PyList_Size(pyobj_files);
+
+    if (VIR_ALLOC_N(infiles, ninfiles) < 0)
+        return PyErr_NoMemory();
+
+    for (i = 0; i < ninfiles; i++) {
+        PyObject *pyfd;
+        int fd;
+
+        pyfd = PyList_GetItem(pyobj_files, i);
+
+        if (libvirt_intUnwrap(pyfd, &fd) < 0)
+            goto cleanup;
+
+        infiles[i] = fd;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainQemuMonitorCommandWithFiles(domain, cmd, ninfiles, infiles,
+                                                    &noutfiles, &outfiles, &result, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0) {
+        py_retval = VIR_PY_NONE;
+        goto cleanup;
+    }
+
+    if (!(py_outfiles = PyList_New(0)) ||
+        !(py_retval = PyTuple_New(2))) {
+        goto error;
+    }
+
+    for (i = 0; i < noutfiles; i++) {
+        int fd = outfiles[i];
+        const char *mode = "r+b";
+
+        /* Since FD passing works only on UNIX-like systems, we can do this. */
+#ifndef __CYGWIN__
+        int fflags;
+
+        if ((fflags = fcntl(fd, F_GETFL)) < 0)
+            goto error;
+
+        switch (fflags & (O_ACCMODE | O_APPEND)) {
+        case O_RDONLY:
+            mode = "rb";
+            break;
+        case O_WRONLY:
+            mode = "wb";
+            break;
+        case O_RDWR:
+            mode = "r+b";
+            break;
+        case O_WRONLY | O_APPEND:
+            mode = "ab";
+            break;
+        case O_RDWR | O_APPEND:
+            mode = "a+b";
+            break;
+        }
+#endif
+
+        VIR_PY_LIST_APPEND_GOTO(py_outfiles, PyFile_FromFd(fd, NULL, mode, 0, NULL, NULL, NULL, 1), error);
+    }
+
+    VIR_PY_TUPLE_SET_GOTO(py_retval, 0, libvirt_charPtrWrap(result), error);
+    VIR_PY_TUPLE_SET_GOTO(py_retval, 1, py_outfiles, error);
+    /* stolen by py_retval */
+    py_outfiles = NULL;
+
+ cleanup:
+    Py_XDECREF(py_outfiles);
+    VIR_FREE(result);
+    VIR_FREE(outfiles);
+    VIR_FREE(infiles);
+    return py_retval;
+
+ error:
+    while (noutfiles > 0) {
+        VIR_FORCE_CLOSE(outfiles[--noutfiles]);
+    }
+    Py_CLEAR(py_retval);
+    goto cleanup;
+}
+#endif /* LIBVIR_CHECK_VERSION(8, 2, 0) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -340,6 +455,9 @@ static PyMethodDef libvirtQemuMethods[] = {
     {(char *) "virConnectDomainQemuMonitorEventRegister", libvirt_qemu_virConnectDomainQemuMonitorEventRegister, METH_VARARGS, NULL},
     {(char *) "virConnectDomainQemuMonitorEventDeregister", libvirt_qemu_virConnectDomainQemuMonitorEventDeregister, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(1, 2, 3) */
+#if LIBVIR_CHECK_VERSION(8, 2, 0)
+    {(char *) "virDomainQemuMonitorCommandWithFiles", libvirt_qemu_virDomainQemuMonitorCommandWithFiles, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(8, 2, 0) */
     {NULL, NULL, 0, NULL}
 };
 
