@@ -349,25 +349,33 @@ for klass in gotfunctions:
             if verbose:
                 print("PASS %s.%s" % (klass, func))
 
-# Phase 7: Validate that all the low level C APIs have binding
-for name, (klass, func, cname) in sorted(finalklassmap.items()):
-    pyname = cname
-    if pyname == "virSetErrorFunc":
-        pyname = "virRegisterErrorHandler"
-    elif pyname == "virConnectListDomains":
-        pyname = "virConnectListDomainsID"
 
-    # These exist in C and exist in python, but we've got
-    # a pure-python impl so don't check them
-    if name in ["virStreamRecvAll", "virStreamSendAll",
-                "virStreamSparseRecvAll", "virStreamSparseSendAll"]:
-        continue
+# Validate that all the low level C APIs have binding
+def validate_c_api_bindings_present(finalklassmap):
+    for name, (klass, func, cname) in sorted(finalklassmap.items()):
+        pyname = cname
+        if pyname == "virSetErrorFunc":
+            pyname = "virRegisterErrorHandler"
+        elif pyname == "virConnectListDomains":
+            pyname = "virConnectListDomainsID"
 
-    try:
-        thing = getattr(libvirt.libvirtmod, pyname)
-    except AttributeError:
-        print("FAIL libvirt.libvirtmod.%s      (C binding does not exist)" % pyname)
-        fail = True
+        # These exist in C and exist in python, but we've got
+        # a pure-python impl so don't check them
+        if name in ["virStreamRecvAll", "virStreamSendAll",
+                    "virStreamSparseRecvAll", "virStreamSparseSendAll"]:
+            continue
+
+        try:
+            thing = getattr(libvirt.libvirtmod, pyname)
+        except AttributeError:
+            raise Exception("libvirt.libvirtmod.%s      (C binding does not exist)" % pyname)
+
+
+try:
+    validate_c_api_bindings_present(finalklassmap)
+except Exception as e:
+    print("FAIL: %s" % e)
+    fail = True
 
 if fail:
     sys.exit(1)
