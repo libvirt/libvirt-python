@@ -5,6 +5,8 @@ import lxml
 import lxml.etree
 from typing import Dict, List, Set, Tuple  # noqa F401
 import libvirt
+import unittest
+import os
 
 
 def get_libvirt_api_xml_path():
@@ -15,14 +17,6 @@ def get_libvirt_api_xml_path():
     if proc.returncode:
         sys.exit(proc.returncode)
     return stdout.splitlines()[0]
-
-xml = get_libvirt_api_xml_path()
-
-with open(xml, "r") as fp:
-    tree = lxml.etree.parse(fp)
-
-verbose = False
-fail = False
 
 # Identify all functions and enums in public API
 def identify_functions_enums(tree):
@@ -337,8 +331,6 @@ def validate_c_to_python_api_mappings(finalklassmap, gotfunctions):
     for name, (klass, func, cname) in sorted(finalklassmap.items()):
         if func in gotfunctions[klass]:
             usedfunctions.add("%s.%s" % (klass, func))
-            if verbose:
-                print("PASS %s -> %s.%s" % (name, klass, func))
         else:
             raise Exception("%s -> %s.%s       (C API not mapped to python)" % (name, klass, func))
     return usedfunctions
@@ -359,9 +351,6 @@ def validate_python_to_c_api_mappings(gotfunctions, usedfunctions):
             key = "%s.%s" % (klass, func)
             if key not in usedfunctions:
                 raise Exception("%s.%s       (Python API not mapped to C)" % (klass, func))
-            else:
-                if verbose:
-                    print("PASS %s.%s" % (klass, func))
 
 
 # Validate that all the low level C APIs have binding
@@ -385,19 +374,26 @@ def validate_c_api_bindings_present(finalklassmap):
             raise Exception("libvirt.libvirtmod.%s      (C binding does not exist)" % pyname)
 
 
-try:
-    wantfunctions, wantenums, enumvals = identify_functions_enums(tree)
-    gotfunctions, gottypes = identify_class_methods(wantenums, enumvals)
-    basicklassmap = basic_class_method_mapping(wantfunctions, gottypes)
-    finalklassmap = fixup_class_method_mapping(basicklassmap)
-    usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
-    validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
-    validate_c_api_bindings_present(finalklassmap)
-except Exception as e:
-    print("FAIL: %s" % e)
-    fail = True
+api_test_flag = unittest.skipUnless(
+    os.environ.get('LIBVIRT_API_COVERAGE', False),
+    "API coverage test is only for upstream maintainers",
+)
 
-if fail:
-    sys.exit(1)
-else:
-    sys.exit(0)
+@api_test_flag
+class LibvirtAPICoverage(unittest.TestCase):
+    def test_libvirt_api(self):
+        xml = get_libvirt_api_xml_path()
+
+        with open(xml, "r") as fp:
+            tree = lxml.etree.parse(fp)
+
+        wantfunctions, wantenums, enumvals = identify_functions_enums(tree)
+        gotfunctions, gottypes = identify_class_methods(wantenums, enumvals)
+        basicklassmap = basic_class_method_mapping(wantfunctions, gottypes)
+        finalklassmap = fixup_class_method_mapping(basicklassmap)
+        usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
+        validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
+        validate_c_api_bindings_present(finalklassmap)
+
+test = LibvirtAPICoverage()
+test.test_libvirt_api()
