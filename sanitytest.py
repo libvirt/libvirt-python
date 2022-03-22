@@ -197,125 +197,128 @@ for cname in wantfunctions:
             basicklassmap[name] = ("libvirt", name[3:], cname)
 
 
-# Phase 4: Deal with oh so many special cases in C -> python mapping
-finalklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
+# Deal with oh so many special cases in C -> python mapping
+def fixup_class_method_mapping(basicklassmap):
+    finalklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
 
-for name, (klass, func, cname) in sorted(basicklassmap.items()):
-    # The object lifecycle APIs are irrelevant since they're
-    # used inside the object constructors/destructors.
-    if func in ["Ref", "Free", "New", "GetConnect", "GetDomain", "GetNetwork"]:
-        if klass == "virStream" and func == "New":
+    for name, (klass, func, cname) in sorted(basicklassmap.items()):
+        # The object lifecycle APIs are irrelevant since they're
+        # used inside the object constructors/destructors.
+        if func in ["Ref", "Free", "New", "GetConnect", "GetDomain", "GetNetwork"]:
+            if klass == "virStream" and func == "New":
+                klass = "virConnect"
+                func = "NewStream"
+            else:
+                continue
+
+        # All the error handling methods need special handling
+        if klass == "libvirt":
+            if func in ["CopyLastError", "DefaultErrorFunc",
+                        "ErrorFunc", "FreeError",
+                        "SaveLastError", "ResetError"]:
+                continue
+            elif func in ["GetLastError", "GetLastErrorMessage",
+                          "GetLastErrorCode", "GetLastErrorDomain",
+                          "ResetLastError", "Initialize"]:
+                func = "vir" + func
+            elif func == "SetErrorFunc":
+                func = "RegisterErrorHandler"
+        elif klass == "virConnect":
+            if func in ["CopyLastError", "SetErrorFunc"]:
+                continue
+            elif func in ["GetLastError", "ResetLastError"]:
+                func = "virConn" + func
+
+        # Remove 'Get' prefix from most APIs, except those in virConnect
+        # and virDomainSnapshot namespaces which stupidly used a different
+        # convention which we now can't fix without breaking API
+        if func[0:3] == "Get" and klass not in ["virConnect", "virDomainCheckpoint", "virDomainSnapshot", "libvirt"]:
+            if func not in ["GetCPUStats", "GetTime"]:
+                func = func[3:]
+
+        # The object creation and lookup APIs all have to get re-mapped
+        # into the parent class
+        if func in ["CreateXML", "CreateLinux", "CreateXMLWithFiles",
+                    "DefineXML", "CreateXMLFrom", "LookupByUUID",
+                    "LookupByUUIDString", "LookupByVolume" "LookupByName",
+                    "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
+                    "LookupByMACString", "LookupByUsage", "LookupByVolume",
+                    "LookupByTargetPath", "LookupSCSIHostByWWN", "LookupByPortDev",
+                    "Restore", "RestoreFlags",
+                    "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags",
+                    "CreateXMLFlags"]:
+            if klass != "virDomain":
+                func = klass[3:] + func
+
+            if klass in ["virDomainCheckpoint", "virDomainSnapshot"]:
+                klass = "virDomain"
+                func = func[6:]
+            elif klass == "virStorageVol" and func in ["StorageVolCreateXMLFrom", "StorageVolCreateXML"]:
+                klass = "virStoragePool"
+                func = func[10:]
+            elif klass == "virNetworkPort":
+                klass = "virNetwork"
+                func = func[7:]
+            elif func == "StoragePoolLookupByVolume":
+                klass = "virStorageVol"
+            elif func == "StorageVolLookupByName":
+                klass = "virStoragePool"
+            else:
+                klass = "virConnect"
+
+        # The open methods get remapped to primary namespace
+        if klass == "virConnect" and func in ["Open", "OpenAuth", "OpenReadOnly"]:
+            klass = "libvirt"
+
+        # These are inexplicably renamed in the python API
+        if func == "ListDomains":
+            func = "ListDomainsID"
+        elif func == "ListAllNodeDevices":
+            func = "ListAllDevices"
+        elif func == "ListNodeDevices":
+            func = "ListDevices"
+
+        # The virInterfaceChangeXXXX APIs go into virConnect. Stupidly
+        # they have lost their 'interface' prefix in names, but we can't
+        # fix this name
+        if func[0:6] == "Change":
             klass = "virConnect"
-            func = "NewStream"
-        else:
-            continue
 
-    # All the error handling methods need special handling
-    if klass == "libvirt":
-        if func in ["CopyLastError", "DefaultErrorFunc",
-                    "ErrorFunc", "FreeError",
-                    "SaveLastError", "ResetError"]:
-            continue
-        elif func in ["GetLastError", "GetLastErrorMessage",
-                      "GetLastErrorCode", "GetLastErrorDomain",
-                      "ResetLastError", "Initialize"]:
-            func = "vir" + func
-        elif func == "SetErrorFunc":
-            func = "RegisterErrorHandler"
-    elif klass == "virConnect":
-        if func in ["CopyLastError", "SetErrorFunc"]:
-            continue
-        elif func in ["GetLastError", "ResetLastError"]:
-            func = "virConn" + func
-
-    # Remove 'Get' prefix from most APIs, except those in virConnect
-    # and virDomainSnapshot namespaces which stupidly used a different
-    # convention which we now can't fix without breaking API
-    if func[0:3] == "Get" and klass not in ["virConnect", "virDomainCheckpoint", "virDomainSnapshot", "libvirt"]:
-        if func not in ["GetCPUStats", "GetTime"]:
-            func = func[3:]
-
-    # The object creation and lookup APIs all have to get re-mapped
-    # into the parent class
-    if func in ["CreateXML", "CreateLinux", "CreateXMLWithFiles",
-                "DefineXML", "CreateXMLFrom", "LookupByUUID",
-                "LookupByUUIDString", "LookupByVolume" "LookupByName",
-                "LookupByID", "LookupByName", "LookupByKey", "LookupByPath",
-                "LookupByMACString", "LookupByUsage", "LookupByVolume",
-                "LookupByTargetPath", "LookupSCSIHostByWWN", "LookupByPortDev",
-                "Restore", "RestoreFlags",
-                "SaveImageDefineXML", "SaveImageGetXMLDesc", "DefineXMLFlags",
-                "CreateXMLFlags"]:
-        if klass != "virDomain":
-            func = klass[3:] + func
-
-        if klass in ["virDomainCheckpoint", "virDomainSnapshot"]:
+        # Need to special case the checkpoint and snapshot APIs
+        if klass == "virDomainSnapshot" and func in ["Current", "ListNames", "Num"]:
             klass = "virDomain"
-            func = func[6:]
-        elif klass == "virStorageVol" and func in ["StorageVolCreateXMLFrom", "StorageVolCreateXML"]:
-            klass = "virStoragePool"
-            func = func[10:]
-        elif klass == "virNetworkPort":
-            klass = "virNetwork"
-            func = func[7:]
-        elif func == "StoragePoolLookupByVolume":
-            klass = "virStorageVol"
-        elif func == "StorageVolLookupByName":
-            klass = "virStoragePool"
-        else:
-            klass = "virConnect"
+            func = "snapshot" + func
 
-    # The open methods get remapped to primary namespace
-    if klass == "virConnect" and func in ["Open", "OpenAuth", "OpenReadOnly"]:
-        klass = "libvirt"
+        # Names should start with lowercase letter...
+        func = func[0:1].lower() + func[1:]
+        if func[0:8] == "nWFilter":
+            func = "nwfilter" + func[8:]
+        if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw" or func[0:6] == "fSInfo":
+            func = "fs" + func[2:]
+        if func[0:12] == "iOThreadInfo":
+            func = "ioThreadInfo"
 
-    # These are inexplicably renamed in the python API
-    if func == "ListDomains":
-        func = "ListDomainsID"
-    elif func == "ListAllNodeDevices":
-        func = "ListAllDevices"
-    elif func == "ListNodeDevices":
-        func = "ListDevices"
+        if klass == "virNetwork":
+            func = func.replace("dHCP", "DHCP")
 
-    # The virInterfaceChangeXXXX APIs go into virConnect. Stupidly
-    # they have lost their 'interface' prefix in names, but we can't
-    # fix this name
-    if func[0:6] == "Change":
-        klass = "virConnect"
+        # ...except when they don't. More stupid naming
+        # decisions we can't fix
+        if func == "iD":
+            func = "ID"
+        if func == "uUID":
+            func = "UUID"
+        if func == "uUIDString":
+            func = "UUIDString"
+        if func == "oSType":
+            func = "OSType"
+        if func == "xMLDesc":
+            func = "XMLDesc"
+        if func == "mACString":
+            func = "MACString"
 
-    # Need to special case the checkpoint and snapshot APIs
-    if klass == "virDomainSnapshot" and func in ["Current", "ListNames", "Num"]:
-        klass = "virDomain"
-        func = "snapshot" + func
+        finalklassmap[name] = (klass, func, cname)
 
-    # Names should start with lowercase letter...
-    func = func[0:1].lower() + func[1:]
-    if func[0:8] == "nWFilter":
-        func = "nwfilter" + func[8:]
-    if func[0:8] == "fSFreeze" or func[0:6] == "fSThaw" or func[0:6] == "fSInfo":
-        func = "fs" + func[2:]
-    if func[0:12] == "iOThreadInfo":
-        func = "ioThreadInfo"
-
-    if klass == "virNetwork":
-        func = func.replace("dHCP", "DHCP")
-
-    # ...except when they don't. More stupid naming
-    # decisions we can't fix
-    if func == "iD":
-        func = "ID"
-    if func == "uUID":
-        func = "UUID"
-    if func == "uUIDString":
-        func = "UUIDString"
-    if func == "oSType":
-        func = "OSType"
-    if func == "xMLDesc":
-        func = "XMLDesc"
-    if func == "mACString":
-        func = "MACString"
-
-    finalklassmap[name] = (klass, func, cname)
+    return finalklassmap
 
 
 # Validate that every C API is mapped to a python API
@@ -373,6 +376,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    finalklassmap = fixup_class_method_mapping(basicklassmap)
     usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
     validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
     validate_c_api_bindings_present(finalklassmap)
