@@ -304,15 +304,13 @@ class my_test(Command):
         Run test suite
         """
 
-        apis = get_api_xml_files()
-
         if "PYTHONPATH" in os.environ:
             os.environ["PYTHONPATH"] = self.build_platlib + ":" + os.environ["PYTHONPATH"]
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
 
         if "LIBVIRT_API_COVERAGE" in os.environ:
-            self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
+            self.spawn([sys.executable, "sanitytest.py", self.build_platlib])
         pytest = self.find_pytest_path()
         subprocess.check_call([pytest])
 

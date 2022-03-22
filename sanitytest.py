@@ -20,12 +20,7 @@ def get_libvirt_api_xml_path():
         sys.exit(proc.returncode)
     return stdout.splitlines()[0]
 
-
-# Path to the libvirt API XML file
-if len(sys.argv) >= 3:
-    xml = sys.argv[2]
-else:
-    xml = get_libvirt_api_xml_path()
+xml = get_libvirt_api_xml_path()
 
 with open(xml, "r") as fp:
     tree = lxml.etree.parse(fp)
