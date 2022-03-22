@@ -119,82 +119,85 @@ for klassname in gottypes:
             gotfunctions[klassname].append(name)
 
 
-# Phase 3: First cut at mapping of C APIs to python classes + methods
-basicklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
+# First cut at mapping of C APIs to python classes + methods
+def basic_class_method_mapping(wantfunctions, gottypes):
+    basicklassmap = {}  # type: Dict[str, Tuple[str, str, str]]
 
-for cname in wantfunctions:
-    name = cname
-    # Some virConnect APIs have stupid names
-    if name[0:7] == "virNode" and name[0:13] != "virNodeDevice":
-        name = "virConnect" + name[7:]
-    if name[0:7] == "virConn" and name[0:10] != "virConnect":
-        name = "virConnect" + name[7:]
+    for cname in wantfunctions:
+        name = cname
+        # Some virConnect APIs have stupid names
+        if name[0:7] == "virNode" and name[0:13] != "virNodeDevice":
+            name = "virConnect" + name[7:]
+        if name[0:7] == "virConn" and name[0:10] != "virConnect":
+            name = "virConnect" + name[7:]
 
-    # The typed param APIs are only for internal use
-    if name[0:14] == "virTypedParams":
-        continue
-
-    if name[0:23] == "virNetworkDHCPLeaseFree":
-        continue
-
-    if name[0:28] == "virDomainStatsRecordListFree":
-        continue
-
-    if name[0:19] == "virDomainFSInfoFree":
-        continue
-
-    if name[0:25] == "virDomainIOThreadInfoFree":
-        continue
-
-    if name[0:22] == "virDomainInterfaceFree":
-        continue
-
-    if name[0:21] == "virDomainListGetStats":
-        name = "virConnectDomainListGetStats"
-
-    # These aren't functions, they're callback signatures
-    if name in ["virConnectAuthCallbackPtr", "virConnectCloseFunc",
-                "virStreamSinkFunc", "virStreamSourceFunc", "virStreamEventCallback",
-                "virEventHandleCallback", "virEventTimeoutCallback", "virFreeCallback",
-                "virStreamSinkHoleFunc", "virStreamSourceHoleFunc", "virStreamSourceSkipFunc"]:
-        continue
-    if name[0:21] == "virConnectDomainEvent" and name[-8:] == "Callback":
-        continue
-    if name[0:22] == "virConnectNetworkEvent" and name[-8:] == "Callback":
-        continue
-    if (name.startswith("virConnectStoragePoolEvent") and
-        name.endswith("Callback")):
-        continue
-    if (name.startswith("virConnectNodeDeviceEvent") and
-        name.endswith("Callback")):
-        continue
-    if (name.startswith("virConnectSecretEvent") and
-        name.endswith("Callback")):
-        continue
-
-    # virEvent APIs go into main 'libvirt' namespace not any class
-    if name[0:8] == "virEvent":
-        if name[-4:] == "Func":
+        # The typed param APIs are only for internal use
+        if name[0:14] == "virTypedParams":
             continue
-        basicklassmap[name] = ("libvirt", name, cname)
-    else:
-        found = False
-        # To start with map APIs to classes based on the
-        # naming prefix. Mistakes will be fixed in next
-        # loop
-        for klassname in gottypes:
-            klen = len(klassname)
-            if name[0:klen] == klassname:
-                found = True
-                if name not in basicklassmap:
-                    basicklassmap[name] = (klassname, name[klen:], cname)
-                elif len(basicklassmap[name]) < klen:
-                    basicklassmap[name] = (klassname, name[klen:], cname)
 
-        # Anything which can't map to a class goes into the
-        # global namespaces
-        if not found:
-            basicklassmap[name] = ("libvirt", name[3:], cname)
+        if name[0:23] == "virNetworkDHCPLeaseFree":
+            continue
+
+        if name[0:28] == "virDomainStatsRecordListFree":
+            continue
+
+        if name[0:19] == "virDomainFSInfoFree":
+            continue
+
+        if name[0:25] == "virDomainIOThreadInfoFree":
+            continue
+
+        if name[0:22] == "virDomainInterfaceFree":
+            continue
+
+        if name[0:21] == "virDomainListGetStats":
+            name = "virConnectDomainListGetStats"
+
+        # These aren't functions, they're callback signatures
+        if name in ["virConnectAuthCallbackPtr", "virConnectCloseFunc",
+                    "virStreamSinkFunc", "virStreamSourceFunc", "virStreamEventCallback",
+                    "virEventHandleCallback", "virEventTimeoutCallback", "virFreeCallback",
+                    "virStreamSinkHoleFunc", "virStreamSourceHoleFunc", "virStreamSourceSkipFunc"]:
+            continue
+        if name[0:21] == "virConnectDomainEvent" and name[-8:] == "Callback":
+            continue
+        if name[0:22] == "virConnectNetworkEvent" and name[-8:] == "Callback":
+            continue
+        if (name.startswith("virConnectStoragePoolEvent") and
+            name.endswith("Callback")):
+            continue
+        if (name.startswith("virConnectNodeDeviceEvent") and
+            name.endswith("Callback")):
+            continue
+        if (name.startswith("virConnectSecretEvent") and
+            name.endswith("Callback")):
+            continue
+
+        # virEvent APIs go into main 'libvirt' namespace not any class
+        if name[0:8] == "virEvent":
+            if name[-4:] == "Func":
+                continue
+            basicklassmap[name] = ("libvirt", name, cname)
+        else:
+            found = False
+            # To start with map APIs to classes based on the
+            # naming prefix. Mistakes will be fixed in next
+            # loop
+            for klassname in gottypes:
+                klen = len(klassname)
+                if name[0:klen] == klassname:
+                    found = True
+                    if name not in basicklassmap:
+                        basicklassmap[name] = (klassname, name[klen:], cname)
+                    elif len(basicklassmap[name]) < klen:
+                        basicklassmap[name] = (klassname, name[klen:], cname)
+
+            # Anything which can't map to a class goes into the
+            # global namespaces
+            if not found:
+                basicklassmap[name] = ("libvirt", name[3:], cname)
+
+    return basicklassmap
 
 
 # Deal with oh so many special cases in C -> python mapping
@@ -376,6 +379,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    basicklassmap = basic_class_method_mapping(wantfunctions, gottypes)
     finalklassmap = fixup_class_method_mapping(basicklassmap)
     usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
     validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
