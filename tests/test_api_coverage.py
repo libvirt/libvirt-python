@@ -430,6 +430,3 @@ class LibvirtAPICoverage(unittest.TestCase):
         usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
         validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
         validate_c_api_bindings_present(finalklassmap)
-
-test = LibvirtAPICoverage()
-test.test_libvirt_api()

@@ -309,8 +309,6 @@ class my_test(Command):
         else:
             os.environ["PYTHONPATH"] = self.build_platlib
 
-        if "LIBVIRT_API_COVERAGE" in os.environ:
-            self.spawn([sys.executable, "sanitytest.py"])
         pytest = self.find_pytest_path()
         subprocess.check_call([pytest])
 
