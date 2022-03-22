@@ -24,60 +24,64 @@ with open(xml, "r") as fp:
 verbose = False
 fail = False
 
-enumvals = {}  # type: Dict[str, Dict[str, int]]
-second_pass = []  # type: List[str]
-wantenums = []  # type: List[str]
-wantfunctions = []  # type: List[str]
+# Identify all functions and enums in public API
+def identify_functions_enums(tree):
+    enumvals = {}  # type: Dict[str, Dict[str, int]]
+    second_pass = []  # type: List[str]
+    wantenums = []  # type: List[str]
+    wantfunctions = []  # type: List[str]
 
-# Phase 1: Identify all functions and enums in public API
-wantfunctions = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
+    wantfunctions = tree.xpath('/api/files/file/exports[@type="function"]/@symbol')
 
-for n in tree.xpath('/api/symbols/enum'):
-    typ = n.attrib['type']
-    name = n.attrib['name']
-    val = n.attrib['value']
+    for n in tree.xpath('/api/symbols/enum'):
+        typ = n.attrib['type']
+        name = n.attrib['name']
+        val = n.attrib['value']
 
-    if typ not in enumvals:
-        enumvals[typ] = {}
+        if typ not in enumvals:
+            enumvals[typ] = {}
 
-    # If the value cannot be converted to int, it is reference to
-    # another enum and needs to be sorted out later on
-    try:
-        val = int(val)
-    except ValueError:
-        second_pass.append(n)
-        continue
+        # If the value cannot be converted to int, it is reference to
+        # another enum and needs to be sorted out later on
+        try:
+            val = int(val)
+        except ValueError:
+            second_pass.append(n)
+            continue
 
-    enumvals[typ][name] = int(val)
+        enumvals[typ][name] = int(val)
 
-for n in second_pass:
-    typ = n.attrib['type']
-    name = n.attrib['name']
-    val = n.attrib['value']
+    for n in second_pass:
+        typ = n.attrib['type']
+        name = n.attrib['name']
+        val = n.attrib['value']
 
-    for v in enumvals.values():
-        if val in v:
-            val = int(v[val])
-            break
+        for v in enumvals.values():
+            if val in v:
+                val = int(v[val])
+                break
 
-    # Version 4.0.0 was broken as missing VIR_TYPED_PARAM enums
-    # constants. This is harmless from POV of validating API
-    # coverage so ignore this error.
-    if (not isinstance(val, int) and
-        not val.startswith("VIR_TYPED_PARAM_")):
-        fail = True
-        print("Cannot get a value of enum %s (originally %s)" % (val, name))
-    enumvals[typ][name] = val
+        # Version 4.0.0 was broken as missing VIR_TYPED_PARAM enums
+        # constants. This is harmless from POV of validating API
+        # coverage so ignore this error.
+        if (not isinstance(val, int) and
+            not val.startswith("VIR_TYPED_PARAM_")):
+            fail = True
+            print("Cannot get a value of enum %s (originally %s)" % (val, name))
+        enumvals[typ][name] = val
 
-for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
-    for enumval in enumvals.values():
-        if n in enumval:
-            enumv = enumval
-            break
-    # Eliminate sentinels
-    if n.endswith('_LAST') and enumv[n] == max(enumv.values()):
-        continue
-    wantenums.append(n)
+    for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
+        for enumval in enumvals.values():
+            if n in enumval:
+                enumv = enumval
+                break
+        # Eliminate sentinels
+        if n.endswith('_LAST') and enumv[n] == max(enumv.values()):
+            continue
+        wantenums.append(n)
+
+    return wantfunctions, wantenums, enumvals
+
 
 # Identify all classes and methods in the 'libvirt' python module
 def identify_class_methods(wantenums, enumvals):
@@ -382,6 +386,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    wantfunctions, wantenums, enumvals = identify_functions_enums(tree)
     gotfunctions, gottypes = identify_class_methods(wantenums, enumvals)
     basicklassmap = basic_class_method_mapping(wantfunctions, gottypes)
     finalklassmap = fixup_class_method_mapping(basicklassmap)
