@@ -14,6 +14,7 @@ import os
 import os.path
 import re
 import shutil
+import subprocess
 import time
 
 if sys.version_info < (3, 5):
@@ -28,26 +29,28 @@ MIN_LIBVIRT_LXC = "1.0.2"
 if not os.path.exists("build"):
     os.mkdir("build")
 
-_pkgcfg = -1
-def get_pkgcfg(do_fail=True):
-    global _pkgcfg
-    if _pkgcfg == -1:
-        _pkgcfg = os.getenv('PKG_CONFIG')
-    if _pkgcfg is None:
-        _pkgcfg = distutils.spawn.find_executable("pkg-config")
-    if _pkgcfg is None and do_fail:
-        raise Exception("pkg-config binary is required to compile libvirt-python")
-    return _pkgcfg
+def check_pkgcfg():
+    try:
+        proc = subprocess.run(["pkg-config", "--version"],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if proc.returncode != 0:
+            print("pkg-config binary does not appear to be functional")
+            sys.exit(1)
+    except FileNotFoundError:
+        print("pkg-config binary is required to compile libvirt-python")
+        sys.exit(1)
+
+check_pkgcfg()
 
 def check_minimum_libvirt_version():
-    spawn([get_pkgcfg(),
+    spawn(["pkg-config",
            "--print-errors",
            "--atleast-version=%s" % MIN_LIBVIRT,
            "libvirt"])
 
 def have_libvirt_lxc():
     try:
-        spawn([get_pkgcfg(),
+        spawn(["pkg-config",
                "--atleast-version=%s" % MIN_LIBVIRT_LXC,
              "libvirt"])
         return True
@@ -56,7 +59,7 @@ def have_libvirt_lxc():
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
-    f = os.popen("%s %s %s" % (get_pkgcfg(), " ".join(args), mod))
+    f = os.popen("%s %s %s" % ("pkg-config", " ".join(args), mod))
 
     line = f.readline()
     if line is not None:
@@ -89,9 +92,6 @@ def get_module_lists():
     Determine which modules we are actually building, and all their
     required config
     """
-    if get_pkgcfg(do_fail=False) is None:
-        return [], []
-
     c_modules = []
     py_modules = []
     ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
