@@ -5,8 +5,6 @@ from distutils.command.build import build
 from distutils.command.sdist import sdist
 from distutils.dir_util import remove_tree
 from distutils.util import get_platform
-from distutils.spawn import spawn
-from distutils.errors import DistutilsExecError
 
 import sys
 import os
@@ -42,19 +40,18 @@ def check_pkgcfg():
 check_pkgcfg()
 
 def check_minimum_libvirt_version():
-    spawn(["pkg-config",
-           "--print-errors",
-           "--atleast-version=%s" % MIN_LIBVIRT,
-           "libvirt"])
+    subprocess.check_call(["pkg-config",
+                           "--print-errors",
+                           "--atleast-version=%s" % MIN_LIBVIRT,
+                           "libvirt"])
 
 def have_libvirt_lxc():
-    try:
-        spawn(["pkg-config",
-               "--atleast-version=%s" % MIN_LIBVIRT_LXC,
-             "libvirt"])
+    proc = subprocess.run(["pkg-config",
+                           "--atleast-version=%s" % MIN_LIBVIRT_LXC,
+                           "libvirt"])
+    if proc.returncode == 0:
         return True
-    except DistutilsExecError:
-        return False
+    return False
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
@@ -142,10 +139,10 @@ class my_build(build):
         check_minimum_libvirt_version()
         apis = get_api_xml_files()
 
-        self.spawn([sys.executable, "generator.py", "libvirt", apis[0]])
-        self.spawn([sys.executable, "generator.py", "libvirt-qemu", apis[1]])
+        subprocess.check_call([sys.executable, "generator.py", "libvirt", apis[0]])
+        subprocess.check_call([sys.executable, "generator.py", "libvirt-qemu", apis[1]])
         if have_libvirt_lxc():
-            self.spawn([sys.executable, "generator.py", "libvirt-lxc", apis[2]])
+            subprocess.check_call([sys.executable, "generator.py", "libvirt-lxc", apis[2]])
         shutil.copy('libvirtaio.py', 'build')
 
         build.run(self)
@@ -295,7 +292,7 @@ class my_test(Command):
         if "LIBVIRT_API_COVERAGE" in os.environ:
             self.spawn([sys.executable, "sanitytest.py", self.build_platlib, apis[0]])
         pytest = self.find_pytest_path()
-        self.spawn([sys.executable, pytest])
+        subprocess.check_call([pytest])
 
 
 class my_clean(Command):
