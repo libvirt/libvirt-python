@@ -318,16 +318,17 @@ for name, (klass, func, cname) in sorted(basicklassmap.items()):
     finalklassmap[name] = (klass, func, cname)
 
 
-# Phase 5: Validate sure that every C API is mapped to a python API
-usedfunctions = set()  # type: Set[str]
-for name, (klass, func, cname) in sorted(finalklassmap.items()):
-    if func in gotfunctions[klass]:
-        usedfunctions.add("%s.%s" % (klass, func))
-        if verbose:
-            print("PASS %s -> %s.%s" % (name, klass, func))
-    else:
-        print("FAIL %s -> %s.%s       (C API not mapped to python)" % (name, klass, func))
-        fail = True
+# Validate that every C API is mapped to a python API
+def validate_c_to_python_api_mappings(finalklassmap, gotfunctions):
+    usedfunctions = set()  # type: Set[str]
+    for name, (klass, func, cname) in sorted(finalklassmap.items()):
+        if func in gotfunctions[klass]:
+            usedfunctions.add("%s.%s" % (klass, func))
+            if verbose:
+                print("PASS %s -> %s.%s" % (name, klass, func))
+        else:
+            raise Exception("%s -> %s.%s       (C API not mapped to python)" % (name, klass, func))
+    return usedfunctions
 
 
 # Validate that every python API has a corresponding C API
@@ -372,6 +373,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
     validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
     validate_c_api_bindings_present(finalklassmap)
 except Exception as e:
