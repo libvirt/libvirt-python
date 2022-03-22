@@ -79,44 +79,47 @@ for n in tree.xpath('/api/files/file/exports[@type="enum"]/@symbol'):
         continue
     wantenums.append(n)
 
-# Phase 2: Identify all classes and methods in the 'libvirt' python module
-gotenums = []  # type: List[str]
-gottypes = []  # type: List[str]
-gotfunctions = {"libvirt": []}  # type: Dict[str, List[str]]
+# Identify all classes and methods in the 'libvirt' python module
+def identify_class_methods(wantenums, enumvals):
+    gotenums = []  # type: List[str]
+    gottypes = []  # type: List[str]
+    gotfunctions = {"libvirt": []}  # type: Dict[str, List[str]]
 
-for name in dir(libvirt):
-    if name.startswith('_'):
-        continue
-    thing = getattr(libvirt, name)
-    # Special-case libvirtError to deal with python 2.4 difference
-    # in Exception class type reporting.
-    if isinstance(thing, int):
-        gotenums.append(name)
-    elif getattr(thing, "__module__", "") == "typing":
-        continue
-    elif type(thing) == type or name == "libvirtError":
-        gottypes.append(name)
-        gotfunctions[name] = []
-    elif callable(thing):
-        gotfunctions["libvirt"].append(name)
-
-for enum in wantenums:
-    if enum not in gotenums:
-        fail = True
-        for typ, enumval in enumvals.items():
-            if enum in enumval:
-                print("FAIL Missing exported enum %s of type %s" % (enum, typ))
-
-for klassname in gottypes:
-    klassobj = getattr(libvirt, klassname)
-    for name in dir(klassobj):
+    for name in dir(libvirt):
         if name.startswith('_'):
             continue
-        if name == 'c_pointer':
+        thing = getattr(libvirt, name)
+        # Special-case libvirtError to deal with python 2.4 difference
+        # in Exception class type reporting.
+        if isinstance(thing, int):
+            gotenums.append(name)
+        elif getattr(thing, "__module__", "") == "typing":
             continue
-        thing = getattr(klassobj, name)
-        if callable(thing):
-            gotfunctions[klassname].append(name)
+        elif type(thing) == type or name == "libvirtError":
+            gottypes.append(name)
+            gotfunctions[name] = []
+        elif callable(thing):
+            gotfunctions["libvirt"].append(name)
+
+    for enum in wantenums:
+        if enum not in gotenums:
+            fail = True
+            for typ, enumval in enumvals.items():
+                if enum in enumval:
+                    raise Exception("Missing exported enum %s of type %s" % (enum, typ))
+
+    for klassname in gottypes:
+        klassobj = getattr(libvirt, klassname)
+        for name in dir(klassobj):
+            if name.startswith('_'):
+                continue
+            if name == 'c_pointer':
+                continue
+            thing = getattr(klassobj, name)
+            if callable(thing):
+                gotfunctions[klassname].append(name)
+
+    return gotfunctions, gottypes
 
 
 # First cut at mapping of C APIs to python classes + methods
@@ -379,6 +382,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    gotfunctions, gottypes = identify_class_methods(wantenums, enumvals)
     basicklassmap = basic_class_method_mapping(wantfunctions, gottypes)
     finalklassmap = fixup_class_method_mapping(basicklassmap)
     usedfunctions = validate_c_to_python_api_mappings(finalklassmap, gotfunctions)
