@@ -330,24 +330,24 @@ for name, (klass, func, cname) in sorted(finalklassmap.items()):
         fail = True
 
 
-# Phase 6: Validate that every python API has a corresponding C API
-for klass in gotfunctions:
-    if klass == "libvirtError":
-        continue
-    for func in sorted(gotfunctions[klass]):
-        # These are pure python methods with no C APi
-        if func in ["connect", "getConnect", "domain", "getDomain",
-                    "virEventInvokeFreeCallback", "network",
-                    "sparseRecvAll", "sparseSendAll"]:
+# Validate that every python API has a corresponding C API
+def validate_python_to_c_api_mappings(gotfunctions, usedfunctions):
+    for klass in gotfunctions:
+        if klass == "libvirtError":
             continue
+        for func in sorted(gotfunctions[klass]):
+            # These are pure python methods with no C APi
+            if func in ["connect", "getConnect", "domain", "getDomain",
+                        "virEventInvokeFreeCallback", "network",
+                        "sparseRecvAll", "sparseSendAll"]:
+                continue
 
-        key = "%s.%s" % (klass, func)
-        if key not in usedfunctions:
-            print("FAIL %s.%s       (Python API not mapped to C)" % (klass, func))
-            fail = True
-        else:
-            if verbose:
-                print("PASS %s.%s" % (klass, func))
+            key = "%s.%s" % (klass, func)
+            if key not in usedfunctions:
+                raise Exception("%s.%s       (Python API not mapped to C)" % (klass, func))
+            else:
+                if verbose:
+                    print("PASS %s.%s" % (klass, func))
 
 
 # Validate that all the low level C APIs have binding
@@ -372,6 +372,7 @@ def validate_c_api_bindings_present(finalklassmap):
 
 
 try:
+    validate_python_to_c_api_mappings(gotfunctions, usedfunctions)
     validate_c_api_bindings_present(finalklassmap)
 except Exception as e:
     print("FAIL: %s" % e)
