@@ -1781,7 +1781,13 @@ quiet = False
 if not os.path.exists("build"):
     os.mkdir("build")
 
-emit_c_code(sys.argv[1])
+output = None
+if len(sys.argv) == 4:
+    output = sys.argv[3]
+if output == "c" or output is None:
+    emit_c_code(sys.argv[1])
 
-emit_py_code(sys.argv[1])
+if output == "py" or output is None:
+    emit_py_code(sys.argv[1])
+
 sys.exit(0)
