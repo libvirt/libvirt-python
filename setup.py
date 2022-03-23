@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from distutils.core import setup, Extension, Command
-from distutils.command.build_ext import build_ext
-from distutils.command.build_py import build_py
-from distutils.command.sdist import sdist
+from setuptools import setup, Extension, Command
+from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py
+from setuptools.command.sdist import sdist
 
 import glob
 import sys
