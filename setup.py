@@ -3,7 +3,6 @@
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
 from distutils.command.sdist import sdist
-from distutils.dir_util import remove_tree
 from distutils.util import get_platform
 
 import sys
@@ -298,7 +297,7 @@ class my_test(Command):
 class my_clean(Command):
     def run(self):
         if os.path.exists("build"):
-            remove_tree("build")
+            shutil.rmtree("build", ignore_errors=True)
 
 
 ##################
