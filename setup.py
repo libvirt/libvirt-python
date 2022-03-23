@@ -7,7 +7,6 @@ from distutils.dir_util import remove_tree
 from distutils.util import get_platform
 from distutils.spawn import spawn
 from distutils.errors import DistutilsExecError
-import distutils
 
 import sys
 import os
@@ -275,7 +274,7 @@ class my_test(Command):
         ]
 
         for binary in binaries:
-            path = distutils.spawn.find_executable(binary)
+            path = shutil.which(binary)
             if path is not None:
                 return path
 
