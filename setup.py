@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from distutils.core import setup, Extension, Command
-from distutils.command.build import build
+from distutils.command.build_ext import build_ext
+from distutils.command.build_py import build_py
 from distutils.command.sdist import sdist
 from distutils.util import get_platform
 
@@ -132,19 +133,32 @@ def get_module_lists():
 # Custom commands #
 ###################
 
-class my_build(build):
+class my_build_ext(build_ext):
 
     def run(self):
         check_minimum_libvirt_version()
         apis = get_api_xml_files()
 
-        subprocess.check_call([sys.executable, "generator.py", "libvirt", apis[0]])
-        subprocess.check_call([sys.executable, "generator.py", "libvirt-qemu", apis[1]])
+        subprocess.check_call([sys.executable, "generator.py", "libvirt", apis[0], "c"])
+        subprocess.check_call([sys.executable, "generator.py", "libvirt-qemu", apis[1], "c"])
         if have_libvirt_lxc():
-            subprocess.check_call([sys.executable, "generator.py", "libvirt-lxc", apis[2]])
+            subprocess.check_call([sys.executable, "generator.py", "libvirt-lxc", apis[2], "c"])
+
+        build_ext.run(self)
+
+class my_build_py(build_py):
+
+    def run(self):
+        check_minimum_libvirt_version()
+        apis = get_api_xml_files()
+
+        subprocess.check_call([sys.executable, "generator.py", "libvirt", apis[0], "py"])
+        subprocess.check_call([sys.executable, "generator.py", "libvirt-qemu", apis[1], "py"])
+        if have_libvirt_lxc():
+            subprocess.check_call([sys.executable, "generator.py", "libvirt-lxc", apis[2], "py"])
         shutil.copy('libvirtaio.py', 'build')
 
-        build.run(self)
+        build_py.run(self)
 
 class my_sdist(sdist):
     user_options = sdist.user_options
@@ -324,7 +338,8 @@ of recent versions of Linux (and other OSes).''',
           '': 'build'
       },
       cmdclass = {
-          'build': my_build,
+          'build_ext': my_build_ext,
+          'build_py': my_build_py,
           'clean': my_clean,
           'sdist': my_sdist,
           'test': my_test
