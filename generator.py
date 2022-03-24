@@ -200,10 +200,6 @@ def enum(type: str, name: str, value: EnumValue) -> None:
 #
 #######################################################################
 
-functions_skipped = {
-    "virConnectListDomains",
-}
-
 skipped_types = {
     # 'int *': "usually a return type",
     'virConnectDomainEventCallback': "No function types in python",
@@ -641,17 +637,55 @@ def validate_functions():
     return 0
 
 
-def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> int:
+def skip_both_impl(name: str) -> bool:
+    if name in skip_function:
+        return True
+
+    (desc, ret, args, file, mod, cond) = functions[name]
+
+    for a_name, a_type, a_info in args:
+        # This should be correct
+        if a_type[0:6] == "const ":
+            a_type = a_type[6:]
+
+        if a_type in skipped_types:
+            return True
+
+    r_type, r_info, r_field = ret
+    if r_type in skipped_types:
+        return True
+
+    return False
+
+
+def skip_c_impl(name: str) -> bool:
+    if skip_both_impl(name):
+        return True
+
+    if name in skip_impl:
+        return True
+
+    return False
+
+
+def skip_py_impl(name: str) -> bool:
+    if skip_both_impl(name):
+        return True
+
+    if name in function_skip_python_impl:
+        return True
+
+    return False
+
+
+def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> bool:
     """
-    :returns: -1 on failure, 0 on skip, 1 on success.
+    :returns: True if generated, False if skipped
     """
     (desc, ret, args, file, mod, cond) = functions[name]
 
-    if name in skip_function:
-        return 0
-    if name in skip_impl:
-        # Don't delete the function entry in the caller.
-        return 1
+    if skip_c_impl(name):
+        return False
 
     c_call = ""
     format = ""
@@ -685,8 +719,6 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
                 c_call += ", "
             c_call += "%s" % (a_name)
         else:
-            if a_type in skipped_types:
-                return 0
             raise Exception("Unexpected type %s in function %s" % (a_type, name))
     if format:
         format += ":%s" % (name)
@@ -717,8 +749,6 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
             ret_convert += "    free(c_retval);\n"
         ret_convert += "    return py_retval;\n"
     else:
-        if r_type in skipped_types:
-            return 0
         raise Exception("Unexpected type %s in function %s" % (r_type, name))
 
     if cond:
@@ -737,14 +767,14 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
             include.write("#endif\n")
             export.write("#endif\n")
             output.write("#endif\n")
-        return 1
+        return True
     if file == "python_accessor" and r_type != "void" and not r_field:
         # Those have been manually generated
         if cond:
             include.write("#endif\n")
             export.write("#endif\n")
             output.write("#endif\n")
-        return 1
+        return True
 
     output.write("PyObject *\n")
     output.write("%s_%s(PyObject *self ATTRIBUTE_UNUSED," % (package, name))
@@ -775,9 +805,7 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
         export.write("#endif /* %s */\n" % cond)
         output.write("#endif /* %s */\n" % cond)
 
-    if name in function_skip_python_impl:
-        return 0
-    return 1
+    return True
 
 
 def print_c_pointer(classname: str, output: IO[str], export: IO[str], include: IO[str]) -> None:
@@ -837,7 +865,6 @@ def buildStubs(module: str) -> None:
     package = module.replace('-', '_')
 
     nb_wrap = 0
-    skipped = 0
 
     header_file = "build/%s.h" % module
     export_file = "build/%s-export.c" % module
@@ -857,13 +884,7 @@ def buildStubs(module: str) -> None:
     wrapper.write("#include \"build/%s.h\"\n\n" % (module,))
 
     for function in sorted(functions):
-        # Skip the functions which are not for the module
-        ret = print_function_wrapper(package, function, wrapper, export, include)
-        if ret == 0:
-            skipped += 1
-            functions_skipped.add(function)
-            del functions[function]
-        if ret == 1:
+        if print_function_wrapper(package, function, wrapper, export, include):
             nb_wrap += 1
 
     if module == "libvirt":
@@ -1266,6 +1287,9 @@ def buildWrappers(module: str) -> None:
         ctypes_processed.add(type)
 
     for name, (desc, ret, args, file, mod, cond) in functions.items():
+        if skip_py_impl(name):
+            continue
+
         for type in ctypes:
             classe = classes_type[type][2]
 
@@ -1620,7 +1644,7 @@ def buildWrappers(module: str) -> None:
                             func = line[offset + 11:]
                             offset = func.find("(")
                             func = func[0:offset]
-                            if func not in functions_skipped:
+                            if not skip_c_impl(func) and func != "virConnectListDomains":
                                 return True
                     return False
 
@@ -1658,6 +1682,8 @@ def buildWrappers(module: str) -> None:
     # Generate functions directly, no classes
     #
     for name, (desc, ret, args, file, mod, cond) in sorted(direct_functions.items()):
+        if skip_py_impl(name):
+            continue
         func = nameFixup(name, 'None', '', '')
         classes.write("def %s(" % func)
         for n, (a_name, a_type, a_info) in enumerate(args):
