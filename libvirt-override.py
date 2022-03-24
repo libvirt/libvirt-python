@@ -1,16 +1,3 @@
-#
-# Manually written part of python bindings for libvirt
-#
-
-# On cygwin, the DLL is called cygvirtmod.dll
-try:
-    import libvirtmod  # type: ignore
-except ImportError as lib_e:
-    try:
-        import cygvirtmod as libvirtmod  # type: ignore
-    except ImportError as cyg_e:
-        if "No module named" in str(cyg_e):
-            raise lib_e
 
 from types import TracebackType
 from typing import Any, Callable, Dict, List, Optional, overload, Tuple, Type, TypeVar, Union

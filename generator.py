@@ -1194,6 +1194,19 @@ def buildWrappers(module: str) -> None:
         print("ERROR: Unknown module type: %s" % module)
         return None
 
+    package = module.replace('-', '_')
+    if module == "libvirt":
+        pymod = "libvirtmod"
+        cygmod = "cygvirtmod"
+    elif module == "libvirt-lxc":
+        pymod = "libvirtmod_lxc"
+        cygmod = "cygvirtmod_lxc"
+    elif module == "libvirt-qemu":
+        pymod = "libvirtmod_qemu"
+        cygmod = "cygvirtmod_qemu"
+    else:
+        raise Exception("Unknown module '%s'" % module)
+
     for tinfo in classes_type.values():
         function_classes[tinfo[2]] = []
 
@@ -1242,7 +1255,7 @@ def buildWrappers(module: str) -> None:
             info = (0, func, name, ret, args, file, mod)
             function_classes['None'].append(info)
 
-    classes_file = "build/%s.py" % module
+    classes_file = "build/%s.py" % package
     extra_file = "%s-override.py" % module
     extra = None
 
@@ -1261,7 +1274,19 @@ def buildWrappers(module: str) -> None:
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
     classes.write("#\n")
+    classes.write("try:\n")
+    classes.write("    import %s  # type: ignore\n" % pymod)
+    classes.write("except ImportError as lib_e:\n")
+    classes.write("    try:\n")
+    classes.write("        import %s as %s  # type: ignore\n" % (cygmod, pymod))
+    classes.write("    except ImportError as cyg_e:\n")
+    classes.write("        if \"No module named\" in str(cyg_e):\n")
+    classes.write("            raise lib_e\n\n")
+
     if extra:
+        classes.write("# WARNING WARNING WARNING WARNING\n")
+        classes.write("#\n")
+        classes.write("# Manually written part of python bindings for libvirt\n")
         classes.writelines(extra.readlines())
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
@@ -1306,7 +1331,7 @@ def buildWrappers(module: str) -> None:
                 classes.write("    ret = ")
             else:
                 classes.write("    ")
-            classes.write("libvirtmod.%s(" % name)
+            classes.write("%s.%s(" % (pymod, name))
             for n, (a_name, a_type, a_info) in enumerate(args):
                 if n != 0:
                     classes.write(", ")
@@ -1400,8 +1425,8 @@ def buildWrappers(module: str) -> None:
             if classname in classes_destructors:
                 classes.write("    def __del__(self):\n")
                 classes.write("        if self._o is not None:\n")
-                classes.write("            libvirtmod.%s(self._o)\n" %
-                              classes_destructors[classname])
+                classes.write("            %s.%s(self._o)\n" %
+                              (pymod, classes_destructors[classname]))
                 classes.write("        self._o = None\n\n")
                 destruct = classes_destructors[classname]
 
@@ -1420,8 +1445,8 @@ def buildWrappers(module: str) -> None:
 
             classes.write("    def c_pointer(self):\n")
             classes.write("        \"\"\"Get C pointer to underlying object\"\"\"\n")
-            classes.write("        return libvirtmod.%s_pointer(self._o)\n\n" %
-                          classname)
+            classes.write("        return %s.%s_pointer(self._o)\n\n" %
+                          (pymod, classname))
 
             flist = function_classes[classname]
             oldfile = ""
@@ -1466,7 +1491,7 @@ def buildWrappers(module: str) -> None:
                     classes.write("        ret = ")
                 else:
                     classes.write("        ")
-                classes.write("libvirtmod.%s(" % name)
+                classes.write("%s.%s(" % (pymod, name))
                 for n, (a_name, a_type, a_info) in enumerate(args):
                     if n != 0:
                         classes.write(", ")
@@ -1552,7 +1577,7 @@ def buildWrappers(module: str) -> None:
 
                 def shouldSkip(lines: List[str]) -> bool:
                     for line in lines:
-                        offset = line.find("libvirtmod.")
+                        offset = line.find(pymod + ".")
                         if offset != -1:
                             func = line[offset + 11:]
                             offset = func.find("(")
