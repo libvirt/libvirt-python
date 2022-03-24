@@ -751,10 +751,8 @@ def print_c_pointer(classname: str, output: IO[str], export: IO[str], include: I
                  (classname, classname))
 
 
-def buildStubs(module: str, api_xml: str) -> int:
+def load_apis(module: str, api_xml: str):
     global onlyOverrides
-
-    package = module.replace('-', '_')
 
     try:
         onlyOverrides = False
@@ -782,6 +780,11 @@ def buildStubs(module: str, api_xml: str) -> int:
         # XXX: This is not right, same function already in @functions
         # will be overwritten.
         print("Found %d functions in %s" % (len(functions) - n, override_api_xml))
+
+
+def buildStubs(module: str) -> int:
+    package = module.replace('-', '_')
+
     nb_wrap = 0
     failed = 0
     skipped = 0
@@ -1712,11 +1715,13 @@ if sys.argv[1] not in ["libvirt", "libvirt-lxc", "libvirt-qemu"]:
     print("ERROR: unknown module %s" % sys.argv[1])
     sys.exit(1)
 
+load_apis(sys.argv[1], sys.argv[2])
+
 quiet = False
 if not os.path.exists("build"):
     os.mkdir("build")
 
-if buildStubs(sys.argv[1], sys.argv[2]) < 0:
+if buildStubs(sys.argv[1]) < 0:
     sys.exit(1)
 
 buildWrappers(sys.argv[1])
