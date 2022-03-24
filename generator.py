@@ -98,12 +98,12 @@ class docParser(xml.sax.handler.ContentHandler):
                 self.function_return_field = attrs.get('field', '')
         elif tag == 'enum':
             # enums come from header files, hence virterror.h
-            if attrs['file'] in libvirt_headers + ["virerror", "virterror"]:
+            files = libvirt_headers + ["virerror",
+                                       "virterror",
+                                       "libvirt-lxc",
+                                       "libvirt-qemu"]
+            if attrs['file'] in files:
                 enum(attrs['type'], attrs['name'], attrs['value'])
-            elif attrs['file'] == "libvirt-lxc":
-                lxc_enum(attrs['type'], attrs['name'], attrs['value'])
-            elif attrs['file'] == "libvirt-qemu":
-                qemu_enum(attrs['type'], attrs['name'], attrs['value'])
         elif tag == "macro":
             if "string" in attrs:
                 params.append((attrs['name'], attrs['string']))
@@ -181,24 +181,13 @@ def enum(type: str, name: str, value: EnumValue) -> None:
         value = 1
     elif value == 'VIR_DOMAIN_AFFECT_CONFIG':
         value = 2
-    if onlyOverrides and name not in enums[type]:
-        return
-    enums[type][name] = value
-
-
-def lxc_enum(type: str, name: str, value: EnumValue) -> None:
-    if onlyOverrides and name not in enums[type]:
-        return
-    enums[type][name] = value
-
-
-def qemu_enum(type: str, name: str, value: EnumValue) -> None:
-    if value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_BLOCK':
+    elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_BLOCK':
         value = -2
     elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_DEFAULT':
         value = -1
     elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_NOWAIT':
         value = 0
+
     if onlyOverrides and name not in enums[type]:
         return
     enums[type][name] = value
