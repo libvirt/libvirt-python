@@ -588,7 +588,7 @@ function_skip_index_one = {
 }
 
 
-def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> int:
+def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> int:
     """
     :returns: -1 on failure, 0 on skip, 1 on success.
     """
@@ -676,18 +676,9 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
         output.write("#if %s\n" % cond)
 
     include.write("PyObject * ")
-    if module == "libvirt":
-        include.write("libvirt_%s(PyObject *self, PyObject *args);\n" % (name))
-        export.write("    { (char *)\"%s\", libvirt_%s, METH_VARARGS, NULL },\n" %
-                     (name, name))
-    elif module == "libvirt-lxc":
-        include.write("libvirt_lxc_%s(PyObject *self, PyObject *args);\n" % (name))
-        export.write("    { (char *)\"%s\", libvirt_lxc_%s, METH_VARARGS, NULL },\n" %
-                     (name, name))
-    elif module == "libvirt-qemu":
-        include.write("libvirt_qemu_%s(PyObject *self, PyObject *args);\n" % (name))
-        export.write("    { (char *)\"%s\", libvirt_qemu_%s, METH_VARARGS, NULL },\n" %
-                     (name, name))
+    include.write("%s_%s(PyObject *self, PyObject *args);\n" % (package, name))
+    export.write("    { (char *)\"%s\", %s_%s, METH_VARARGS, NULL },\n" %
+                 (name, package, name))
 
     if file == "python":
         # Those have been manually generated
@@ -705,12 +696,7 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
         return 1
 
     output.write("PyObject *\n")
-    if module == "libvirt":
-        output.write("libvirt_%s(PyObject *self ATTRIBUTE_UNUSED," % (name))
-    elif module == "libvirt-lxc":
-        output.write("libvirt_lxc_%s(PyObject *self ATTRIBUTE_UNUSED," % (name))
-    elif module == "libvirt-qemu":
-        output.write("libvirt_qemu_%s(PyObject *self ATTRIBUTE_UNUSED," % (name))
+    output.write("%s_%s(PyObject *self ATTRIBUTE_UNUSED," % (package, name))
     output.write(" PyObject *args")
     if format == "":
         output.write(" ATTRIBUTE_UNUSED")
@@ -738,15 +724,8 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
         export.write("#endif /* %s */\n" % cond)
         output.write("#endif /* %s */\n" % cond)
 
-    if module == "libvirt":
-        if name in function_skip_python_impl:
-            return 0
-    elif module == "libvirt-lxc":
-        if name in function_skip_python_impl:
-            return 0
-    elif module == "libvirt-qemu":
-        if name in function_skip_python_impl:
-            return 0
+    if name in function_skip_python_impl:
+        return 0
     return 1
 
 
@@ -775,19 +754,7 @@ def print_c_pointer(classname: str, output: IO[str], export: IO[str], include: I
 def buildStubs(module: str, api_xml: str) -> int:
     global onlyOverrides
 
-    if module not in ["libvirt", "libvirt-qemu", "libvirt-lxc"]:
-        print("ERROR: Unknown module type: %s" % module)
-        return -1
-
-    if module == "libvirt":
-        funcs = functions
-        funcs_skipped = functions_skipped
-    elif module == "libvirt-lxc":
-        funcs = functions
-        funcs_skipped = functions_skipped
-    elif module == "libvirt-qemu":
-        funcs = functions
-        funcs_skipped = functions_skipped
+    package = module.replace('-', '_')
 
     try:
         onlyOverrides = False
@@ -797,7 +764,7 @@ def buildStubs(module: str, api_xml: str) -> int:
         print(api_xml, ":", msg)
         sys.exit(1)
 
-    n = len(funcs)
+    n = len(functions)
     if not quiet:
         print("Found %d functions in %s" % ((n), api_xml))
 
@@ -814,7 +781,7 @@ def buildStubs(module: str, api_xml: str) -> int:
     if not quiet:
         # XXX: This is not right, same function already in @functions
         # will be overwritten.
-        print("Found %d functions in %s" % (len(funcs) - n, override_api_xml))
+        print("Found %d functions in %s" % (len(functions) - n, override_api_xml))
     nb_wrap = 0
     failed = 0
     skipped = 0
@@ -837,17 +804,17 @@ def buildStubs(module: str, api_xml: str) -> int:
     wrapper.write("#include \"typewrappers.h\"\n")
     wrapper.write("#include \"build/%s.h\"\n\n" % (module,))
 
-    for function in sorted(funcs):
+    for function in sorted(functions):
         # Skip the functions which are not for the module
-        ret = print_function_wrapper(module, function, wrapper, export, include)
+        ret = print_function_wrapper(package, function, wrapper, export, include)
         if ret < 0:
             failed += 1
             funcs_failed.append(function)
-            del funcs[function]
+            del functions[function]
         if ret == 0:
             skipped += 1
-            funcs_skipped.add(function)
-            del funcs[function]
+            functions_skipped.add(function)
+            del functions[function]
         if ret == 1:
             nb_wrap += 1
 
@@ -1214,15 +1181,9 @@ def functionSortKey(info: Tuple) -> Tuple[str, str]:
 
 
 def writeDoc(module: str, name: str, args: List[ArgumentType], indent: str, output: IO) -> None:
-    if module == "libvirt":
-        funcs = functions
-    elif module == "libvirt-lxc":
-        funcs = functions
-    elif module == "libvirt-qemu":
-        funcs = functions
-    if not funcs[name][0]:
+    if not functions[name][0]:
         return
-    val = funcs[name][0]
+    val = functions[name][0]
     val = val.replace("NULL", "None")
     sep = '\n%s' % (indent,)
     output.write('%s"""%s """\n' % (indent, sep.join(val.splitlines())))
