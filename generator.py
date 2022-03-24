@@ -117,37 +117,21 @@ class docParser(xml.sax.handler.ContentHandler):
             # functions come from source files, hence 'virerror.c'
             if self.function:
                 assert self.function_return
-                if self.function_module in libvirt_headers + \
-                        ["event", "virevent", "virerror", "virterror"]:
+
+                modules = libvirt_headers + ["event",
+                                             "virevent",
+                                             "virerror",
+                                             "virterror",
+                                             "libvirt-lxc",
+                                             "libvirt-qemu"]
+                files = ["python", "python-lxc", "python-qemu"]
+
+                if (self.function_module in modules or
+                    self.function_file in files):
                     function(self.function, self.function_descr,
                              self.function_return, self.function_args,
                              self.function_file, self.function_module,
                              self.function_cond)
-                elif self.function_module == "libvirt-lxc":
-                    lxc_function(self.function, self.function_descr,
-                                 self.function_return, self.function_args,
-                                 self.function_file, self.function_module,
-                                 self.function_cond)
-                elif self.function_module == "libvirt-qemu":
-                    qemu_function(self.function, self.function_descr,
-                                  self.function_return, self.function_args,
-                                  self.function_file, self.function_module,
-                                  self.function_cond)
-                elif self.function_file == "python":
-                    function(self.function, self.function_descr,
-                             self.function_return, self.function_args,
-                             self.function_file, self.function_module,
-                             self.function_cond)
-                elif self.function_file == "python-lxc":
-                    lxc_function(self.function, self.function_descr,
-                                 self.function_return, self.function_args,
-                                 self.function_file, self.function_module,
-                                 self.function_cond)
-                elif self.function_file == "python-qemu":
-                    qemu_function(self.function, self.function_descr,
-                                  self.function_return, self.function_args,
-                                  self.function_file, self.function_module,
-                                  self.function_cond)
                 self.in_function = False
         elif tag == 'arg':
             if self.in_function:
@@ -174,18 +158,6 @@ def function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], 
         return
     if name == "virConnectListDomains":
         name = "virConnectListDomainsID"
-    functions[name] = (desc, ret, args, file, module, cond)
-
-
-def qemu_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
-    if onlyOverrides and name not in functions:
-        return
-    functions[name] = (desc, ret, args, file, module, cond)
-
-
-def lxc_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
-    if onlyOverrides and name not in functions:
-        return
     functions[name] = (desc, ret, args, file, module, cond)
 
 
