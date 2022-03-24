@@ -1,4 +1,3 @@
-# Manually written part of python bindings for libvirt-qemu
 from typing import Any, Callable, Dict, List, IO
 
 

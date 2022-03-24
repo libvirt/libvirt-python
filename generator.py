@@ -1190,10 +1190,6 @@ def writeDoc(module: str, name: str, args: List[ArgumentType], indent: str, outp
 
 
 def buildWrappers(module: str) -> None:
-    if not module == "libvirt":
-        print("ERROR: Unknown module type: %s" % module)
-        return None
-
     package = module.replace('-', '_')
     if module == "libvirt":
         pymod = "libvirtmod"
@@ -1283,15 +1279,19 @@ def buildWrappers(module: str) -> None:
     classes.write("        if \"No module named\" in str(cyg_e):\n")
     classes.write("            raise lib_e\n\n")
 
+    if module != "libvirt":
+        classes.write("import libvirt\n")
+        classes.write("\n")
+
     if extra:
         classes.write("# WARNING WARNING WARNING WARNING\n")
         classes.write("#\n")
-        classes.write("# Manually written part of python bindings for libvirt\n")
+        classes.write("# Manually written part of python bindings for %s\n" % module)
         classes.writelines(extra.readlines())
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
     classes.write("#\n")
-    classes.write("# Automatically written part of python bindings for libvirt\n")
+    classes.write("# Automatically written part of python bindings for %s\n" % module)
     classes.write("#\n")
     classes.write("# WARNING WARNING WARNING WARNING\n")
     if extra:
@@ -1384,7 +1384,10 @@ def buildWrappers(module: str) -> None:
 
             classes.write("\n")
 
-    for classname in classes_list:
+    modclasses = []
+    if module == "libvirt":
+        modclasses = classes_list
+    for classname in modclasses:
         PARENTS = {
             "virConnect": "self._conn",
             "virDomain": "self._dom",
@@ -1563,8 +1566,9 @@ def buildWrappers(module: str) -> None:
 
                 classes.write("\n")
             # Append "<classname>.py" to class def, iff it exists
-            try:
-                extra = open("libvirt-override-%s.py" % (classname,), "r")
+            class_override = "%s-override-%s.py" % (module, classname)
+            if os.path.exists(class_override):
+                extra = open(class_override, "r")
                 classes.write("    #\n")
                 classes.write("    # %s methods from %s.py (hand coded)\n" % (classname, classname))
                 classes.write("    #\n")
@@ -1609,8 +1613,59 @@ def buildWrappers(module: str) -> None:
                     classes.writelines(cached)
                 classes.write("\n")
                 extra.close()
-            except Exception:
-                pass
+
+    direct_functions = {}
+    if module != "libvirt":
+        direct_functions = functions
+
+        classes.write("#\n# Functions from module %s\n#\n\n" % module)
+
+    #
+    # Generate functions directly, no classes
+    #
+    for name, (desc, ret, args, file, mod, cond) in sorted(direct_functions.items()):
+        func = nameFixup(name, 'None', '', '')
+        classes.write("def %s(" % func)
+        for n, (a_name, a_type, a_info) in enumerate(args):
+            if n != 0:
+                classes.write(", ")
+            classes.write("%s" % a_name)
+        classes.write("):\n")
+        writeDoc(module, name, args, '    ', classes)
+
+        r_type, r_info, r_field = ret
+        if r_type != "void":
+            classes.write("    ret = ")
+        else:
+            classes.write("    ")
+        classes.write("%s.%s(" % (pymod, name))
+
+        conn = None
+
+        for n, (a_name, a_type, a_info) in enumerate(args):
+            if a_type == "virConnectPtr":
+                conn = a_name
+
+            if n != 0:
+                classes.write(", ")
+            if a_type in ["virDomainPtr", "virConnectPtr"]:
+                # FIXME: This might have problem if the function
+                # has multiple args which are objects.
+                classes.write("%s.%s" % (a_name, "_o"))
+            else:
+                classes.write("%s" % a_name)
+        classes.write(")\n")
+
+        if r_type != "void":
+            classes.write("    if ret is None:\n"
+                     "        raise libvirt.libvirtError('%s() failed')\n" % (name,))
+            if r_type == "virDomainPtr":
+                classes.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
+                classes.write("    return __tmp\n")
+            else:
+                classes.write("    return ret\n")
+
+        classes.write("\n")
 
     #
     # Generate enum constants
@@ -1646,222 +1701,16 @@ def buildWrappers(module: str) -> None:
             classes.write("%s = %s\n" % (name, value))
         classes.write("\n")
 
-    classes.write("# typed parameter names\n")
-    for name, value in params:
-        classes.write("%s = \"%s\"\n" % (name, value))
+    if params:
+        classes.write("# typed parameter names\n")
+        for name, value in params:
+            classes.write("%s = \"%s\"\n" % (name, value))
 
     classes.close()
 
-
-def qemuBuildWrappers(module: str) -> None:
-    if not module == "libvirt-qemu":
-        print("ERROR: only libvirt-qemu is supported")
-        return None
-
-    extra_file = "%s-override.py" % module
-    extra = None
-
-    fd = open("build/libvirt_qemu.py", "w")
-
-    if os.path.exists(extra_file):
-        extra = open(extra_file, "r")
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    fd.write("# This file is automatically written by generator.py. Any changes\n")
-    fd.write("# made here will be lost.\n")
-    fd.write("#\n")
-    fd.write("# To change the manually written methods edit %s-override.py\n" % (module,))
-    fd.write("# To change the automatically written methods edit generator.py\n")
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    fd.write("# Automatically written part of python bindings for libvirt\n")
-    fd.write("#\n")
-
-    fd.write("try:\n")
-    fd.write("    import libvirtmod_qemu\n")
-    fd.write("except ImportError as lib_e:\n")
-    fd.write("    try:\n")
-    fd.write("        import cygvirtmod_qemu as libvirtmod_qemu\n")
-    fd.write("    except ImportError as cyg_e:\n")
-    fd.write("        if \"No module named\" in str(cyg_e):\n")
-    fd.write("            raise lib_e\n\n")
-
-    fd.write("import libvirt\n\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    if extra:
-        fd.writelines(extra.readlines())
-    fd.write("#\n")
-    if extra:
-        extra.close()
-
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    fd.write("#\n# Functions from module %s\n#\n\n" % module)
-    #
-    # Generate functions directly, no classes
-    #
-    for name, (desc, ret, args, file, mod, cond) in sorted(functions.items()):
-        func = nameFixup(name, 'None', '', '')
-        fd.write("def %s(" % func)
-        for n, (a_name, a_type, a_info) in enumerate(args):
-            if n != 0:
-                fd.write(", ")
-            fd.write("%s" % a_name)
-        fd.write("):\n")
-        writeDoc(module, name, args, '    ', fd)
-
-        r_type, r_info, r_field = ret
-        if r_type != "void":
-            fd.write("    ret = ")
-        else:
-            fd.write("    ")
-        fd.write("libvirtmod_qemu.%s(" % name)
-
-        conn = None
-
-        for n, (a_name, a_type, a_info) in enumerate(args):
-            if a_type == "virConnectPtr":
-                conn = a_name
-
-            if n != 0:
-                fd.write(", ")
-            if a_type in ["virDomainPtr", "virConnectPtr"]:
-                # FIXME: This might have problem if the function
-                # has multiple args which are objects.
-                fd.write("%s.%s" % (a_name, "_o"))
-            else:
-                fd.write("%s" % a_name)
-        fd.write(")\n")
-
-        if r_type != "void":
-            fd.write("    if ret is None:\n"
-                     "        raise libvirt.libvirtError('%s() failed')\n" % (name,))
-            if r_type == "virDomainPtr":
-                fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
-                fd.write("    return __tmp\n")
-            else:
-                fd.write("    return ret\n")
-
-        fd.write("\n")
-
-    #
-    # Generate enum constants
-    #
-    for type, enum in sorted(enums.items()):
-        fd.write("# %s\n" % type)
-        for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
-            fd.write("%s = %s\n" % (name, value))
-        fd.write("\n")
-
-    fd.close()
-
-
-def lxcBuildWrappers(module: str) -> None:
-    if not module == "libvirt-lxc":
-        print("ERROR: only libvirt-lxc is supported")
-        return None
-
-    extra_file = "%s-override.py" % module
-    extra = None
-
-    fd = open("build/libvirt_lxc.py", "w")
-
-    if os.path.exists(extra_file):
-        extra = open(extra_file, "r")
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    fd.write("# This file is automatically written by generator.py. Any changes\n")
-    fd.write("# made here will be lost.\n")
-    fd.write("#\n")
-    fd.write("# To change the manually written methods edit %s-override.py\n" % (module,))
-    fd.write("# To change the automatically written methods edit generator.py\n")
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    if extra:
-        fd.writelines(extra.readlines())
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    fd.write("#\n")
-    fd.write("# Automatically written part of python bindings for libvirt\n")
-    fd.write("#\n")
-    fd.write("# WARNING WARNING WARNING WARNING\n")
-    if extra:
-        extra.close()
-
-    fd.write("try:\n")
-    fd.write("    import libvirtmod_lxc\n")
-    fd.write("except ImportError as lib_e:\n")
-    fd.write("    try:\n")
-    fd.write("        import cygvirtmod_lxc as libvirtmod_lxc\n")
-    fd.write("    except ImportError as cyg_e:\n")
-    fd.write("        if \"No module named\" in str(cyg_e):\n")
-    fd.write("            raise lib_e\n\n")
-
-    fd.write("import libvirt\n\n")
-    fd.write("#\n# Functions from module %s\n#\n\n" % module)
-    #
-    # Generate functions directly, no classes
-    #
-    for name, (desc, ret, args, file, mod, cond) in sorted(functions.items()):
-        func = nameFixup(name, 'None', '', '')
-        fd.write("def %s(" % func)
-        for n, (a_name, a_type, a_info) in enumerate(args):
-            if n != 0:
-                fd.write(", ")
-            fd.write("%s" % a_name)
-        fd.write("):\n")
-        writeDoc(module, name, args, '    ', fd)
-
-        r_type, r_info, r_field = ret
-        if r_type != "void":
-            fd.write("    ret = ")
-        else:
-            fd.write("    ")
-        fd.write("libvirtmod_lxc.%s(" % name)
-
-        conn = None
-
-        for n, (a_name, a_type, a_info) in enumerate(args):
-            if a_type == "virConnectPtr":
-                conn = a_name
-
-            if n != 0:
-                fd.write(", ")
-            if a_type in ["virDomainPtr", "virConnectPtr"]:
-                # FIXME: This might have problem if the function
-                # has multiple args which are objects.
-                fd.write("%s.%s" % (a_name, "_o"))
-            else:
-                fd.write("%s" % a_name)
-        fd.write(")\n")
-
-        if r_type != "void":
-            fd.write("    if ret is None:\n"
-                     "        raise libvirt.libvirtError('%s() failed')\n" % (name,))
-            if r_type == "virDomainPtr":
-                fd.write("    __tmp = libvirt.virDomain(%s, _obj=ret)\n" % (conn,))
-                fd.write("    return __tmp\n")
-            else:
-                fd.write("    return ret\n")
-
-        fd.write("\n")
-
-    #
-    # Generate enum constants
-    #
-    for type, enum in sorted(enums.items()):
-        fd.write("# %s\n" % type)
-        for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
-            fd.write("%s = %s\n" % (name, value))
-        fd.write("\n")
-
-    fd.close()
-
+if sys.argv[1] not in ["libvirt", "libvirt-lxc", "libvirt-qemu"]:
+    print("ERROR: unknown module %s" % sys.argv[1])
+    sys.exit(1)
 
 quiet = False
 if not os.path.exists("build"):
@@ -1870,14 +1719,5 @@ if not os.path.exists("build"):
 if buildStubs(sys.argv[1], sys.argv[2]) < 0:
     sys.exit(1)
 
-if sys.argv[1] == "libvirt":
-    buildWrappers(sys.argv[1])
-elif sys.argv[1] == "libvirt-lxc":
-    lxcBuildWrappers(sys.argv[1])
-elif sys.argv[1] == "libvirt-qemu":
-    qemuBuildWrappers(sys.argv[1])
-else:
-    print("ERROR: unknown module %s" % sys.argv[1])
-    sys.exit(1)
-
+buildWrappers(sys.argv[1])
 sys.exit(0)
