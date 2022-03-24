@@ -17,8 +17,6 @@ EnumType = Dict[str, EnumValue]
 
 functions = {}  # type: Dict[str, FunctionType]
 enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
-lxc_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
-qemu_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
 event_ids = []  # type: List[str]
 params = []  # type: List[Tuple[str, str]] # [ (paramName, paramValue)... ]
 
@@ -189,9 +187,9 @@ def enum(type: str, name: str, value: EnumValue) -> None:
 
 
 def lxc_enum(type: str, name: str, value: EnumValue) -> None:
-    if onlyOverrides and name not in lxc_enums[type]:
+    if onlyOverrides and name not in enums[type]:
         return
-    lxc_enums[type][name] = value
+    enums[type][name] = value
 
 
 def qemu_enum(type: str, name: str, value: EnumValue) -> None:
@@ -201,9 +199,9 @@ def qemu_enum(type: str, name: str, value: EnumValue) -> None:
         value = -1
     elif value == 'VIR_DOMAIN_AGENT_RESPONSE_TIMEOUT_NOWAIT':
         value = 0
-    if onlyOverrides and name not in qemu_enums[type]:
+    if onlyOverrides and name not in enums[type]:
         return
-    qemu_enums[type][name] = value
+    enums[type][name] = value
 
 
 #######################################################################
@@ -1777,7 +1775,7 @@ def qemuBuildWrappers(module: str) -> None:
     #
     # Generate enum constants
     #
-    for type, enum in sorted(qemu_enums.items()):
+    for type, enum in sorted(enums.items()):
         fd.write("# %s\n" % type)
         for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
             fd.write("%s = %s\n" % (name, value))
@@ -1881,7 +1879,7 @@ def lxcBuildWrappers(module: str) -> None:
     #
     # Generate enum constants
     #
-    for type, enum in sorted(lxc_enums.items()):
+    for type, enum in sorted(enums.items()):
         fd.write("# %s\n" % type)
         for name, value in sorted(enum.items(), key=lambda i: (int(i[1]), i[0])):
             fd.write("%s = %s\n" % (name, value))
