@@ -244,8 +244,6 @@ def qemu_enum(type: str, name: str, value: EnumValue) -> None:
 functions_skipped = {
     "virConnectListDomains",
 }
-lxc_functions_skipped = set()  # type: Set[str]
-qemu_functions_skipped = set()  # type: Set[str]
 
 skipped_types = {
     # 'int *': "usually a return type",
@@ -480,13 +478,9 @@ skip_impl = {
     'virDomainAuthorizedSSHKeysSet',
     'virDomainGetMessages',
     'virNodeDeviceGetAutostart',
-}
 
-lxc_skip_impl = {
     'virDomainLxcOpenNamespace',
-}
 
-qemu_skip_impl = {
     'virDomainQemuMonitorCommand',
     'virDomainQemuAgentCommand',
 }
@@ -614,13 +608,10 @@ skip_function = {
     'virDomainFSInfoFree',  # only useful in C, python code uses list
     'virDomainIOThreadInfoFree',  # only useful in C, python code uses list
     'virDomainInterfaceFree',  # only useful in C, python code uses list
-}
 
-lxc_skip_function = {
     "virDomainLxcEnterNamespace",
     "virDomainLxcEnterSecurityLabel",
-}
-qemu_skip_function = {
+
     # "virDomainQemuAttach",
     'virConnectDomainQemuMonitorEventRegister',  # overridden in -qemu.py
     'virConnectDomainQemuMonitorEventDeregister',  # overridden in -qemu.py
@@ -633,9 +624,6 @@ function_skip_python_impl = {
                       # be exposed in bindings
 }
 
-lxc_function_skip_python_impl = set()  # type: Set[str]
-qemu_function_skip_python_impl = set()  # type: Set[str]
-
 function_skip_index_one = {
     "virDomainRevertToSnapshot",
 }
@@ -645,25 +633,11 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
     """
     :returns: -1 on failure, 0 on skip, 1 on success.
     """
-    try:
-        if module == "libvirt":
-            (desc, ret, args, file, mod, cond) = functions[name]
-            skip_function2, skip_impl2 = skip_function, skip_impl
-        elif module == "libvirt-lxc":
-            (desc, ret, args, file, mod, cond) = functions[name]
-            skip_function2, skip_impl2 = lxc_skip_function, lxc_skip_impl
-        elif module == "libvirt-qemu":
-            (desc, ret, args, file, mod, cond) = functions[name]
-            skip_function2, skip_impl2 = qemu_skip_function, qemu_skip_impl
-        else:
-            raise ValueError(module)
-    except Exception:
-        print("failed to get function %s infos" % name)
-        return -1
+    (desc, ret, args, file, mod, cond) = functions[name]
 
-    if name in skip_function2:
+    if name in skip_function:
         return 0
-    if name in skip_impl2:
+    if name in skip_impl:
         # Don't delete the function entry in the caller.
         return 1
 
@@ -809,10 +783,10 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
         if name in function_skip_python_impl:
             return 0
     elif module == "libvirt-lxc":
-        if name in lxc_function_skip_python_impl:
+        if name in function_skip_python_impl:
             return 0
     elif module == "libvirt-qemu":
-        if name in qemu_function_skip_python_impl:
+        if name in function_skip_python_impl:
             return 0
     return 1
 
@@ -851,10 +825,10 @@ def buildStubs(module: str, api_xml: str) -> int:
         funcs_skipped = functions_skipped
     elif module == "libvirt-lxc":
         funcs = functions
-        funcs_skipped = lxc_functions_skipped
+        funcs_skipped = functions_skipped
     elif module == "libvirt-qemu":
         funcs = functions
-        funcs_skipped = qemu_functions_skipped
+        funcs_skipped = functions_skipped
 
     try:
         onlyOverrides = False
