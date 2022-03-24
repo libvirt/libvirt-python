@@ -2,7 +2,6 @@
 
 from distutils.core import setup, Extension, Command
 from distutils.command.build import build
-from distutils.command.clean import clean
 from distutils.command.sdist import sdist
 from distutils.dir_util import remove_tree
 from distutils.util import get_platform
@@ -300,10 +299,8 @@ class my_test(Command):
         self.spawn([sys.executable, pytest])
 
 
-class my_clean(clean):
+class my_clean(Command):
     def run(self):
-        clean.run(self)
-
         if os.path.exists("build"):
             remove_tree("build")
 
