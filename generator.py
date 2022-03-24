@@ -298,8 +298,6 @@ py_types = {
 }  # type: Dict[str, Tuple[str, str, str, str]]
 
 
-unknown_types = defaultdict(list)  # type: Dict[str, List[str]]
-
 #######################################################################
 #
 #  This part writes the C <-> Python stubs libvirt.[ch] and
@@ -588,6 +586,61 @@ function_skip_index_one = {
 }
 
 
+def validate_function(name):
+    (desc, ret, args, file, mod, cond) = functions[name]
+
+    if name in skip_function:
+        return []
+    if name in skip_impl:
+        return []
+
+    failed = False
+    unknown = []
+    for a_name, a_type, a_info in args:
+        # This should be correct
+        if a_type[0:6] == "const ":
+            a_type = a_type[6:]
+
+        if a_type in skipped_types:
+            return []
+
+        if a_type not in py_types:
+            unknown.append(a_type)
+
+    r_type, r_info, r_field = ret
+    if r_type in skipped_types:
+        return []
+    if r_type != 'void' and r_type not in py_types:
+        unknown.append(r_type)
+
+    return unknown
+
+
+def validate_functions():
+    unknown_types = defaultdict(list)  # type: Dict[str, List[str]]
+    funcs_failed = []  # type: List[str]
+
+    for name in sorted(functions):
+        unknown = validate_function(name)
+        if unknown:
+            funcs_failed.append(name)
+            for thetype in unknown:
+                unknown_types[thetype].append(name)
+
+    if unknown_types:
+        print("Missing type converters: ")
+        for type, count in unknown_types.items():
+            print("%s:%d " % (type, len(count)))
+
+    for f in funcs_failed:
+        print("ERROR: failed %s" % f)
+
+    if funcs_failed:
+        return -1
+
+    return 0
+
+
 def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[str], include: IO[str]) -> int:
     """
     :returns: -1 on failure, 0 on skip, 1 on success.
@@ -634,8 +687,7 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
         else:
             if a_type in skipped_types:
                 return 0
-            unknown_types[a_type].append(name)
-            return -1
+            raise Exception("Unexpected type %s in function %s" % (a_type, name))
     if format:
         format += ":%s" % (name)
 
@@ -667,8 +719,7 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
     else:
         if r_type in skipped_types:
             return 0
-        unknown_types[r_type].append(name)
-        return -1
+        raise Exception("Unexpected type %s in function %s" % (r_type, name))
 
     if cond:
         include.write("#if %s\n" % cond)
@@ -782,13 +833,11 @@ def load_apis(module: str, api_xml: str):
         print("Found %d functions in %s" % (len(functions) - n, override_api_xml))
 
 
-def buildStubs(module: str) -> int:
+def buildStubs(module: str) -> None:
     package = module.replace('-', '_')
 
     nb_wrap = 0
-    failed = 0
     skipped = 0
-    funcs_failed = []  # type: List[str]
 
     header_file = "build/%s.h" % module
     export_file = "build/%s-export.c" % module
@@ -810,10 +859,6 @@ def buildStubs(module: str) -> int:
     for function in sorted(functions):
         # Skip the functions which are not for the module
         ret = print_function_wrapper(package, function, wrapper, export, include)
-        if ret < 0:
-            failed += 1
-            funcs_failed.append(function)
-            del functions[function]
         if ret == 0:
             skipped += 1
             functions_skipped.add(function)
@@ -836,20 +881,6 @@ def buildStubs(module: str) -> int:
 
     if not quiet:
         print("Generated %d wrapper functions" % nb_wrap)
-
-    if unknown_types:
-        print("Missing type converters: ")
-        for type, count in unknown_types.items():
-            print("%s:%d " % (type, len(count)))
-
-    for f in funcs_failed:
-        print("ERROR: failed %s" % f)
-
-    if failed > 0:
-        return -1
-    if unknown_types:
-        return -1
-    return 0
 
 
 #######################################################################
@@ -1717,12 +1748,14 @@ if sys.argv[1] not in ["libvirt", "libvirt-lxc", "libvirt-qemu"]:
 
 load_apis(sys.argv[1], sys.argv[2])
 
+if validate_functions() < 0:
+    sys.exit(1)
+
 quiet = False
 if not os.path.exists("build"):
     os.mkdir("build")
 
-if buildStubs(sys.argv[1]) < 0:
-    sys.exit(1)
+buildStubs(sys.argv[1])
 
 buildWrappers(sys.argv[1])
 sys.exit(0)
