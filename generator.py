@@ -16,8 +16,6 @@ EnumValue = Union[str, int]
 EnumType = Dict[str, EnumValue]
 
 functions = {}  # type: Dict[str, FunctionType]
-lxc_functions = {}  # type: Dict[str, FunctionType]
-qemu_functions = {}  # type: Dict[str, FunctionType]
 enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
 lxc_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
 qemu_enums = defaultdict(dict)  # type: Dict[str, EnumType] # { enumType: { enumConstant: enumValue } }
@@ -180,15 +178,15 @@ def function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], 
 
 
 def qemu_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
-    if onlyOverrides and name not in qemu_functions:
+    if onlyOverrides and name not in functions:
         return
-    qemu_functions[name] = (desc, ret, args, file, module, cond)
+    functions[name] = (desc, ret, args, file, module, cond)
 
 
 def lxc_function(name: str, desc: str, ret: ArgumentType, args: List[ArgumentType], file: str, module: str, cond: str) -> None:
-    if onlyOverrides and name not in lxc_functions:
+    if onlyOverrides and name not in functions:
         return
-    lxc_functions[name] = (desc, ret, args, file, module, cond)
+    functions[name] = (desc, ret, args, file, module, cond)
 
 
 def enum(type: str, name: str, value: EnumValue) -> None:
@@ -652,10 +650,10 @@ def print_function_wrapper(module: str, name: str, output: IO[str], export: IO[s
             (desc, ret, args, file, mod, cond) = functions[name]
             skip_function2, skip_impl2 = skip_function, skip_impl
         elif module == "libvirt-lxc":
-            (desc, ret, args, file, mod, cond) = lxc_functions[name]
+            (desc, ret, args, file, mod, cond) = functions[name]
             skip_function2, skip_impl2 = lxc_skip_function, lxc_skip_impl
         elif module == "libvirt-qemu":
-            (desc, ret, args, file, mod, cond) = qemu_functions[name]
+            (desc, ret, args, file, mod, cond) = functions[name]
             skip_function2, skip_impl2 = qemu_skip_function, qemu_skip_impl
         else:
             raise ValueError(module)
@@ -852,10 +850,10 @@ def buildStubs(module: str, api_xml: str) -> int:
         funcs = functions
         funcs_skipped = functions_skipped
     elif module == "libvirt-lxc":
-        funcs = lxc_functions
+        funcs = functions
         funcs_skipped = lxc_functions_skipped
     elif module == "libvirt-qemu":
-        funcs = qemu_functions
+        funcs = functions
         funcs_skipped = qemu_functions_skipped
 
     try:
@@ -1286,9 +1284,9 @@ def writeDoc(module: str, name: str, args: List[ArgumentType], indent: str, outp
     if module == "libvirt":
         funcs = functions
     elif module == "libvirt-lxc":
-        funcs = lxc_functions
+        funcs = functions
     elif module == "libvirt-qemu":
-        funcs = qemu_functions
+        funcs = functions
     if not funcs[name][0]:
         return
     val = funcs[name][0]
@@ -1786,7 +1784,7 @@ def qemuBuildWrappers(module: str) -> None:
     #
     # Generate functions directly, no classes
     #
-    for name, (desc, ret, args, file, mod, cond) in sorted(qemu_functions.items()):
+    for name, (desc, ret, args, file, mod, cond) in sorted(functions.items()):
         func = nameFixup(name, 'None', '', '')
         fd.write("def %s(" % func)
         for n, (a_name, a_type, a_info) in enumerate(args):
@@ -1890,7 +1888,7 @@ def lxcBuildWrappers(module: str) -> None:
     #
     # Generate functions directly, no classes
     #
-    for name, (desc, ret, args, file, mod, cond) in sorted(lxc_functions.items()):
+    for name, (desc, ret, args, file, mod, cond) in sorted(functions.items()):
         func = nameFixup(name, 'None', '', '')
         fd.write("def %s(" % func)
         for n, (a_name, a_type, a_info) in enumerate(args):
