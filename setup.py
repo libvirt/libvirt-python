@@ -233,26 +233,6 @@ class my_sdist(sdist):
         else:
             sdist.run(self)
 
-class my_rpm(Command):
-    user_options = []
-
-    description = "Build src and noarch rpms."
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        """
-        Run sdist, then 'rpmbuild' the tar.gz
-        """
-
-        self.run_command('sdist')
-        self.spawn(["/usr/bin/rpmbuild", "-ta", "--clean",
-            "dist/libvirt-python-%s.tar.gz" % self.distribution.get_version()])
-
 class my_test(Command):
     user_options = [
         ('build-base=', 'b',
@@ -355,7 +335,6 @@ of recent versions of Linux (and other OSes).''',
           'build': my_build,
           'clean': my_clean,
           'sdist': my_sdist,
-          'rpm': my_rpm,
           'test': my_test
       },
       classifiers = [
