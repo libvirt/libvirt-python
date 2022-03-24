@@ -861,7 +861,7 @@ def load_apis(module: str, api_xml: str):
         print("Found %d functions in %s" % (len(functions) - n, override_api_xml))
 
 
-def buildStubs(module: str) -> None:
+def emit_c_code(module: str) -> None:
     package = module.replace('-', '_')
 
     nb_wrap = 0
@@ -1244,7 +1244,7 @@ def writeDoc(module: str, name: str, args: List[ArgumentType], indent: str, outp
     output.write('%s"""%s """\n' % (indent, sep.join(val.splitlines())))
 
 
-def buildWrappers(module: str) -> None:
+def emit_py_code(module: str) -> None:
     package = module.replace('-', '_')
     if module == "libvirt":
         pymod = "libvirtmod"
@@ -1781,7 +1781,7 @@ quiet = False
 if not os.path.exists("build"):
     os.mkdir("build")
 
-buildStubs(sys.argv[1])
+emit_c_code(sys.argv[1])
 
-buildWrappers(sys.argv[1])
+emit_py_code(sys.argv[1])
 sys.exit(0)
