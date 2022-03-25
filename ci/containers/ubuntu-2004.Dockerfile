@@ -21,6 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
             python3 \
             python3-dev \
             python3-lxml \
+            python3-pip \
             python3-pytest \
             python3-setuptools && \
     eatmydata apt-get autoremove -y && \

@@ -18,6 +18,7 @@ RUN zypper dist-upgrade -y && \
            python3-base \
            python3-devel \
            python3-lxml \
+           python3-pip \
            python3-pytest \
            python3-setuptools \
            rpm-build && \

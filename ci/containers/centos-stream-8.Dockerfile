@@ -37,6 +37,7 @@ RUN dnf update -y && \
         python3-devel \
         python3-docutils \
         python3-lxml \
+        python3-pip \
         python3-pytest \
         python3-setuptools \
         rpcgen \

@@ -29,6 +29,7 @@ exec "$@"' > /usr/bin/nosync && \
         python3 \
         python3-devel \
         python3-lxml \
+        python3-pip \
         python3-pytest \
         python3-setuptools \
         rpm-build && \
