@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-import lxml
-import lxml.etree
 from typing import Dict, List, Set, Tuple  # noqa F401
 import libvirt
 import unittest
@@ -373,17 +371,55 @@ def validate_c_api_bindings_present(finalklassmap):
         except AttributeError:
             raise Exception("libvirt.libvirtmod.%s      (C binding does not exist)" % pyname)
 
+# Historically python lxml is incompatible with any other
+# use of libxml2 in the same process. Merely importing
+# 'lxml.etree' will result in libvirt's use of libxml2
+# triggering a SEGV:
+#
+#    https://bugs.launchpad.net/lxml/+bug/1748019
+#
+# per the last comment though, it was somewhat improved by
+#
+#    https://github.com/lxml/lxml/commit/fa1d856cad369d0ac64323ddec14b02281491706
+#
+# so if we have version >= 4.5.2, we are safe to import
+# lxml.etree for the purposes of unit tests at least
+def broken_lxml():
+    import lxml
+
+    if not hasattr(lxml, "__version__"):
+        return True
+
+    digits = [int(d) for d in lxml.__version__.split(".")]
+
+    # We have 3 digits in versions today, but be paranoid
+    # for possible future changes.
+    if len(digits) != 3:
+        return False
+
+    version = (digits[0] * 1000 * 1000) + (digits[1] * 1000) + digits[2]
+    if version < 4005002:
+        return True
+
+    return False
 
 api_test_flag = unittest.skipUnless(
     os.environ.get('LIBVIRT_API_COVERAGE', False),
     "API coverage test is only for upstream maintainers",
 )
 
+lxml_broken_flag = unittest.skipIf(
+    broken_lxml(),
+    "lxml version clashes with libxml usage from libvirt"
+)
+
 @api_test_flag
+@lxml_broken_flag
 class LibvirtAPICoverage(unittest.TestCase):
     def test_libvirt_api(self):
         xml = get_libvirt_api_xml_path()
 
+        import lxml.etree
         with open(xml, "r") as fp:
             tree = lxml.etree.parse(fp)
 
