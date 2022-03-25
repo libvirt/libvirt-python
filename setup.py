@@ -4,8 +4,8 @@ from distutils.core import setup, Extension, Command
 from distutils.command.build_ext import build_ext
 from distutils.command.build_py import build_py
 from distutils.command.sdist import sdist
-from distutils.util import get_platform
 
+import glob
 import sys
 import os
 import os.path
@@ -248,11 +248,31 @@ class my_test(Command):
         ('build-platlib=', None,
          "build directory for platform-specific distributions"),
         ('plat-name=', 'p',
-         "platform name to build for, if supported "
-         "(default: %s)" % get_platform()),
+         "platform name to build for, if supported "),
     ]
 
     description = "Run test suite."
+
+    def find_build_dir(self):
+        if self.plat_name is not None:
+            plat_specifier = ".%s-%d.%d" % (self.plat_name,
+                                            sys.version_info[0],
+                                            sys.version_info[1])
+            if hasattr(sys, 'gettotalrefcount'):
+                plat_specifier += '-pydebug'
+
+            return os.path.join(self.build_base,
+                                'lib' + plat_specifier)
+        else:
+            dirs = glob.glob(os.path.join(self.build_base,
+                                          "lib.*"))
+            if len(dirs) == 0:
+                print("No build directory found, run 'setup.py build'")
+                sys.exit(1)
+            if len(dirs) > 1:
+                print("Multiple build dirs found, use --plat-name option")
+                sys.exit(1)
+            return dirs[0]
 
     def initialize_options(self):
         self.build_base = 'build'
@@ -260,19 +280,8 @@ class my_test(Command):
         self.plat_name = None
 
     def finalize_options(self):
-        if self.plat_name is None:
-            self.plat_name = get_platform()
-
-        plat_specifier = ".%s-%d.%d" % (self.plat_name,
-                                        sys.version_info[0],
-                                        sys.version_info[1])
-
-        if hasattr(sys, 'gettotalrefcount'):
-            plat_specifier += '-pydebug'
-
         if self.build_platlib is None:
-            self.build_platlib = os.path.join(self.build_base,
-                                              'lib' + plat_specifier)
+            self.build_platlib = self.find_build_dir()
 
     def find_pytest_path(self):
         binaries = [
