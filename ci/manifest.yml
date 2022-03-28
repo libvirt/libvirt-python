@@ -8,7 +8,7 @@ gitlab:
 
 targets:
 
-  centos-8:
+  centos-stream-8:
     projects:
       - libvirt-python
       - libvirt+minimal
@@ -25,15 +25,13 @@ targets:
             - scratch
             - build
 
-  centos-stream-8: x86_64
-
   debian-10: x86_64
 
   debian-sid: x86_64
 
-  fedora-33: x86_64
-
   fedora-34: x86_64
+
+  fedora-35: x86_64
 
   fedora-rawhide: x86_64
 
