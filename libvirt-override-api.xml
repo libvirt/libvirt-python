@@ -852,5 +852,19 @@
       <arg name='params' type='virTypedParameterPtr' info='pointer to launch security state objects'/>
       <arg name='flags' type='unsigned int' info='currently used, set to 0.'/>
     </function>
+    <function name='virDomainSaveParams' file='python'>
+      <info>This method will suspend a domain and save its memory contents to a file on disk.</info>
+      <return type='int' info='0 in case of success and -1 in case of failure'/>
+      <arg name='domain' type='virDomainPtr' info='pointer to domain object'/>
+      <arg name='params' type='virTypedParameterPtr' info='pointer to save parameter objects'/>
+      <arg name='flags'  type='int' info='an OR&apos;ed set of virDomainSaveRestoreFlags'/>
+    </function>
+    <function name='virDomainRestoreParams' file='python'>
+      <info>This method will restore a domain saved to disk.</info>
+      <return type='int' info='0 in case of success and -1 in case of failure'/>
+      <arg name='conn' type='virConnectPtr' info='pointer to the hypervisor connection'/>
+      <arg name='params' type='virTypedParameterPtr' info='pointer to save parameter objects'/>
+      <arg name='flags'  type='int' info='an OR&apos;ed set of virDomainSaveRestoreFlags'/>
+    </function>
   </symbols>
 </api>

@@ -431,6 +431,8 @@ skip_impl = {
     'virDomainAuthorizedSSHKeysSet',
     'virDomainGetMessages',
     'virNodeDeviceGetAutostart',
+    'virDomainSaveParams',
+    'virDomainRestoreParams',
 
     'virDomainLxcOpenNamespace',
 

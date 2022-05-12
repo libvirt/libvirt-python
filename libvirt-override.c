@@ -10696,6 +10696,91 @@ libvirt_virDomainSetLaunchSecurityState(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(8, 0, 0) */
 
+
+#if LIBVIR_CHECK_VERSION(8, 4, 0)
+static virPyTypedParamsHint virPyDomainSaveParams[] = {
+    { VIR_DOMAIN_SAVE_PARAM_FILE, VIR_TYPED_PARAM_STRING },
+    { VIR_DOMAIN_SAVE_PARAM_DXML, VIR_TYPED_PARAM_STRING },
+};
+
+
+static PyObject *
+libvirt_virDomainSaveParams(PyObject *self ATTRIBUTE_UNUSED,
+                            PyObject *args)
+{
+    PyObject *pyobj_dom = NULL;
+    PyObject *pyobj_dict = NULL;
+    virDomainPtr dom;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags = 0;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OO|I:virDomainSaveParams",
+                          &pyobj_dom, &pyobj_dict, &flags))
+        return NULL;
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSaveParams,
+                                   VIR_N_ELEMENTS(virPyDomainSaveParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError, "Save params must be a dictionary");
+        return NULL;
+    }
+
+    dom = (virDomainPtr) PyvirDomain_Get(pyobj_dom);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainSaveParams(dom, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    virTypedParamsFree(params, nparams);
+
+    return libvirt_intWrap(c_retval);
+}
+
+static PyObject *
+libvirt_virDomainRestoreParams(PyObject *self ATTRIBUTE_UNUSED,
+                               PyObject *args)
+{
+    PyObject *pyobj_conn = NULL;
+    PyObject *pyobj_dict = NULL;
+    virConnectPtr conn;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags = 0;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OO|I:virDomainRestoreParams",
+                          &pyobj_conn, &pyobj_dict, &flags))
+        return NULL;
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSaveParams,
+                                   VIR_N_ELEMENTS(virPyDomainSaveParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError, "Restore params must be a dictionary");
+        return NULL;
+    }
+
+    conn = (virConnectPtr) PyvirConnect_Get(pyobj_conn);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainRestoreParams(conn, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    virTypedParamsFree(params, nparams);
+
+    return libvirt_intWrap(c_retval);
+}
+#endif /* LIBVIR_CHECK_VERSION(8, 4, 0) */
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -10973,6 +11058,10 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(8, 0, 0)
     {(char *) "virDomainSetLaunchSecurityState", libvirt_virDomainSetLaunchSecurityState, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(8, 0, 0) */
+#if LIBVIR_CHECK_VERSION(8, 4, 0)
+    {(char *) "virDomainSaveParams", libvirt_virDomainSaveParams, METH_VARARGS, NULL},
+    {(char *) "virDomainRestoreParams", libvirt_virDomainRestoreParams, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(8, 4, 0) */
     {NULL, NULL, 0, NULL}
 };
 
