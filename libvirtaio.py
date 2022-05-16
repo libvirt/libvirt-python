@@ -211,8 +211,7 @@ class TimeoutCallback(Callback):
         return '<{} iden={} timeout={}>'.format(
             self.__class__.__name__, self.iden, self.timeout)
 
-    @asyncio.coroutine
-    def _timer(self) -> Generator[Any, None, None]:
+    async def _timer(self) -> Generator[Any, None, None]:
         '''An actual timer running on the event loop.
 
         This is a coroutine.
@@ -222,10 +221,10 @@ class TimeoutCallback(Callback):
                 if self.timeout > 0:
                     timeout = self.timeout * 1e-3
                     self.impl.log.debug('sleeping %r', timeout)
-                    yield from asyncio.sleep(timeout)
+                    await asyncio.sleep(timeout)
                 else:
                     # scheduling timeout for next loop iteration
-                    yield
+                    await asyncio.sleep(0)
 
             except asyncio.CancelledError:
                 self.impl.log.debug('timer %d cancelled', self.iden)
@@ -306,8 +305,7 @@ class virEventAsyncIOImpl(object):
         '''Schedule a ff callback from one of the handles or timers'''
         asyncio.ensure_future(self._ff_callback(iden, opaque), loop=self.loop)
 
-    @asyncio.coroutine
-    def _ff_callback(self, iden: int, opaque: _T) -> None:
+    async def _ff_callback(self, iden: int, opaque: _T) -> None:
         '''Directly free the opaque object
 
         This is a coroutine.
@@ -316,15 +314,14 @@ class virEventAsyncIOImpl(object):
         libvirt.virEventInvokeFreeCallback(opaque)
         self._pending_dec()
 
-    @asyncio.coroutine
-    def drain(self) -> Generator[Any, None, None]:
+    async def drain(self) -> None:
         '''Wait for the implementation to become idle.
 
         This is a coroutine.
         '''
         self.log.debug('drain()')
         if self._pending:
-            yield from self._finished.wait()
+            await self._finished.wait()
         self.log.debug('drain ended')
 
     def is_idle(self) -> bool:
