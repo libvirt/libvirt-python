@@ -46,14 +46,6 @@ __all__ = [
     'virEventRegisterAsyncIOImpl',
 ]
 
-# Python < 3.4.4 doesn't have 'ensure_future', so we have to fall
-# back to 'async'; however, since 'async' is a reserved keyword
-# in Python >= 3.7, we can't perform a straightforward import and
-# we have to resort to getattr() instead
-ensure_future = getattr(asyncio, "ensure_future", None)
-if not ensure_future:
-    ensure_future = getattr(asyncio, "async")
-
 
 class Callback(object):
     '''Base class for holding callback
@@ -248,8 +240,8 @@ class TimeoutCallback(Callback):
 
         if self.timeout >= 0 and self._task is None:
             self.impl.log.debug('timer %r start', self.iden)
-            self._task = ensure_future(self._timer(),
-                                       loop=self.impl.loop)
+            self._task = asyncio.ensure_future(self._timer(),
+                                               loop=self.impl.loop)
 
         elif self.timeout < 0 and self._task is not None:
             self.impl.log.debug('timer %r stop', self.iden)
@@ -312,7 +304,7 @@ class virEventAsyncIOImpl(object):
 
     def schedule_ff_callback(self, iden: int, opaque: _T) -> None:
         '''Schedule a ff callback from one of the handles or timers'''
-        ensure_future(self._ff_callback(iden, opaque), loop=self.loop)
+        asyncio.ensure_future(self._ff_callback(iden, opaque), loop=self.loop)
 
     @asyncio.coroutine
     def _ff_callback(self, iden: int, opaque: _T) -> None:
