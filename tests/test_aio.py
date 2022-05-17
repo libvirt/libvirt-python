@@ -3,7 +3,9 @@ import libvirt
 import libvirtaio
 import sys
 import unittest
-import pytest
+from unittest import mock
+
+import eventmock
 
 
 class TestLibvirtAio(unittest.TestCase):
@@ -70,8 +72,9 @@ class TestLibvirtAio(unittest.TestCase):
             if domainStopped:
                 dom.create()
 
-    @pytest.mark.separate_process
-    def testEventsWithManualLoopSetup(self):
+    @mock.patch('libvirt.virEventRegisterImpl',
+                side_effect=eventmock.virEventRegisterImplMock)
+    def testEventsWithManualLoopSetup(self, mock_event_register):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -79,15 +82,19 @@ class TestLibvirtAio(unittest.TestCase):
 
         loop.close()
         asyncio.set_event_loop(None)
+        mock_event_register.assert_called_once()
 
-    @pytest.mark.separate_process
+    @mock.patch('libvirt.virEventRegisterImpl',
+                side_effect=eventmock.virEventRegisterImplMock)
     @unittest.skipIf(sys.version_info < (3,7), "test requires Python 3.7+")
-    def testEventsWithAsyncioRun(self):
+    def testEventsWithAsyncioRun(self, mock_event_register):
         asyncio.run(self._run(register=True))
+        mock_event_register.assert_called_once()
 
-    @pytest.mark.separate_process
+    @mock.patch('libvirt.virEventRegisterImpl',
+                side_effect=eventmock.virEventRegisterImplMock)
     @unittest.skipIf(sys.version_info >= (3,10), "test not compatible with Python 3.10+")
-    def testEventsPreInit(self):
+    def testEventsPreInit(self, mock_event_register):
         # Initialize libvirt events before setting the event loop. This is not recommended.
         # But is supported in older version of Python for the sake of back-compat.
         loop = asyncio.new_event_loop()
@@ -98,9 +105,11 @@ class TestLibvirtAio(unittest.TestCase):
 
         loop.close()
         asyncio.set_event_loop(None)
+        mock_event_register.assert_called_once()
 
-    @pytest.mark.separate_process
-    def testEventsImplicitLoopInit(self):
+    @mock.patch('libvirt.virEventRegisterImpl',
+                side_effect=eventmock.virEventRegisterImplMock)
+    def testEventsImplicitLoopInit(self, mock_event_register):
         # Allow virEventRegisterAsyncIOImpl() to init the event loop by calling
         # asyncio.get_event_loop(). This is not recommended and probably only works by
         # accident. But is supported for now for the sake of back-compat. For Python
@@ -112,3 +121,4 @@ class TestLibvirtAio(unittest.TestCase):
 
         loop.close()
         asyncio.set_event_loop(None)
+        mock_event_register.assert_called_once()
