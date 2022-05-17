@@ -271,10 +271,11 @@ class virEventAsyncIOImpl(object):
         self.descriptors = DescriptorDict(self)
         self.log = logging.getLogger(self.__class__.__name__)
 
-        # NOTE invariant: _finished.is_set() iff _pending == 0
         self._pending = 0
-        self._finished = asyncio.Event(loop=loop)
-        self._finished.set()
+        # Transient asyncio.Event instance dynamically created
+        # and destroyed by drain()
+        # NOTE invariant: _finished.is_set() iff _pending == 0
+        self._finished = None
 
     def __repr__(self) -> str:
         return '<{} callbacks={} descriptors={}>'.format(
@@ -283,13 +284,14 @@ class virEventAsyncIOImpl(object):
     def _pending_inc(self) -> None:
         '''Increase the count of pending affairs. Do not use directly.'''
         self._pending += 1
-        self._finished.clear()
+        if self._finished is not None:
+            self._finished.clear()
 
     def _pending_dec(self) -> None:
         '''Decrease the count of pending affairs. Do not use directly.'''
         assert self._pending > 0
         self._pending -= 1
-        if self._pending == 0:
+        if self._pending == 0 and self._finished is not None:
             self._finished.set()
 
     def register(self) -> "virEventAsyncIOImpl":
@@ -321,7 +323,11 @@ class virEventAsyncIOImpl(object):
         '''
         self.log.debug('drain()')
         if self._pending:
+            assert self._finished is None
+            self._finished = asyncio.Event()
             await self._finished.wait()
+            self._finished = None
+            assert self._pending == 0
         self.log.debug('drain ended')
 
     def is_idle(self) -> bool:
