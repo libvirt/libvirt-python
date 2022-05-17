@@ -438,8 +438,9 @@ def virEventLoopNativeRun() -> None:
 def virEventLoopPollStart() -> None:
     global eventLoopThread
     virEventLoopPollRegister()
-    eventLoopThread = threading.Thread(target=virEventLoopPollRun, name="libvirtEventLoop")
-    eventLoopThread.setDaemon(True)
+    eventLoopThread = threading.Thread(target=virEventLoopPollRun,
+                                       name="libvirtEventLoop",
+                                       daemon=True)
     eventLoopThread.start()
 
 
@@ -449,16 +450,19 @@ def virEventLoopAIOStart() -> None:
     import asyncio
     loop = asyncio.new_event_loop()
     libvirtaio.virEventRegisterAsyncIOImpl(loop=loop)
-    eventLoopThread = threading.Thread(target=virEventLoopAIORun, args=(loop,), name="libvirtEventLoop")
-    eventLoopThread.setDaemon(True)
+    eventLoopThread = threading.Thread(target=virEventLoopAIORun,
+                                       args=(loop,),
+                                       name="libvirtEventLoop",
+                                       daemon=True)
     eventLoopThread.start()
 
 
 def virEventLoopNativeStart() -> None:
     global eventLoopThread
     libvirt.virEventRegisterDefaultImpl()
-    eventLoopThread = threading.Thread(target=virEventLoopNativeRun, name="libvirtEventLoop")
-    eventLoopThread.setDaemon(True)
+    eventLoopThread = threading.Thread(target=virEventLoopNativeRun,
+                                       name="libvirtEventLoop",
+                                       daemon=True)
     eventLoopThread.start()
 
 
