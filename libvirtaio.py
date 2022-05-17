@@ -21,8 +21,27 @@
 
 Register the implementation of default loop:
 
-    >>> import libvirtaio
-    >>> libvirtaio.virEventRegisterAsyncIOImpl()
+    import asyncio
+    import libvirtaio
+
+    async def myapp():
+      libvirtaio.virEventRegisterAsyncIOImpl()
+
+      conn = libvirt.open("test:///default")
+
+For compatibility with Python < 3.7:
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(myapp())
+
+    asyncio.set_event_loop(None)
+    loop.close()
+
+If Python >= 3.7 can be required then
+
+    asyncio.run(myapp())
 
 .. seealso::
     https://libvirt.org/html/libvirt-libvirt-event.html
