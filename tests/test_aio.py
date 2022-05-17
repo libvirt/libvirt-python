@@ -75,6 +75,10 @@ class TestLibvirtAio(unittest.TestCase):
     @mock.patch('libvirt.virEventRegisterImpl',
                 side_effect=eventmock.virEventRegisterImplMock)
     def testEventsWithManualLoopSetup(self, mock_event_register):
+        # Register libvirt events after starting the asyncio loop.
+        #
+        # Manually create and set the event loop against this
+        # thread.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -88,15 +92,20 @@ class TestLibvirtAio(unittest.TestCase):
                 side_effect=eventmock.virEventRegisterImplMock)
     @unittest.skipIf(sys.version_info < (3,7), "test requires Python 3.7+")
     def testEventsWithAsyncioRun(self, mock_event_register):
+        # Register libvirt events after starting the asyncio loop.
+        #
+        # Use asyncio helper to create and set the event loop
+        # against this thread.
         asyncio.run(self._run(register=True))
         mock_event_register.assert_called_once()
 
     @mock.patch('libvirt.virEventRegisterImpl',
                 side_effect=eventmock.virEventRegisterImplMock)
-    @unittest.skipIf(sys.version_info >= (3,10), "test not compatible with Python 3.10+")
-    def testEventsPreInit(self, mock_event_register):
-        # Initialize libvirt events before setting the event loop. This is not recommended.
-        # But is supported in older version of Python for the sake of back-compat.
+    def testEventsPreInitExplicit(self, mock_event_register):
+        # Register libvirt events before starting the asyncio loop.
+        #
+        # Tell virEventRegisterAsyncIOImpl() explicitly what loop
+        # to use before we set a loop for this thread.
         loop = asyncio.new_event_loop()
         libvirtaio.virEventRegisterAsyncIOImpl(loop)
         asyncio.set_event_loop(loop)
@@ -109,11 +118,34 @@ class TestLibvirtAio(unittest.TestCase):
 
     @mock.patch('libvirt.virEventRegisterImpl',
                 side_effect=eventmock.virEventRegisterImplMock)
+    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10")
+    def testEventsPreInitImplicit(self, mock_event_register):
+        # Register libvirt events before starting the asyncio loop.
+        #
+        # Allow virEventRegisterAsyncIOImpl() to implicitly find the
+        # loop we set for this thread.
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        libvirtaio.virEventRegisterAsyncIOImpl()
+
+        loop.run_until_complete(self._run(register=False))
+
+        loop.close()
+        asyncio.set_event_loop(None)
+        mock_event_register.assert_called_once()
+
+    @mock.patch('libvirt.virEventRegisterImpl',
+                side_effect=eventmock.virEventRegisterImplMock)
+    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10")
     def testEventsImplicitLoopInit(self, mock_event_register):
-        # Allow virEventRegisterAsyncIOImpl() to init the event loop by calling
-        # asyncio.get_event_loop(). This is not recommended and probably only works by
-        # accident. But is supported for now for the sake of back-compat. For Python
-        # 3.10+, asyncio will report deprecation warnings.
+        # Register libvirt events before starting the asyncio loop.
+        #
+        # Let virEventRegisterAsyncIOImpl() auto-create a default
+        # event loop, which we then register against this thread.
+        #
+        # Historically this often worked if called from the main thead,
+        # but since Python 3.10 this triggers a deprecation warning,
+        # which will turn into a RuntimeError in a later release.
         libvirtaio.virEventRegisterAsyncIOImpl()
         loop = asyncio.get_event_loop()
 
