@@ -313,6 +313,16 @@ class my_test(Command):
         subprocess.check_call([pytest])
 
 class my_clean(Command):
+    user_options = [
+        ('all', None, 'unused, compatibility with distutils')
+    ]
+
+    def initialize_options(self):
+        self.all = False
+
+    def finalize_options(self):
+        pass
+
     def run(self):
         if os.path.exists("build"):
             shutil.rmtree("build", ignore_errors=True)
