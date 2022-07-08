@@ -408,10 +408,12 @@ virPyDictToTypedParamOne(virTypedParameterPtr *params,
             type = VIR_TYPED_PARAM_BOOLEAN;
         } else if (PyLong_Check(value)) {
             unsigned long long ull = PyLong_AsUnsignedLongLong(value);
-            if (ull == (unsigned long long) -1 && PyErr_Occurred())
+            if (ull == (unsigned long long) -1 && PyErr_Occurred()) {
                 type = VIR_TYPED_PARAM_LLONG;
-            else
+                PyErr_Clear();
+            } else {
                 type = VIR_TYPED_PARAM_ULLONG;
+            }
         } else if (PyFloat_Check(value)) {
             type = VIR_TYPED_PARAM_DOUBLE;
         }
