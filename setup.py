@@ -105,7 +105,7 @@ def get_module_lists():
 
     moduleqemu = Extension('libvirtmod_qemu',
                            sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
-                           libraries = [ "virt-qemu" ],
+                           libraries = [ "virt-qemu", "virt" ],
                            include_dirs = [ "." ])
     moduleqemu.extra_compile_args.extend(cflags)
     moduleqemu.extra_link_args.extend(ldflags)
@@ -116,7 +116,7 @@ def get_module_lists():
     if have_libvirt_lxc():
         modulelxc = Extension('libvirtmod_lxc',
                               sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
-                              libraries = [ "virt-lxc" ],
+                              libraries = [ "virt-lxc", "virt" ],
                               include_dirs = [ "." ])
         modulelxc.extra_compile_args.extend(cflags)
         modulelxc.extra_link_args.extend(ldflags)
