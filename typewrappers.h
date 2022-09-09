@@ -189,7 +189,7 @@ typedef struct {
 } PyvirVoidPtr_Object;
 
 PyObject * libvirt_intWrap(int val);
-PyObject * libvirt_uintWrap(uint val);
+PyObject * libvirt_uintWrap(unsigned int val);
 PyObject * libvirt_longWrap(long val);
 PyObject * libvirt_ulongWrap(unsigned long val);
 PyObject * libvirt_longlongWrap(long long val);
