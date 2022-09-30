@@ -4,9 +4,9 @@
 #
 # https://gitlab.com/libvirt/libvirt-ci
 
-FROM registry.opensuse.org/opensuse/tumbleweed:latest
+FROM registry.opensuse.org/opensuse/leap:15.3
 
-RUN zypper dist-upgrade -y && \
+RUN zypper update -y && \
     zypper install -y \
            ca-certificates \
            ccache \

@@ -25,17 +25,19 @@ targets:
             - scratch
             - build
 
+  centos-stream-9: x86_64
+
   debian-10: x86_64
 
   debian-sid: x86_64
 
-  fedora-34: x86_64
-
   fedora-35: x86_64
+
+  fedora-36: x86_64
 
   fedora-rawhide: x86_64
 
-  opensuse-leap-152:
+  opensuse-leap-153:
     jobs:
       - arch: x86_64
         variables:
@@ -47,6 +49,6 @@ targets:
         variables:
           RPM: skip
 
-  ubuntu-1804: x86_64
-
   ubuntu-2004: x86_64
+
+  ubuntu-2204: x86_64

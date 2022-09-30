@@ -4,26 +4,26 @@
 #
 # https://gitlab.com/libvirt/libvirt-ci
 
-FROM docker.io/library/ubuntu:18.04
+FROM docker.io/library/ubuntu:22.04
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y eatmydata && \
     eatmydata apt-get dist-upgrade -y && \
     eatmydata apt-get install --no-install-recommends -y \
-            ca-certificates \
-            ccache \
-            gcc \
-            git \
-            libvirt-dev \
-            locales \
-            pkgconf \
-            python3 \
-            python3-dev \
-            python3-lxml \
-            python3-pip \
-            python3-pytest \
-            python3-setuptools && \
+                      ca-certificates \
+                      ccache \
+                      gcc \
+                      git \
+                      libvirt-dev \
+                      locales \
+                      pkgconf \
+                      python3 \
+                      python3-dev \
+                      python3-lxml \
+                      python3-pip \
+                      python3-pytest \
+                      python3-setuptools && \
     eatmydata apt-get autoremove -y && \
     eatmydata apt-get autoclean -y && \
     sed -Ei 's,^# (en_US\.UTF-8 .*)$,\1,' /etc/locale.gen && \
@@ -33,6 +33,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
 
+ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
 ENV LANG "en_US.UTF-8"
 ENV PYTHON "/usr/bin/python3"
-ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"

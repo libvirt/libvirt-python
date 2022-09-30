@@ -15,10 +15,8 @@ stages:
   export CFLAGS="-Werror"
 
 .native_git_build_job:
-  extends: .gitlab_native_build_job
-  before_script:
-    - *git_build_vars
   script:
+    - *git_build_vars
     - pushd "$PWD"
     - mkdir -p "$SCRATCH_DIR"
     - cd "$SCRATCH_DIR"
@@ -33,31 +31,62 @@ stages:
     - $PYTHON setup.py sdist
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ; then rpmbuild --nodeps -ta dist/libvirt-python*tar.gz ; fi
 
+.native_git_build_job_prebuilt_env:
+  extends:
+    - .native_git_build_job
+    - .gitlab_native_build_job_prebuilt_env
+
+.native_git_build_job_local_env:
+  extends:
+    - .native_git_build_job
+    - .gitlab_native_build_job_local_env
+
 .native_build_job:
-  extends: .gitlab_native_build_job
-  before_script:
+  script:
     - export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     - export CFLAGS="-Werror"
-  script:
     - $PYTHON setup.py build
     - $PYTHON -m pip install .
     - $PYTHON setup.py test
     - $PYTHON setup.py sdist
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ; then rpmbuild --nodeps -ta dist/libvirt-python*tar.gz ; fi
 
+.native_build_job_prebuilt_env:
+  extends:
+    - .native_build_job
+    - .gitlab_native_build_job_prebuilt_env
+
+.native_build_job_local_env:
+  extends:
+    - .native_build_job
+    - .gitlab_native_build_job_local_env
+
 include: '/ci/gitlab.yml'
 
-api-coverage:
-  image: $CI_REGISTRY_IMAGE/ci-centos-stream-8:latest
+.api_coverage_job:
   stage: sanity_checks
-  needs:
-    - job: x86_64-centos-stream-8-git
-      artifacts: true
-  before_script:
-    - *git_build_vars
   script:
+    - *git_build_vars
     - LIBVIRT_API_COVERAGE=1 $PYTHON setup.py test
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      allow_failure: true
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  allow_failure: true
+
+api_coverage_prebuilt_env:
+  extends:
+    - .api_coverage_job
+    - .gitlab_native_build_job_prebuilt_env
+  needs:
+    - job: x86_64-centos-stream-8-git-prebuilt-env
+      artifacts: true
+  variables:
+    NAME: centos-stream-8
+
+api_coverage_local_env:
+  extends:
+    - .api_coverage_job
+    - .gitlab_native_build_job_local_env
+  needs:
+    - job: x86_64-centos-stream-8-git-local-env
+      artifacts: true
+  variables:
+    IMAGE: quay.io/centos/centos:stream8
+    NAME: centos-stream-8

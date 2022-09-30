@@ -19,20 +19,20 @@ exec "$@"' > /usr/bin/nosync && \
     chmod +x /usr/bin/nosync && \
     nosync dnf distro-sync -y && \
     nosync dnf install -y \
-        ca-certificates \
-        ccache \
-        gcc \
-        git \
-        glibc-langpack-en \
-        libvirt-devel \
-        pkgconfig \
-        python3 \
-        python3-devel \
-        python3-lxml \
-        python3-pip \
-        python3-pytest \
-        python3-setuptools \
-        rpm-build && \
+               ca-certificates \
+               ccache \
+               gcc \
+               git \
+               glibc-langpack-en \
+               libvirt-devel \
+               pkgconfig \
+               python3 \
+               python3-devel \
+               python3-lxml \
+               python3-pip \
+               python3-pytest \
+               python3-setuptools \
+               rpm-build && \
     nosync dnf autoremove -y && \
     nosync dnf clean all -y && \
     rpm -qa | sort > /packages.txt && \
@@ -40,6 +40,6 @@ exec "$@"' > /usr/bin/nosync && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
 
+ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
 ENV LANG "en_US.UTF-8"
 ENV PYTHON "/usr/bin/python3"
-ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
