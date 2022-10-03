@@ -72,8 +72,8 @@ include: '/ci/gitlab.yml'
 
 api_coverage_prebuilt_env:
   extends:
-    - .api_coverage_job
     - .gitlab_native_build_job_prebuilt_env
+    - .api_coverage_job
   needs:
     - job: x86_64-centos-stream-8-git-prebuilt-env
       artifacts: true
@@ -82,8 +82,8 @@ api_coverage_prebuilt_env:
 
 api_coverage_local_env:
   extends:
-    - .api_coverage_job
     - .gitlab_native_build_job_local_env
+    - .api_coverage_job
   needs:
     - job: x86_64-centos-stream-8-git-local-env
       artifacts: true
