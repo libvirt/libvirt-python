@@ -23,6 +23,7 @@ BuildRequires: libvirt-devel == %{version}
 BuildRequires: python3-devel
 BuildRequires: python3-pytest
 BuildRequires: python3-lxml
+BuildRequires: python3-setuptools
 BuildRequires: gcc
 
 # Don't want provides for python shared objects
