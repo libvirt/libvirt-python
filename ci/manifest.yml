@@ -31,9 +31,9 @@ targets:
 
   debian-sid: x86_64
 
-  fedora-35: x86_64
-
   fedora-36: x86_64
+
+  fedora-37: x86_64
 
   fedora-rawhide: x86_64
 
