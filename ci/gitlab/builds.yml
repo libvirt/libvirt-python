@@ -61,6 +61,10 @@ x86_64-centos-stream-9-prebuilt-env:
   allow_failure: false
   variables:
     NAME: centos-stream-9
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 x86_64-centos-stream-9-local-env:
   extends: .native_build_job_local_env
@@ -69,6 +73,10 @@ x86_64-centos-stream-9-local-env:
   variables:
     IMAGE: quay.io/centos/centos:stream9
     NAME: centos-stream-9
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 
 x86_64-debian-10-prebuilt-env:
@@ -115,6 +123,10 @@ x86_64-fedora-36-prebuilt-env:
   allow_failure: false
   variables:
     NAME: fedora-36
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 x86_64-fedora-36-local-env:
   extends: .native_build_job_local_env
@@ -123,6 +135,10 @@ x86_64-fedora-36-local-env:
   variables:
     IMAGE: registry.fedoraproject.org/fedora:36
     NAME: fedora-36
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 
 x86_64-fedora-37-prebuilt-env:
@@ -133,6 +149,10 @@ x86_64-fedora-37-prebuilt-env:
   allow_failure: false
   variables:
     NAME: fedora-37
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 x86_64-fedora-37-local-env:
   extends: .native_build_job_local_env
@@ -141,6 +161,10 @@ x86_64-fedora-37-local-env:
   variables:
     IMAGE: registry.fedoraproject.org/fedora:37
     NAME: fedora-37
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
 
 
 x86_64-fedora-rawhide-prebuilt-env:
