@@ -20,7 +20,7 @@ targets:
         template: .native_git_build_job
         suffix: -git
         artifacts:
-          expiry: 2 days
+          expire_in: 2 days
           paths:
             - scratch
             - build
