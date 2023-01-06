@@ -16,6 +16,11 @@ targets:
 
     jobs:
       - arch: x86_64
+        artifacts:
+          expire_in: 1 hour
+          paths:
+            - libvirt-python-rpms
+
       - arch: x86_64
         template: .native_git_build_job
         suffix: -git
