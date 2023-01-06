@@ -4,6 +4,12 @@ MANIFEST
 *~
 *#*#
 *.#*#
-*.pyc
+*.py[cod]
 tags
 .tox
+dist/
+eggs/
+.eggs/
+sdist/
+*.egg-info/
+*.egg
