@@ -80,3 +80,31 @@
         if ret == -1:
             raise libvirtError('virDomainSetTime() failed')
         return ret
+
+    def FDAssociate(self, name: str, files: List[int], flags: int = 0) -> int:
+        """Associate the array of FDs passed as @fds with the domain object
+        under @name. The FDs are associated as long as the connection used to
+        associated exists and are disposed of afterwards. FD may still be kept
+        open by the hypervisor for as long as it's needed.
+
+        Security labelling (e.g. via the selinux) may be applied on the passed
+        FDs when requiredg for usage by the VM. By default libvirt does not
+        restore the seclabels on the FDs afterwards to avoid keeping it open
+        unnecessarily.
+
+        Restoring of the security label can be requested by passing either
+        VIR_DOMAIN_FD_ASSOCIATE_SECLABEL_RESTORE for a best-effort attempt to
+        restore the security label after use.  Requesting the restore of
+        security label will require that the file descriptors are kept open for
+        the whole time they are used by the hypervisor, or other additional
+        overhead.
+
+        In certain cases usage of the fd group would imply read-only access.
+        Passing VIR_DOMAIN_FD_ASSOCIATE_SECLABEL_WRITABLE in @flags ensures
+        that a writable security label is picked in case when the file
+        represented by the fds may be used in write mode. """
+        ret = libvirtmod.virDomainFDAssociate(self._o, name, files, flags)
+        if ret == -1:
+            raise libvirtError('virDomainFDAssociate() failed')
+        return ret
+

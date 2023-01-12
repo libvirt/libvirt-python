@@ -484,6 +484,7 @@ skip_function = {
     'virConnectListAllSecrets',  # overridden in virConnect.py
     'virConnectGetAllDomainStats',  # overridden in virConnect.py
     'virDomainListGetStats',  # overridden in virConnect.py
+    'virDomainFDAssociate',  # overridden in virDomain.py
 
     'virStreamRecvAll',  # Pure python libvirt-override-virStream.py
     'virStreamSendAll',  # Pure python libvirt-override-virStream.py

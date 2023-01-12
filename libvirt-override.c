@@ -10789,6 +10789,59 @@ libvirt_virDomainRestoreParams(PyObject *self ATTRIBUTE_UNUSED,
 }
 #endif /* LIBVIR_CHECK_VERSION(8, 4, 0) */
 
+
+#if LIBVIR_CHECK_VERSION(9, 0, 0)
+static PyObject *
+libvirt_virDomainFDAssociate(PyObject *self ATTRIBUTE_UNUSED,
+                             PyObject *args)
+{
+    PyObject *py_retval = NULL;
+    int c_retval;
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    PyObject *pyobj_files;
+    const char *name = NULL;
+    unsigned int flags;
+    unsigned int nfiles;
+    int *files = NULL;
+    ssize_t i;
+
+    if (!PyArg_ParseTuple(args, (char *)"OsOI:virDomainFDAssociate",
+                          &pyobj_domain, &name, &pyobj_files, &flags))
+        return NULL;
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    nfiles = PyList_Size(pyobj_files);
+
+    if (VIR_ALLOC_N(files, nfiles) < 0)
+        return PyErr_NoMemory();
+
+    for (i = 0; i < nfiles; i++) {
+        PyObject *pyfd;
+        int fd;
+
+        pyfd = PyList_GetItem(pyobj_files, i);
+
+        if (libvirt_intUnwrap(pyfd, &fd) < 0)
+            goto cleanup;
+
+        files[i] = fd;
+    }
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainFDAssociate(domain, name, nfiles, files, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    py_retval = libvirt_intWrap((int) c_retval);
+
+ cleanup:
+    VIR_FREE(files);
+    return py_retval;
+}
+#endif /* LIBVIR_CHECK_VERSION(9, 0, 0) */
+
+
+
 /************************************************************************
  *									*
  *			The registration stuff				*
@@ -11070,6 +11123,9 @@ static PyMethodDef libvirtMethods[] = {
     {(char *) "virDomainSaveParams", libvirt_virDomainSaveParams, METH_VARARGS, NULL},
     {(char *) "virDomainRestoreParams", libvirt_virDomainRestoreParams, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(8, 4, 0) */
+#if LIBVIR_CHECK_VERSION(9, 0, 0)
+    {(char *) "virDomainFDAssociate", libvirt_virDomainFDAssociate, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(9, 0, 0) */
     {NULL, NULL, 0, NULL}
 };
 
