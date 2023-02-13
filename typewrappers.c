@@ -26,7 +26,7 @@ libvirt_buildPyObject(void *cobj,
 PyObject *
 libvirt_intWrap(int val)
 {
-    return PyLong_FromLong((long) val);
+    return PyLong_FromLong(val);
 }
 
 PyObject *
