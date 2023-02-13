@@ -32,7 +32,7 @@ libvirt_intWrap(int val)
 PyObject *
 libvirt_uintWrap(unsigned int val)
 {
-    return PyLong_FromLong((long) val);
+    return PyLong_FromUnsignedLong(val);
 }
 
 PyObject *
