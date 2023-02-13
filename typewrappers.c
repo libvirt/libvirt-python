@@ -132,18 +132,18 @@ int
 libvirt_uintUnwrap(PyObject *obj,
                    unsigned int *val)
 {
-    long long_val;
+    unsigned long long_val;
 
     if (!obj) {
         PyErr_SetString(PyExc_TypeError, "unexpected type");
         return -1;
     }
 
-    long_val = PyLong_AsLong(obj);
-    if ((long_val == -1) && PyErr_Occurred())
+    long_val = PyLong_AsUnsignedLong(obj);
+    if ((long_val == (unsigned long)-1) && PyErr_Occurred())
         return -1;
 
-    if (long_val >= 0 && long_val <= UINT_MAX) {
+    if (long_val <= UINT_MAX) {
         *val = long_val;
     } else {
         PyErr_SetString(PyExc_OverflowError,
