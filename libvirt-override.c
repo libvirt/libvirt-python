@@ -456,7 +456,7 @@ libvirt_virDomainGetSchedulerType(PyObject *self ATTRIBUTE_UNUSED,
         goto cleanup;
 
     VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_constcharPtrWrap(c_retval), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap((long)nparams), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap(nparams), error);
 
  cleanup:
     VIR_FREE(c_retval);
@@ -1274,14 +1274,14 @@ libvirt_virDomainGetVcpus(PyObject *self ATTRIBUTE_UNUSED,
 
         VIR_PY_LIST_SET_GOTO(pycpuinfo, i, info, cleanup);
 
-        VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap((long)cpuinfo[i].number),
+        VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap(cpuinfo[i].number),
                               cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap((long)cpuinfo[i].state),
+        VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap(cpuinfo[i].state),
                               cleanup);
         VIR_PY_TUPLE_SET_GOTO(info, 2,
-                              libvirt_ulonglongWrap((long)cpuinfo[i].cpuTime),
+                              libvirt_ulonglongWrap(cpuinfo[i].cpuTime),
                               cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap((long)cpuinfo[i].cpu),
+        VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap(cpuinfo[i].cpu),
                               cleanup);
     }
     for (i = 0; i < dominfo.nrVirtCpu; i++) {
@@ -1766,15 +1766,15 @@ libvirt_virGetLastError(PyObject *self ATTRIBUTE_UNUSED,
     if ((info = PyTuple_New(9)) == NULL)
         return NULL;
 
-    VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap((long)err->code), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap((long)err->domain), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap(err->code), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap(err->domain), error);
     VIR_PY_TUPLE_SET_GOTO(info, 2, libvirt_constcharPtrWrap(err->message), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap((long)err->level), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap(err->level), error);
     VIR_PY_TUPLE_SET_GOTO(info, 4, libvirt_constcharPtrWrap(err->str1), error);
     VIR_PY_TUPLE_SET_GOTO(info, 5, libvirt_constcharPtrWrap(err->str2), error);
     VIR_PY_TUPLE_SET_GOTO(info, 6, libvirt_constcharPtrWrap(err->str3), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap((long)err->int1), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap((long)err->int2), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap(err->int1), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap(err->int2), error);
 
     return info;
 
@@ -1806,15 +1806,15 @@ libvirt_virConnGetLastError(PyObject *self ATTRIBUTE_UNUSED,
     if ((info = PyTuple_New(9)) == NULL)
         return NULL;
 
-    VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap((long)err->code), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap((long)err->domain), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap(err->code), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap(err->domain), error);
     VIR_PY_TUPLE_SET_GOTO(info, 2, libvirt_constcharPtrWrap(err->message), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap((long)err->level), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap(err->level), error);
     VIR_PY_TUPLE_SET_GOTO(info, 4, libvirt_constcharPtrWrap(err->str1), error);
     VIR_PY_TUPLE_SET_GOTO(info, 5, libvirt_constcharPtrWrap(err->str2), error);
     VIR_PY_TUPLE_SET_GOTO(info, 6, libvirt_constcharPtrWrap(err->str3), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap((long)err->int1), error);
-    VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap((long)err->int2), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap(err->int1), error);
+    VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap(err->int2), error);
 
     return info;
 
@@ -1853,15 +1853,15 @@ libvirt_virErrorFuncHandler(ATTRIBUTE_UNUSED void *ctx,
 
         VIR_PY_TUPLE_SET_GOTO(list, 1, info, cleanup);
 
-        VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap((long)err->code), cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap((long)err->domain), cleanup);
+        VIR_PY_TUPLE_SET_GOTO(info, 0, libvirt_intWrap(err->code), cleanup);
+        VIR_PY_TUPLE_SET_GOTO(info, 1, libvirt_intWrap(err->domain), cleanup);
         VIR_PY_TUPLE_SET_GOTO(info, 2, libvirt_constcharPtrWrap(err->message), cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap((long)err->level), cleanup);
+        VIR_PY_TUPLE_SET_GOTO(info, 3, libvirt_intWrap(err->level), cleanup);
         VIR_PY_TUPLE_SET_GOTO(info, 4, libvirt_constcharPtrWrap(err->str1), cleanup);
         VIR_PY_TUPLE_SET_GOTO(info, 5, libvirt_constcharPtrWrap(err->str2), cleanup);
         VIR_PY_TUPLE_SET_GOTO(info, 6, libvirt_constcharPtrWrap(err->str3), cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap((long)err->int1), cleanup);
-        VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap((long)err->int2), cleanup);
+        VIR_PY_TUPLE_SET_GOTO(info, 7, libvirt_intWrap(err->int1), cleanup);
+        VIR_PY_TUPLE_SET_GOTO(info, 8, libvirt_intWrap(err->int2), cleanup);
 
         /* TODO pass conn and dom if available */
         result = PyObject_Call(libvirt_virPythonErrorFuncHandler, list, NULL);
@@ -1944,7 +1944,7 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
         VIR_PY_TUPLE_SET_GOTO(pycred, i, pycreditem, cleanup);
 
         VIR_PY_LIST_SET_GOTO(pycreditem, 0,
-                             libvirt_intWrap((long)cred[i].type), cleanup);
+                             libvirt_intWrap(cred[i].type), cleanup);
         VIR_PY_LIST_SET_GOTO(pycreditem, 1,
                              libvirt_constcharPtrWrap(cred[i].prompt), cleanup);
 
@@ -2689,11 +2689,11 @@ libvirt_virDomainGetInfo(PyObject *self ATTRIBUTE_UNUSED,
     if ((py_retval = PyList_New(5)) == NULL)
         return NULL;
 
-    VIR_PY_LIST_SET_GOTO(py_retval, 0, libvirt_intWrap((int) info.state), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 0, libvirt_intWrap(info.state), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1, libvirt_ulongWrap(info.maxMem), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2, libvirt_ulongWrap(info.memory), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 3,
-                         libvirt_intWrap((int) info.nrVirtCpu), error);
+                         libvirt_intWrap(info.nrVirtCpu), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 4,
                    libvirt_ulonglongWrap(info.cpuTime), error);
 
@@ -2849,12 +2849,12 @@ libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED,
                          libvirt_constcharPtrWrap(&info.model[0]), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
                          libvirt_ulongWrap(info.memory >> 10), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 2, libvirt_intWrap((int) info.cpus), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 3, libvirt_intWrap((int) info.mhz), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 4, libvirt_intWrap((int) info.nodes), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 5, libvirt_intWrap((int) info.sockets), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 6, libvirt_intWrap((int) info.cores), error);
-    VIR_PY_LIST_SET_GOTO(py_retval, 7, libvirt_intWrap((int) info.threads), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 2, libvirt_intWrap(info.cpus), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 3, libvirt_intWrap(info.mhz), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 4, libvirt_intWrap(info.nodes), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 5, libvirt_intWrap(info.sockets), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 6, libvirt_intWrap(info.cores), error);
+    VIR_PY_LIST_SET_GOTO(py_retval, 7, libvirt_intWrap(info.threads), error);
 
     return py_retval;
 
@@ -3873,7 +3873,7 @@ libvirt_virStoragePoolGetInfo(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     VIR_PY_LIST_SET_GOTO(py_retval, 0,
-                         libvirt_intWrap((int) info.state), error);
+                         libvirt_intWrap(info.state), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
                          libvirt_ulonglongWrap(info.capacity), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2,
@@ -3914,7 +3914,7 @@ libvirt_virStorageVolGetInfo(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     VIR_PY_LIST_SET_GOTO(py_retval, 0,
-                         libvirt_intWrap((int) info.type), error);
+                         libvirt_intWrap(info.type), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
                          libvirt_ulonglongWrap(info.capacity), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2,
@@ -3954,7 +3954,7 @@ libvirt_virStorageVolGetInfoFlags(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     VIR_PY_LIST_SET_GOTO(py_retval, 0,
-                         libvirt_intWrap((int) info.type), error);
+                         libvirt_intWrap(info.type), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
                          libvirt_ulonglongWrap(info.capacity), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2,
@@ -4924,7 +4924,7 @@ libvirt_virDomainGetJobInfo(PyObject *self ATTRIBUTE_UNUSED,
         return NULL;
 
     VIR_PY_LIST_SET_GOTO(py_retval, 0,
-                         libvirt_intWrap((int) info.type), error);
+                         libvirt_intWrap(info.type), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
                          libvirt_ulonglongWrap(info.timeElapsed), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2,
@@ -8532,7 +8532,7 @@ libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED,
     c_retval = virDomainCreateWithFiles(domain, nfiles, files, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    py_retval = libvirt_intWrap((int) c_retval);
+    py_retval = libvirt_intWrap(c_retval);
 
  cleanup:
     VIR_FREE(files);
@@ -10834,7 +10834,7 @@ libvirt_virDomainFDAssociate(PyObject *self ATTRIBUTE_UNUSED,
     c_retval = virDomainFDAssociate(domain, name, nfiles, files, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    py_retval = libvirt_intWrap((int) c_retval);
+    py_retval = libvirt_intWrap(c_retval);
 
  cleanup:
     VIR_FREE(files);
