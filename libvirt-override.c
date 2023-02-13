@@ -2846,7 +2846,7 @@ libvirt_virNodeGetInfo(PyObject *self ATTRIBUTE_UNUSED,
     VIR_PY_LIST_SET_GOTO(py_retval, 0,
                          libvirt_constcharPtrWrap(&info.model[0]), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 1,
-                         libvirt_longWrap((long) info.memory >> 10), error);
+                         libvirt_ulongWrap(info.memory >> 10), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 2, libvirt_intWrap((int) info.cpus), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 3, libvirt_intWrap((int) info.mhz), error);
     VIR_PY_LIST_SET_GOTO(py_retval, 4, libvirt_intWrap((int) info.nodes), error);
