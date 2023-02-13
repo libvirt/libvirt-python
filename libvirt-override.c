@@ -2012,7 +2012,7 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED,
                            PyObject *args)
 {
     PyObject *py_retval;
-    virConnectPtr c_retval;
+    virConnectPtr c_retval = NULL;
     char * name;
     unsigned int flags;
     PyObject *pyauth;
@@ -2036,7 +2036,8 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED,
         for (i = 0; i < auth.ncredtype; i++) {
             PyObject *val;
             val = PyList_GetItem(pycredtype, i);
-            auth.credtype[i] = (int)PyLong_AsLong(val);
+            if (libvirt_intUnwrap(val, &auth.credtype[i]) < 0)
+                goto cleanup;
         }
     }
     if (pycredcb && pycredcb != Py_None)
@@ -2047,6 +2048,7 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED,
     c_retval = virConnectOpenAuth(name, &auth, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
+ cleanup:
     VIR_FREE(auth.credtype);
     py_retval = libvirt_virConnectPtrWrap((virConnectPtr) c_retval);
     return py_retval;
