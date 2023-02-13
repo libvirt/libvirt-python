@@ -7926,7 +7926,7 @@ libvirt_virStreamRecv(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     buf[ret > -1 ? ret : 0] = '\0';
-    DEBUG("StreamRecv ret=%d strlen=%d\n", ret, (int) strlen(buf));
+    DEBUG("StreamRecv ret=%d strlen=%zu\n", ret, strlen(buf));
 
     if (ret == -2) {
         VIR_FREE(buf);
@@ -10071,7 +10071,7 @@ libvirt_virStreamRecvFlags(PyObject *self ATTRIBUTE_UNUSED,
     LIBVIRT_END_ALLOW_THREADS;
 
     buf[ret > -1 ? ret : 0] = '\0';
-    DEBUG("StreamRecvFlags ret=%d strlen=%d\n", ret, (int) strlen(buf));
+    DEBUG("StreamRecvFlags ret=%d strlen=%zu\n", ret, strlen(buf));
 
     if (ret == -2 || ret == -3)
         return libvirt_intWrap(ret);
