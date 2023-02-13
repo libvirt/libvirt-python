@@ -343,7 +343,7 @@ libvirt_qemu_virDomainQemuMonitorCommandWithFiles(PyObject *self ATTRIBUTE_UNUSE
     unsigned int noutfiles = 0;
     int *outfiles = NULL;
     char *result = NULL;
-    ssize_t i;
+    size_t i;
     PyObject *py_outfiles = NULL;
     PyObject *py_retval = NULL;
     int c_retval;

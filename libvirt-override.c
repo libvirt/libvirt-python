@@ -347,7 +347,7 @@ libvirt_virDomainMemoryStats(PyObject *self ATTRIBUTE_UNUSED,
     virDomainPtr domain;
     PyObject *pyobj_domain;
     unsigned int nr_stats;
-    ssize_t i;
+    size_t i;
     virDomainMemoryStatStruct stats[VIR_DOMAIN_MEMORY_STAT_NR];
     PyObject *info;
     PyObject *key = NULL, *val = NULL;
@@ -1921,7 +1921,7 @@ virConnectCredCallbackWrapper(virConnectCredentialPtr cred,
     PyObject *pycb;
     PyObject *pyret = NULL;
     int ret = -1;
-    ssize_t i;
+    size_t i;
 
     LIBVIRT_ENSURE_THREAD_STATE;
 
@@ -2030,7 +2030,7 @@ libvirt_virConnectOpenAuth(PyObject *self ATTRIBUTE_UNUSED,
 
     auth.ncredtype = PyList_Size(pycredtype);
     if (auth.ncredtype) {
-        ssize_t i;
+        size_t i;
         if (VIR_ALLOC_N(auth.credtype, auth.ncredtype) < 0)
             return PyErr_NoMemory();
         for (i = 0; i < auth.ncredtype; i++) {
@@ -5240,7 +5240,7 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int source;
     unsigned int flags;
     int ifaces_count = 0;
-    ssize_t i, j;
+    ssize_t i;
 
     if (!PyArg_ParseTuple(args, (char *) "OII:virDomainInterfaceAddresses",
                           &pyobj_domain, &source, &flags))
@@ -5262,6 +5262,7 @@ libvirt_virDomainInterfaceAddresses(PyObject *self ATTRIBUTE_UNUSED,
         virDomainInterfacePtr iface = ifaces[i];
         PyObject *py_addrs = NULL;
         PyObject *py_iface = NULL;
+        size_t j;
 
         if (!(py_iface = PyDict_New()))
             goto error;
@@ -7981,7 +7982,7 @@ libvirt_virDomainSendKey(PyObject *self ATTRIBUTE_UNUSED,
     int ret;
     ssize_t i;
     unsigned int keycodes[VIR_DOMAIN_SEND_KEY_MAX_KEYS];
-    unsigned int nkeycodes;
+    int nkeycodes;
 
     if (!PyArg_ParseTuple(args, (char *)"OiiOII:virDomainSendKey",
                           &pyobj_domain, &codeset, &holdtime, &pyobj_list,
@@ -8504,7 +8505,7 @@ libvirt_virDomainCreateWithFiles(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int nfiles;
     int *files = NULL;
-    ssize_t i;
+    size_t i;
 
     if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainCreateWithFiles",
                           &pyobj_domain, &pyobj_files, &flags))
@@ -8553,7 +8554,7 @@ libvirt_virDomainCreateXMLWithFiles(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int nfiles;
     int *files = NULL;
-    ssize_t i;
+    size_t i;
 
     if (!PyArg_ParseTuple(args, (char *)"OzOI:virDomainCreateXMLWithFiles",
                           &pyobj_conn, &xmlDesc, &pyobj_files, &flags))
@@ -8603,7 +8604,8 @@ libvirt_virDomainFSFreeze(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int nmountpoints = 0;
     char **mountpoints = NULL;
-    ssize_t i = 0, j;
+    size_t i = 0;
+    size_t j = 0;
 
     if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainFSFreeze",
                           &pyobj_domain, &pyobj_list, &flags))
@@ -8650,7 +8652,8 @@ libvirt_virDomainFSThaw(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int nmountpoints = 0;
     char **mountpoints = NULL;
-    ssize_t i = 0, j;
+    size_t i = 0;
+    size_t j = 0;
 
     if (!PyArg_ParseTuple(args, (char *)"OOI:virDomainFSThaw",
                           &pyobj_domain, &pyobj_list, &flags))
@@ -10806,7 +10809,7 @@ libvirt_virDomainFDAssociate(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     unsigned int nfiles;
     int *files = NULL;
-    ssize_t i;
+    size_t i;
 
     if (!PyArg_ParseTuple(args, (char *)"OsOI:virDomainFDAssociate",
                           &pyobj_domain, &name, &pyobj_files, &flags))
