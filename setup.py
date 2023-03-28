@@ -310,7 +310,7 @@ class my_test(Command):
             os.environ["PYTHONPATH"] = self.build_platlib
 
         pytest = self.find_pytest_path()
-        subprocess.check_call([pytest])
+        subprocess.check_call([pytest, "tests"])
 
 class my_clean(Command):
     user_options = [
