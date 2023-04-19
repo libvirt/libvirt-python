@@ -60,7 +60,7 @@ targets:
 
   fedora-rawhide: x86_64
 
-  opensuse-leap-153:
+  opensuse-leap-154:
     jobs:
       - arch: x86_64
         variables:
