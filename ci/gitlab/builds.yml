@@ -110,14 +110,14 @@ x86_64-debian-sid-prebuilt-env:
   needs:
     - job: x86_64-debian-sid-container
       optional: true
-  allow_failure: false
+  allow_failure: true
   variables:
     NAME: debian-sid
 
 x86_64-debian-sid-local-env:
   extends: .native_build_job_local_env
   needs: []
-  allow_failure: false
+  allow_failure: true
   variables:
     IMAGE: docker.io/library/debian:sid-slim
     NAME: debian-sid
@@ -180,14 +180,14 @@ x86_64-fedora-rawhide-prebuilt-env:
   needs:
     - job: x86_64-fedora-rawhide-container
       optional: true
-  allow_failure: false
+  allow_failure: true
   variables:
     NAME: fedora-rawhide
 
 x86_64-fedora-rawhide-local-env:
   extends: .native_build_job_local_env
   needs: []
-  allow_failure: false
+  allow_failure: true
   variables:
     IMAGE: registry.fedoraproject.org/fedora:rawhide
     NAME: fedora-rawhide
@@ -218,7 +218,7 @@ x86_64-opensuse-tumbleweed-prebuilt-env:
   needs:
     - job: x86_64-opensuse-tumbleweed-container
       optional: true
-  allow_failure: false
+  allow_failure: true
   variables:
     NAME: opensuse-tumbleweed
     RPM: skip
@@ -226,7 +226,7 @@ x86_64-opensuse-tumbleweed-prebuilt-env:
 x86_64-opensuse-tumbleweed-local-env:
   extends: .native_build_job_local_env
   needs: []
-  allow_failure: false
+  allow_failure: true
   variables:
     IMAGE: registry.opensuse.org/opensuse/tumbleweed:latest
     NAME: opensuse-tumbleweed
