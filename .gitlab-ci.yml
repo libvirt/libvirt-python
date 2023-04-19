@@ -26,7 +26,7 @@ stages:
     - ninja -C build install
     - popd
     - $PYTHON setup.py build
-    - $PYTHON -m pip install .
+    - $PYTHON -m pip ${PIP_INSTALL:-install} .
     - $PYTHON setup.py test
     - $PYTHON setup.py sdist
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ;
@@ -50,7 +50,7 @@ stages:
     - export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     - export CFLAGS="-Werror"
     - $PYTHON setup.py build
-    - $PYTHON -m pip install .
+    - $PYTHON -m pip ${PIP_INSTALL:-install} .
     - $PYTHON setup.py test
     - $PYTHON setup.py sdist
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ;

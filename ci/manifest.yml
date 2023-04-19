@@ -44,6 +44,8 @@ targets:
     jobs:
       - arch: x86_64
         allow-failure: true
+        variables:
+          PIP_INSTALL: install --break-system-packages
 
   fedora-36:
     jobs:

@@ -113,6 +113,7 @@ x86_64-debian-sid-prebuilt-env:
   allow_failure: true
   variables:
     NAME: debian-sid
+    PIP_INSTALL: install --break-system-packages
 
 x86_64-debian-sid-local-env:
   extends: .native_build_job_local_env
@@ -121,6 +122,7 @@ x86_64-debian-sid-local-env:
   variables:
     IMAGE: docker.io/library/debian:sid-slim
     NAME: debian-sid
+    PIP_INSTALL: install --break-system-packages
 
 
 x86_64-fedora-36-prebuilt-env:
