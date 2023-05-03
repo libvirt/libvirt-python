@@ -63,6 +63,14 @@ targets:
           paths:
             - libvirt-python-rpms
 
+  fedora-38:
+    jobs:
+      - arch: x86_64
+        artifacts:
+          expire_in: 1 hour
+          paths:
+            - libvirt-python-rpms
+
   fedora-rawhide:
     jobs:
       - arch: x86_64
