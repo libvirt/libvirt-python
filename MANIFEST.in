@@ -55,3 +55,4 @@ include tests/test_storage.py
 include tox.ini
 include typewrappers.c
 include typewrappers.h
+include Makefile
