@@ -1,6 +1,5 @@
 include AUTHORS
 include COPYING
-include COPYING.LESSER
 include CONTRIBUTING.rst
 include HACKING
 include ChangeLog

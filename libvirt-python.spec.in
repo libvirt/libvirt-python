@@ -73,7 +73,7 @@ exit 1
 %{__python3} setup.py test
 
 %files -n python3-libvirt
-%doc ChangeLog AUTHORS README COPYING COPYING.LESSER examples/
+%doc ChangeLog AUTHORS README COPYING examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
 %{python3_sitearch}/libvirt_qemu.py*
