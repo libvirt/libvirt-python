@@ -1,7 +1,11 @@
 Libvirt Python Binding README
 =============================
 
-This package provides a python binding to the libvirt.so,
+This package provides a module that permits applications
+written in the Python 3.x programming language to call the interface
+supplied by the libvirt library, to manage the virtualization
+capabilities of recent versions of Linux (and other OSes).
+As such, the module exposes Python bindings to to the libvirt.so,
 libvirt-qemu.so and libvirt-lxc.so library APIs.
 
 It is written to build against any version of libvirt that
