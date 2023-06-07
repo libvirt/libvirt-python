@@ -59,7 +59,9 @@ def have_libvirt_lxc():
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
-    f = os.popen("%s %s %s" % ("pkg-config", " ".join(args), mod))
+
+    args_str = " ".join(args)
+    f = os.popen(f"pkg-config {args_str} {mod}")
 
     line = f.readline()
     if line is not None:
@@ -67,7 +69,7 @@ def get_pkgconfig_data(args, mod, required=True):
 
     if line is None or line == "":
         if required:
-            raise Exception("Cannot determine '%s' from libvirt pkg-config file" % " ".join(args))
+            raise Exception(f"Cannot determine '{args_str}' from libvirt pkg-config file")
         else:
             return ""
 
@@ -261,11 +263,7 @@ class my_test(Command):
 
     def find_build_dir(self):
         if self.plat_name is not None:
-            plat_specifier = ".%s-%d.%d" % (self.plat_name,
-                                            sys.version_info[0],
-                                            sys.version_info[1])
-            if hasattr(sys, "gettotalrefcount"):
-                plat_specifier += "-pydebug"
+            plat_specifier = f".{self.plat_name}-{sys.version_info[0]}.{sys.version_info[1]}"
 
             return os.path.join(self.build_base,
                                 'lib' + plat_specifier)
@@ -291,10 +289,9 @@ class my_test(Command):
 
     def find_pytest_path(self):
         binaries = [
-            "pytest-%d.%d" % (sys.version_info[0],
-                                 sys.version_info[1]),
-            "pytest-%d" % (sys.version_info[0]),
-            "pytest%d" % (sys.version_info[0]),
+            f"pytest-{sys.version_info[0]}.{sys.version_info[1]}",
+            f"pytest-{sys.version_info[0]}",
+            f"pytest{sys.version_info[0]}",
             "pytest",
         ]
 
