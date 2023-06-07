@@ -50,16 +50,13 @@ def get_pkgconfig_data(args, mod, required=True):
     f = os.popen(f"pkg-config {args_str} {mod}")
 
     line = f.readline()
-    if line is not None:
-        line = line.strip()
-
     if line is None or line == "":
         if required:
             raise Exception(f"Cannot determine '{args_str}' from libvirt pkg-config file")
         else:
-            return ""
+            line = ""
+    return line.strip()
 
-    return line
 
 def get_api_xml_files():
     """Check with pkg-config that libvirt is present and extract
