@@ -98,8 +98,8 @@ def get_module_lists():
     ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
     cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
 
-    module = Extension('libvirtmod',
-                       sources = ['libvirt-override.c', 'build/libvirt.c', 'typewrappers.c', 'libvirt-utils.c'],
+    module = Extension("libvirtmod",
+                       sources = ["libvirt-override.c", "build/libvirt.c", "typewrappers.c", "libvirt-utils.c"],
                        libraries = [ "virt" ],
                        include_dirs = [ "." ])
     module.extra_compile_args.extend(cflags)
@@ -108,8 +108,8 @@ def get_module_lists():
     c_modules.append(module)
     py_modules.append("libvirt")
 
-    moduleqemu = Extension('libvirtmod_qemu',
-                           sources = ['libvirt-qemu-override.c', 'build/libvirt-qemu.c', 'typewrappers.c', 'libvirt-utils.c'],
+    moduleqemu = Extension("libvirtmod_qemu",
+                           sources = ["libvirt-qemu-override.c", "build/libvirt-qemu.c", "typewrappers.c", "libvirt-utils.c"],
                            libraries = [ "virt-qemu", "virt" ],
                            include_dirs = [ "." ])
     moduleqemu.extra_compile_args.extend(cflags)
@@ -119,8 +119,8 @@ def get_module_lists():
     py_modules.append("libvirt_qemu")
 
     if have_libvirt_lxc():
-        modulelxc = Extension('libvirtmod_lxc',
-                              sources = ['libvirt-lxc-override.c', 'build/libvirt-lxc.c', 'typewrappers.c', 'libvirt-utils.c'],
+        modulelxc = Extension("libvirtmod_lxc",
+                              sources = ["libvirt-lxc-override.c", "build/libvirt-lxc.c", "typewrappers.c", "libvirt-utils.c"],
                               libraries = [ "virt-lxc", "virt" ],
                               include_dirs = [ "." ])
         modulelxc.extra_compile_args.extend(cflags)
@@ -162,7 +162,7 @@ class my_build_py(build_py):
         subprocess.check_call([sys.executable, "generator.py", "libvirt-qemu", apis[1], "py"])
         if have_libvirt_lxc():
             subprocess.check_call([sys.executable, "generator.py", "libvirt-lxc", apis[2], "py"])
-        shutil.copy('libvirtaio.py', 'build')
+        shutil.copy("libvirtaio.py", "build")
 
         build_py.run(self)
 
@@ -182,11 +182,11 @@ class my_sdist(sdist):
         sdist.finalize_options(self)
 
     def gen_rpm_spec(self):
-        f1 = open('libvirt-python.spec.in', 'r')
-        f2 = open('libvirt-python.spec', 'w')
+        f1 = open("libvirt-python.spec.in", "r")
+        f2 = open("libvirt-python.spec", "w")
         for line in f1:
             f2.write(line
-                     .replace('@PY_VERSION@', self.distribution.get_version()))
+                     .replace("@PY_VERSION@", self.distribution.get_version()))
         f1.close()
         f2.close()
 
@@ -200,24 +200,24 @@ class my_sdist(sdist):
 
         authors.sort(key=str.lower)
 
-        f1 = open('AUTHORS.in', 'r')
-        f2 = open('AUTHORS', 'w')
+        f1 = open("AUTHORS.in", "r")
+        f2 = open("AUTHORS", "w")
         for line in f1:
-            f2.write(line.replace('@AUTHORS@', "\n".join(authors)))
+            f2.write(line.replace("@AUTHORS@", "\n".join(authors)))
         f1.close()
         f2.close()
 
     def gen_changelog(self):
         f1 = os.popen("git log '--pretty=format:%H:%ct %an  <%ae>%n%n%s%n%b%n'")
-        f2 = open("ChangeLog", 'w')
+        f2 = open("ChangeLog", "w")
 
         for line in f1:
-            m = re.match(r'([a-f0-9]+):(\d+)\s(.*)', line)
+            m = re.match(r"([a-f0-9]+):(\d+)\s(.*)", line)
             if m:
                 t = time.gmtime(int(m.group(2)))
                 f2.write("%04d-%02d-%02d %s\n" % (t.tm_year, t.tm_mon, t.tm_mday, m.group(3)))
             else:
-                if re.match(r'Signed-off-by', line):
+                if re.match(r"Signed-off-by", line):
                     continue
                 f2.write("    " + line.strip() + "\n")
 
@@ -249,11 +249,11 @@ class my_sdist(sdist):
 
 class my_test(Command):
     user_options = [
-        ('build-base=', 'b',
+        ("build-base=", "b",
          "base directory for build library"),
-        ('build-platlib=', None,
+        ("build-platlib=", None,
          "build directory for platform-specific distributions"),
-        ('plat-name=', 'p',
+        ("plat-name=", "p",
          "platform name to build for, if supported "),
     ]
 
@@ -264,8 +264,8 @@ class my_test(Command):
             plat_specifier = ".%s-%d.%d" % (self.plat_name,
                                             sys.version_info[0],
                                             sys.version_info[1])
-            if hasattr(sys, 'gettotalrefcount'):
-                plat_specifier += '-pydebug'
+            if hasattr(sys, "gettotalrefcount"):
+                plat_specifier += "-pydebug"
 
             return os.path.join(self.build_base,
                                 'lib' + plat_specifier)
@@ -281,7 +281,7 @@ class my_test(Command):
             return dirs[0]
 
     def initialize_options(self):
-        self.build_base = 'build'
+        self.build_base = "build"
         self.build_platlib = None
         self.plat_name = None
 
@@ -321,7 +321,7 @@ class my_test(Command):
 
 class my_clean(Command):
     user_options = [
-        ('all', None, 'unused, compatibility with distutils')
+        ("all", None, "unused, compatibility with distutils")
     ]
 
     def initialize_options(self):
@@ -341,29 +341,29 @@ class my_clean(Command):
 
 _c_modules, _py_modules = get_module_lists()
 
-setup(name = 'libvirt-python',
-      version = '9.5.0',
-      url = 'http://www.libvirt.org',
-      maintainer = 'Libvirt Maintainers',
-      maintainer_email = 'libvir-list@redhat.com',
-      description = 'The libvirt virtualization API python binding',
+setup(name = "libvirt-python",
+      version = "9.5.0",
+      url = "http://www.libvirt.org",
+      maintainer = "Libvirt Maintainers",
+      maintainer_email = "libvir-list@redhat.com",
+      description = "The libvirt virtualization API python binding",
       long_description =
-        '''The libvirt-python package provides a module that permits applications
+        """The libvirt-python package provides a module that permits applications
 written in the Python 3.x programming language to call the interface
 supplied by the libvirt library, to manage the virtualization capabilities
-of recent versions of Linux (and other OSes).''',
-      license = 'LGPLv2+',
+of recent versions of Linux (and other OSes).""",
+      license = "LGPLv2+",
       ext_modules = _c_modules,
       py_modules = _py_modules,
       package_dir = {
-          '': 'build'
+          "": "build"
       },
       cmdclass = {
-          'build_ext': my_build_ext,
-          'build_py': my_build_py,
-          'clean': my_clean,
-          'sdist': my_sdist,
-          'test': my_test
+          "build_ext": my_build_ext,
+          "build_py": my_build_py,
+          "clean": my_clean,
+          "sdist": my_sdist,
+          "test": my_test
       },
       classifiers = [
           "Development Status :: 5 - Production/Stable",
