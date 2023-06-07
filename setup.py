@@ -14,8 +14,8 @@ import shutil
 import subprocess
 import time
 
-if sys.version_info < (3, 5):
-    print("libvirt-python requires Python >= 3.5 to build")
+if sys.version_info < (3, 6):
+    print("libvirt-python requires Python >= 3.6 to build")
     sys.exit(1)
 
 MIN_LIBVIRT = "0.9.11"
