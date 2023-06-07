@@ -40,11 +40,13 @@ def check_pkgcfg():
 
 check_pkgcfg()
 
+
 def check_minimum_libvirt_version():
     subprocess.check_call(["pkg-config",
                            "--print-errors",
                            "--atleast-version=%s" % MIN_LIBVIRT,
                            "libvirt"])
+
 
 def have_libvirt_lxc():
     proc = subprocess.run(["pkg-config",
@@ -53,6 +55,7 @@ def have_libvirt_lxc():
     if proc.returncode == 0:
         return True
     return False
+
 
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
@@ -83,6 +86,7 @@ def get_api_xml_files():
     libvirt_lxc_api = libvirt_api[0:offset] + "-lxc-api.xml"
 
     return (libvirt_api, libvirt_qemu_api, libvirt_lxc_api)
+
 
 def get_module_lists():
     """
@@ -147,6 +151,7 @@ class my_build_ext(build_ext):
 
         build_ext.run(self)
 
+
 class my_build_py(build_py):
 
     def run(self):
@@ -160,6 +165,7 @@ class my_build_py(build_py):
         shutil.copy('libvirtaio.py', 'build')
 
         build_py.run(self)
+
 
 class my_sdist(sdist):
     user_options = sdist.user_options
@@ -201,7 +207,6 @@ class my_sdist(sdist):
         f1.close()
         f2.close()
 
-
     def gen_changelog(self):
         f1 = os.popen("git log '--pretty=format:%H:%ct %an  <%ae>%n%n%s%n%b%n'")
         f2 = open("ChangeLog", 'w')
@@ -218,7 +223,6 @@ class my_sdist(sdist):
 
         f1.close()
         f2.close()
-
 
     def run(self):
         if not os.path.exists("build"):
@@ -241,6 +245,7 @@ class my_sdist(sdist):
                         os.unlink(f)
         else:
             sdist.run(self)
+
 
 class my_test(Command):
     user_options = [
@@ -312,6 +317,7 @@ class my_test(Command):
 
         pytest = self.find_pytest_path()
         subprocess.check_call([pytest, "tests"])
+
 
 class my_clean(Command):
     user_options = [
