@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 
-from setuptools import setup, Extension, Command
-from setuptools.command.build_ext import build_ext
-from setuptools.command.build_py import build_py
-from setuptools.command.sdist import sdist
-
 import glob
 import sys
 import os
@@ -13,6 +8,12 @@ import re
 import shutil
 import subprocess
 import time
+
+from setuptools import setup, Extension, Command
+from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py
+from setuptools.command.sdist import sdist
+
 
 if sys.version_info < (3, 6):
     print("libvirt-python requires Python >= 3.6 to build")
