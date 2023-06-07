@@ -15,18 +15,6 @@ from setuptools.command.build_py import build_py
 from setuptools.command.sdist import sdist
 
 
-if sys.version_info < (3, 6):
-    print("libvirt-python requires Python >= 3.6 to build")
-    sys.exit(1)
-
-MIN_LIBVIRT = "0.9.11"
-MIN_LIBVIRT_LXC = "1.0.2"
-
-# Hack to stop 'pip install' failing with error
-# about missing 'build' dir.
-if not os.path.exists("build"):
-    os.mkdir("build")
-
 def check_pkgcfg():
     try:
         proc = subprocess.run(["pkg-config", "--version"],
@@ -38,8 +26,6 @@ def check_pkgcfg():
     except FileNotFoundError:
         print("pkg-config binary is required to compile libvirt-python")
         sys.exit(1)
-
-check_pkgcfg()
 
 
 def check_minimum_libvirt_version():
@@ -353,6 +339,20 @@ class my_clean(Command):
 ##################
 # Invoke setup() #
 ##################
+
+if sys.version_info < (3, 6):
+    print("libvirt-python requires Python >= 3.6 to build")
+    sys.exit(1)
+
+MIN_LIBVIRT = "0.9.11"
+MIN_LIBVIRT_LXC = "1.0.2"
+
+# Hack to stop "pip install" failing with error
+# about missing "build" dir.
+if not os.path.exists("build"):
+    os.mkdir("build")
+
+check_pkgcfg()
 
 _c_modules, _py_modules = get_module_lists()
 
