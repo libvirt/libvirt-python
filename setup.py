@@ -30,7 +30,8 @@ if not os.path.exists("build"):
 def check_pkgcfg():
     try:
         proc = subprocess.run(["pkg-config", "--version"],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                              stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL)
         if proc.returncode != 0:
             print("pkg-config binary does not appear to be functional")
             sys.exit(1)
@@ -101,9 +102,14 @@ def get_module_lists():
     cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
 
     module = Extension("libvirtmod",
-                       sources = ["libvirt-override.c", "build/libvirt.c", "typewrappers.c", "libvirt-utils.c"],
-                       libraries = [ "virt" ],
-                       include_dirs = [ "." ])
+                       sources=[
+                            "libvirt-override.c",
+                            "build/libvirt.c",
+                            "typewrappers.c",
+                            "libvirt-utils.c"
+                       ],
+                       libraries=["virt"],
+                       include_dirs=["."])
     module.extra_compile_args.extend(cflags)
     module.extra_link_args.extend(ldflags)
 
@@ -111,9 +117,14 @@ def get_module_lists():
     py_modules.append("libvirt")
 
     moduleqemu = Extension("libvirtmod_qemu",
-                           sources = ["libvirt-qemu-override.c", "build/libvirt-qemu.c", "typewrappers.c", "libvirt-utils.c"],
-                           libraries = [ "virt-qemu", "virt" ],
-                           include_dirs = [ "." ])
+                           sources=[
+                               "libvirt-qemu-override.c",
+                               "build/libvirt-qemu.c",
+                               "typewrappers.c",
+                               "libvirt-utils.c"
+                            ],
+                           libraries=["virt-qemu", "virt"],
+                           include_dirs=["."])
     moduleqemu.extra_compile_args.extend(cflags)
     moduleqemu.extra_link_args.extend(ldflags)
 
@@ -122,9 +133,14 @@ def get_module_lists():
 
     if have_libvirt_lxc():
         modulelxc = Extension("libvirtmod_lxc",
-                              sources = ["libvirt-lxc-override.c", "build/libvirt-lxc.c", "typewrappers.c", "libvirt-utils.c"],
-                              libraries = [ "virt-lxc", "virt" ],
-                              include_dirs = [ "." ])
+                              sources=[
+                                  "libvirt-lxc-override.c",
+                                  "build/libvirt-lxc.c",
+                                  "typewrappers.c",
+                                  "libvirt-utils.c"
+                              ],
+                              libraries=["virt-lxc", "virt"],
+                              include_dirs=["."])
         modulelxc.extra_compile_args.extend(cflags)
         modulelxc.extra_link_args.extend(ldflags)
 
@@ -239,9 +255,11 @@ class my_sdist(sdist):
                 sdist.run(self)
 
             finally:
-                files = ["libvirt-python.spec",
-                         "AUTHORS",
-                         "ChangeLog"]
+                files = [
+                    "libvirt-python.spec",
+                    "AUTHORS",
+                    "ChangeLog"
+                ]
                 for f in files:
                     if os.path.exists(f):
                         os.unlink(f)
