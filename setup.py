@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
-import glob
 import sys
 import os
-import os.path
 import re
 import shutil
 import subprocess
 import time
 
+from pathlib import Path
 from setuptools import setup, Extension, Command
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
@@ -229,10 +228,9 @@ class my_sdist(sdist):
         f2.close()
 
     def run(self):
-        if not os.path.exists("build"):
-            os.mkdir("build")
+        Path("build").mkdir(exist_ok=True)
 
-        if os.path.exists(".git"):
+        if Path(".git").exists():
             try:
                 self.gen_rpm_spec()
                 self.gen_authors()
@@ -247,8 +245,10 @@ class my_sdist(sdist):
                     "ChangeLog"
                 ]
                 for f in files:
-                    if os.path.exists(f):
-                        os.unlink(f)
+                    try:
+                        Path(f).unlink()
+                    except FileNotFoundError:
+                        pass
         else:
             sdist.run(self)
 
@@ -269,11 +269,12 @@ class my_test(Command):
         if self.plat_name is not None:
             plat_specifier = f".{self.plat_name}-{sys.version_info[0]}.{sys.version_info[1]}"
 
-            return os.path.join(self.build_base,
-                                'lib' + plat_specifier)
+            if hasattr(sys, "gettotalrefcount"):
+                plat_specifier += "-pydebug"
+
+            return Path(self.build_base, "lib" + plat_specifier).as_posix()
         else:
-            dirs = glob.glob(os.path.join(self.build_base,
-                                          "lib.*"))
+            dirs = [p.as_posix() for p in Path(self.build_base).glob("lib.*")]
             if len(dirs) == 0:
                 print("No build directory found, run 'setup.py build'")
                 sys.exit(1)
