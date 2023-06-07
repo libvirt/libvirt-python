@@ -341,31 +341,31 @@ class my_clean(Command):
 
 _c_modules, _py_modules = get_module_lists()
 
-setup(name = "libvirt-python",
-      version = "9.5.0",
-      url = "http://www.libvirt.org",
-      maintainer = "Libvirt Maintainers",
-      maintainer_email = "libvir-list@redhat.com",
-      description = "The libvirt virtualization API python binding",
-      long_description =
+setup(name="libvirt-python",
+      version="9.5.0",
+      url="http://www.libvirt.org",
+      maintainer="Libvirt Maintainers",
+      maintainer_email="libvir-list@redhat.com",
+      description="The libvirt virtualization API python binding",
+      long_description=
         """The libvirt-python package provides a module that permits applications
 written in the Python 3.x programming language to call the interface
 supplied by the libvirt library, to manage the virtualization capabilities
 of recent versions of Linux (and other OSes).""",
-      license = "LGPLv2+",
-      ext_modules = _c_modules,
-      py_modules = _py_modules,
-      package_dir = {
+      license="LGPLv2+",
+      ext_modules=_c_modules,
+      py_modules=_py_modules,
+      package_dir={
           "": "build"
       },
-      cmdclass = {
+      cmdclass={
           "build_ext": my_build_ext,
           "build_py": my_build_py,
           "clean": my_clean,
           "sdist": my_sdist,
           "test": my_test
       },
-      classifiers = [
+      classifiers=[
           "Development Status :: 5 - Production/Stable",
           "Intended Audience :: Developers",
           "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
