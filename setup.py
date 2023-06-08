@@ -235,8 +235,6 @@ class my_sdist(sdist):
                     f_out.write("    " + line.strip() + "\n")
 
     def run(self):
-        Path("build").mkdir(exist_ok=True)
-
         if Path(".git").exists():
             try:
                 self.gen_rpm_spec()
