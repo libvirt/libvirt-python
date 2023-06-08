@@ -30,13 +30,13 @@ def check_pkgcfg():
 def check_minimum_libvirt_version():
     subprocess.check_call(["pkg-config",
                            "--print-errors",
-                           "--atleast-version=%s" % MIN_LIBVIRT,
+                           f"--atleast-version={MIN_LIBVIRT}",
                            "libvirt"])
 
 
 def have_libvirt_lxc():
     proc = subprocess.run(["pkg-config",
-                           "--atleast-version=%s" % MIN_LIBVIRT_LXC,
+                           f"--atleast-version={MIN_LIBVIRT_LXC}",
                            "libvirt"])
     if proc.returncode == 0:
         return True
