@@ -46,14 +46,18 @@ def have_libvirt_lxc():
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
 
-    args_str = " ".join(args)
-    f = os.popen(f"pkg-config {args_str} {mod}")
+    cmd = ["pkg-config"] + args + [f"{mod}"]
+    with subprocess.Popen(cmd,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT,
+                          universal_newlines=True) as p:
 
-    line = f.readline()
-    if line is None or line == "":
-        if required:
-            raise Exception(f"Cannot determine '{args_str}' from libvirt pkg-config file")
-        else:
+        line = p.stdout.readline()
+        if line is None or line == "":
+            if required:
+                args_str = " ".join(args)
+                raise Exception(f"Cannot determine '{args_str}' from "
+                                "libvirt pkg-config file")
             line = ""
     return line.strip()
 
@@ -191,12 +195,17 @@ class my_sdist(sdist):
         f2.close()
 
     def gen_authors(self):
-        f = os.popen("git log --pretty=format:'%aN <%aE>'")
+
         authors = []
-        for line in f:
-            line = "   " + line.strip()
-            if line not in authors:
-                authors.append(line)
+        cmd = "git log --pretty=format:'%aN <%aE>'".split(" ")
+        with subprocess.Popen(cmd,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL,
+                              universal_newlines=True) as p:
+            for line in p.stdout:
+                line = "   " + line.strip()
+                if line not in authors:
+                    authors.append(line)
 
         authors.sort(key=str.lower)
 
@@ -208,20 +217,22 @@ class my_sdist(sdist):
         f2.close()
 
     def gen_changelog(self):
-        f1 = os.popen("git log '--pretty=format:%H:%ct %an  <%ae>%n%n%s%n%b%n'")
         f2 = open("ChangeLog", "w")
+        cmd = "git log '--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n'".split(" ")
+        with subprocess.Popen(cmd,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL,
+                              universal_newlines=True) as p:
+            for line in p.stdout:
+                m = re.match(r"([a-f0-9]+):(\d+)\s(.*)", line)
+                if m:
+                    t = time.gmtime(int(m.group(2)))
+                    f2.write("%04d-%02d-%02d %s\n" % (t.tm_year, t.tm_mon, t.tm_mday, m.group(3)))
+                else:
+                    if re.match(r"Signed-off-by", line):
+                        continue
+                    f2.write("    " + line.strip() + "\n")
 
-        for line in f1:
-            m = re.match(r"([a-f0-9]+):(\d+)\s(.*)", line)
-            if m:
-                t = time.gmtime(int(m.group(2)))
-                f2.write("%04d-%02d-%02d %s\n" % (t.tm_year, t.tm_mon, t.tm_mday, m.group(3)))
-            else:
-                if re.match(r"Signed-off-by", line):
-                    continue
-                f2.write("    " + line.strip() + "\n")
-
-        f1.close()
         f2.close()
 
     def run(self):
