@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
-import os
 import re
 import shutil
 import subprocess
 import time
 
 from pathlib import Path
-from setuptools import setup, Extension, Command
+from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
 from setuptools.command.sdist import sdist
@@ -263,74 +262,6 @@ class my_sdist(sdist):
             sdist.run(self)
 
 
-class my_test(Command):
-    user_options = [
-        ("build-base=", "b",
-         "base directory for build library"),
-        ("build-platlib=", None,
-         "build directory for platform-specific distributions"),
-        ("plat-name=", "p",
-         "platform name to build for, if supported "),
-    ]
-
-    description = "Run test suite."
-
-    def find_build_dir(self):
-        if self.plat_name is not None:
-            plat_specifier = f".{self.plat_name}-{sys.version_info[0]}.{sys.version_info[1]}"
-
-            if hasattr(sys, "gettotalrefcount"):
-                plat_specifier += "-pydebug"
-
-            return Path(self.build_base, "lib" + plat_specifier).as_posix()
-        else:
-            dirs = [p.as_posix() for p in Path(self.build_base).glob("lib.*")]
-            if len(dirs) == 0:
-                print("No build directory found, run 'setup.py build'")
-                sys.exit(1)
-            if len(dirs) > 1:
-                print("Multiple build dirs found, use --plat-name option")
-                sys.exit(1)
-            return dirs[0]
-
-    def initialize_options(self):
-        self.build_base = "build"
-        self.build_platlib = None
-        self.plat_name = None
-
-    def finalize_options(self):
-        if self.build_platlib is None:
-            self.build_platlib = self.find_build_dir()
-
-    def find_pytest_path(self):
-        binaries = [
-            f"pytest-{sys.version_info[0]}.{sys.version_info[1]}",
-            f"pytest-{sys.version_info[0]}",
-            f"pytest{sys.version_info[0]}",
-            "pytest",
-        ]
-
-        for binary in binaries:
-            path = shutil.which(binary)
-            if path is not None:
-                return path
-
-        raise Exception("Cannot find any pytest binary")
-
-    def run(self):
-        """
-        Run test suite
-        """
-
-        if "PYTHONPATH" in os.environ:
-            os.environ["PYTHONPATH"] = self.build_platlib + ":" + os.environ["PYTHONPATH"]
-        else:
-            os.environ["PYTHONPATH"] = self.build_platlib
-
-        pytest = self.find_pytest_path()
-        subprocess.check_call([pytest, "tests"])
-
-
 ##################
 # Invoke setup() #
 ##################
@@ -360,6 +291,5 @@ setup(
         "build_ext": my_build_ext,
         "build_py": my_build_py,
         "sdist": my_sdist,
-        "test": my_test
         },
 )
