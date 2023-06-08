@@ -217,9 +217,9 @@ class my_sdist(sdist):
         f2.close()
 
     def gen_changelog(self):
-        f2 = open("ChangeLog", "w")
         cmd = "git log '--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n'".split(" ")
-        with subprocess.Popen(cmd,
+        with open("ChangeLog", "w") as f_out, \
+             subprocess.Popen(cmd,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL,
                               universal_newlines=True) as p:
@@ -227,13 +227,12 @@ class my_sdist(sdist):
                 m = re.match(r"([a-f0-9]+):(\d+)\s(.*)", line)
                 if m:
                     t = time.gmtime(int(m.group(2)))
-                    f2.write("%04d-%02d-%02d %s\n" % (t.tm_year, t.tm_mon, t.tm_mday, m.group(3)))
+                    fmt = "{: 04d}-{: 02d}-{: 02d} {}\n"
+                    f_out.write(fmt.format(t.tm_year, t.tm_mon, t.tm_mday, m.group(3)))
                 else:
                     if re.match(r"Signed-off-by", line):
                         continue
-                    f2.write("    " + line.strip() + "\n")
-
-        f2.close()
+                    f_out.write("    " + line.strip() + "\n")
 
     def run(self):
         Path("build").mkdir(exist_ok=True)
