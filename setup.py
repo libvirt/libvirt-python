@@ -331,22 +331,6 @@ class my_test(Command):
         subprocess.check_call([pytest, "tests"])
 
 
-class my_clean(Command):
-    user_options = [
-        ("all", None, "unused, compatibility with distutils")
-    ]
-
-    def initialize_options(self):
-        self.all = False
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        if Path("build").exists():
-            shutil.rmtree("build", ignore_errors=True)
-
-
 ##################
 # Invoke setup() #
 ##################
@@ -375,7 +359,6 @@ setup(
     cmdclass={
         "build_ext": my_build_ext,
         "build_py": my_build_py,
-        "clean": my_clean,
         "sdist": my_sdist,
         "test": my_test
         },
