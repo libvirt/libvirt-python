@@ -14,6 +14,11 @@ from setuptools.command.build_py import build_py
 from setuptools.command.sdist import sdist
 
 
+def getVersion():
+    with open("VERSION") as f:
+        return f.read().strip()
+
+
 def check_pkgcfg():
     try:
         proc = subprocess.run(["pkg-config", "--version"],
@@ -195,7 +200,7 @@ class my_sdist(sdist):
         return self._gen_from_in("libvirt-python.spec.in",
                                  "libvirt-python.spec",
                                  "@PY_VERSION@",
-                                 self.distribution.get_version())
+                                 getVersion())
 
     def gen_authors(self):
 

@@ -5,6 +5,7 @@ include AUTHORS
 include COPYING
 include CONTRIBUTING.rst
 include HACKING
+include VERSION
 include requirements-test.txt
 include tox.ini
 include Makefile
