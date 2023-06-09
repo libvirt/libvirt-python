@@ -338,7 +338,7 @@ class my_clean(Command):
         pass
 
     def run(self):
-        if os.path.exists("build"):
+        if Path("build").exists():
             shutil.rmtree("build", ignore_errors=True)
 
 
@@ -355,8 +355,7 @@ MIN_LIBVIRT_LXC = "1.0.2"
 
 # Hack to stop "pip install" failing with error
 # about missing "build" dir.
-if not os.path.exists("build"):
-    os.mkdir("build")
+Path("build").mkdir(exist_ok=True)
 
 check_pkgcfg()
 
