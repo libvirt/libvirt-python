@@ -3,16 +3,16 @@
 PYTHON ?= python
 
 all:
-	$(PYTHON) setup.py build
+	$(PYTHON) -m build
 
 install: all
-	$(PYTHON) setup.py install
+	$(PYTHON) -m pip install .
 
 clean:
-	$(PYTHON) setup.py clean
+	rm -rf build/ dist/
 
 check: all
-	$(PYTHON) setup.py test
+	tox -e py36
 
-rpm:
-	$(PYTHON) setup.py rpm
+rpm: all
+	rpmbuild -ta dist/libvirt-python-$(shell tr -d '\n' < VERSION).tar.gz
