@@ -14,5 +14,8 @@ clean:
 check: all
 	tox -e py36
 
+test: all
+	tox
+
 rpm: all
 	rpmbuild -ta dist/libvirt-python-$(shell tr -d '\n' < VERSION).tar.gz
