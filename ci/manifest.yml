@@ -28,7 +28,7 @@ targets:
           expire_in: 2 days
           paths:
             - scratch
-            - build
+            - dist
 
   centos-stream-9:
     jobs:

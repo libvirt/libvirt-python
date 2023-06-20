@@ -45,7 +45,7 @@ x86_64-centos-stream-8-git-prebuilt-env:
     expire_in: 2 days
     paths:
       - scratch
-      - build
+      - dist
 
 x86_64-centos-stream-8-git-local-env:
   extends: .native_git_build_job_local_env
@@ -58,7 +58,7 @@ x86_64-centos-stream-8-git-local-env:
     expire_in: 2 days
     paths:
       - scratch
-      - build
+      - dist
 
 
 x86_64-centos-stream-9-prebuilt-env:
