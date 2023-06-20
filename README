@@ -26,30 +26,38 @@ Building and installing
 The module can be built by following the normal python module
 build process
 
-  python setup.py build
-  sudo python setup.py install
+  $ python3 -m build
 
-or to install as non-root
+for testing and distributing purposes or it can be installed directly via pip
+as
 
-  python setup.py build
-  python setup.py install --user
+  $ python3 -m pip install .
 
-If python-pytest is installed, you can test the package with
+without explicit building.
 
-  python setup.py test
+In order to test the package, you'll need either tox or at least pytest,
+depending on whether you want to test an already installed package in which
+case the latter is sufficient or if you wish to test in a virtual
+environment you'd need tox. Depending on your preferred setup, you can run the
+tests either as
 
-A makefile shim is provided so that you can do
+  $ python3 -m pytest
 
-  make && make check
+or as
 
-rather than directly invoking setup.py.
+  $ tox
+
+A makefile shim is also provided for your convenience, so that you don't have
+to care about the exact operations mentioned above and instead you simply do
+
+  $ make && make check
 
 As of libvirt 1.2.6, it is possible to develop against an uninstalled
 libvirt.git checkout, by setting PKG_CONFIG_PATH and LD_LIBRARY_PATH
 environment variables to point into that libvirt tree; you can even
 automate this by using libvirt's run script:
 
-  /path/to/libvirt/run python setup.py build
+  /path/to/libvirt/run python3 -m build
 
 Patches for this code should be submitted as merge requests to the
 project page on gitlab. See CONTRIBUTING.rst for more information.
