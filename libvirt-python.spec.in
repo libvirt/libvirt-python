@@ -70,7 +70,7 @@ exit 1
 %py3_install
 
 %check
-%{__python3} setup.py test
+%pytest
 
 %files -n python3-libvirt
 %doc ChangeLog AUTHORS README COPYING examples/
