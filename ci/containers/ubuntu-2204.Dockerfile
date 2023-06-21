@@ -23,7 +23,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
                       python3-lxml \
                       python3-pip \
                       python3-pytest \
-                      python3-setuptools && \
+                      python3-setuptools \
+                      python3-venv \
+                      python3-wheel && \
     eatmydata apt-get autoremove -y && \
     eatmydata apt-get autoclean -y && \
     sed -Ei 's,^# (en_US\.UTF-8 .*)$,\1,' /etc/locale.gen && \
@@ -32,6 +34,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     mkdir -p /usr/libexec/ccache-wrappers && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc && \
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
+
+RUN /usr/bin/pip3 install build
 
 ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
 ENV LANG "en_US.UTF-8"

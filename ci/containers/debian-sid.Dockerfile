@@ -19,11 +19,13 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
                       locales \
                       pkgconf \
                       python3 \
+                      python3-build \
                       python3-dev \
                       python3-lxml \
                       python3-pip \
                       python3-pytest \
-                      python3-setuptools && \
+                      python3-setuptools \
+                      python3-venv && \
     eatmydata apt-get autoremove -y && \
     eatmydata apt-get autoclean -y && \
     sed -Ei 's,^# (en_US\.UTF-8 .*)$,\1,' /etc/locale.gen && \

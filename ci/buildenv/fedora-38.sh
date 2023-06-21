@@ -15,6 +15,7 @@ function install_buildenv() {
         libvirt-devel \
         pkgconfig \
         python3 \
+        python3-build \
         python3-devel \
         python3-lxml \
         python3-pip \
