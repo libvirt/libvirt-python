@@ -87,6 +87,8 @@ def get_module_lists():
     ldflags = get_pkgconfig_data(["--libs-only-L"], "libvirt", False).split()
     cflags = get_pkgconfig_data(["--cflags"], "libvirt", False).split()
 
+    cflags += ["-Wp,-DPy_LIMITED_API=0x03060000"]
+
     module = Extension("libvirtmod",
                        sources=[
                             "libvirt-override.c",
