@@ -19,6 +19,8 @@
  *
  */
 
+#include <string.h>
+
 #include <Python.h>
 
 /* Ugly python defines that, which is also defined in errno.h */

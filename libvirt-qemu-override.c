@@ -14,6 +14,7 @@
    which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
 #undef HAVE_PTHREAD_H
 
+#include <stdio.h>
 #include <Python.h>
 #include <libvirt/libvirt-qemu.h>
 #include <libvirt/virterror.h>

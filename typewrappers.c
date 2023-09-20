@@ -12,6 +12,8 @@
  * which has over 180 autoconf-style HAVE_* definitions.  Shame on them.  */
 #undef HAVE_PTHREAD_H
 
+#include <stdio.h>
+#include <string.h>
 #include "typewrappers.h"
 #include "libvirt-utils.h"
 
