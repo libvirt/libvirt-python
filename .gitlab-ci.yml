@@ -30,6 +30,7 @@ stages:
     - $PYTHON -m pytest tests
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ;
       then
+          unset CFLAGS ;
           rpmbuild --clean --nodeps --define "_topdir $PWD/rpmbuild" -ta dist/libvirt-python*tar.gz ;
           mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
       fi
@@ -53,6 +54,7 @@ stages:
     - $PYTHON -m pytest tests
     - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ;
       then
+          unset CFLAGS ;
           rpmbuild --clean --nodeps --define "_topdir $PWD/rpmbuild" -ta dist/libvirt-python*tar.gz ;
           mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
       fi
