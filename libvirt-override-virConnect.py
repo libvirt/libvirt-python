@@ -299,6 +299,15 @@
         cb(self, virNetwork(self, _obj=net), event, detail, opaque)
         return 0
 
+    def _dispatchNetworkEventMetadataChangeCallback(self, dom: 'virNetwork', mtype: int, nsuri: str, cbData: Dict[str, Any]) -> int:
+        """Dispatches event to python user network metadata change event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virNetwork(self, _obj=dom), mtype, nsuri, opaque)
+        return 0
+
     def networkEventDeregisterAny(self, callbackID: int) -> None:
         """Removes a Network Event Callback. De-registering for a
            network callback will disable delivery of this event type"""

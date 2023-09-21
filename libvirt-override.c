@@ -7649,6 +7649,59 @@ libvirt_virConnectNetworkEventLifecycleCallback(virConnectPtr conn ATTRIBUTE_UNU
     return ret;
 }
 
+#ifdef VIR_NETWORK_EVENT_ID_METADATA_CHANGE
+static int
+libvirt_virConnectNetworkEventMetadataChangeCallback(virConnectPtr conn ATTRIBUTE_UNUSED,
+                                                     virNetworkPtr dom,
+                                                     int type,
+                                                     const char *nsuri,
+                                                     void *opaque)
+{
+    PyObject *pyobj_cbData = (PyObject*)opaque;
+    PyObject *pyobj_dom;
+    PyObject *pyobj_ret = NULL;
+    PyObject *pyobj_conn;
+    PyObject *dictKey;
+    int ret = -1;
+
+    LIBVIRT_ENSURE_THREAD_STATE;
+
+    if (!(dictKey = libvirt_constcharPtrWrap("conn")))
+        goto cleanup;
+    pyobj_conn = PyDict_GetItem(pyobj_cbData, dictKey);
+    Py_DECREF(dictKey);
+
+    /* Create a python instance of this virNetworkPtr */
+    virNetworkRef(dom);
+    if (!(pyobj_dom = libvirt_virNetworkPtrWrap(dom))) {
+        virNetworkFree(dom);
+        goto cleanup;
+    }
+    Py_INCREF(pyobj_cbData);
+
+    /* Call the Callback Dispatcher */
+    pyobj_ret = PyObject_CallMethod(pyobj_conn,
+                                    (char*)"_dispatchNetworkEventMetadataChangeCallback",
+                                    (char*)"OisO",
+                                    pyobj_dom, type, nsuri, pyobj_cbData);
+
+    Py_DECREF(pyobj_cbData);
+    Py_DECREF(pyobj_dom);
+
+ cleanup:
+    if (!pyobj_ret) {
+        DEBUG("%s - ret:%p\n", __FUNCTION__, pyobj_ret);
+        PyErr_Print();
+    } else {
+        Py_DECREF(pyobj_ret);
+        ret = 0;
+    }
+
+    LIBVIRT_RELEASE_THREAD_STATE;
+    return ret;
+}
+#endif /* VIR_NETWORK_EVENT_ID_METADATA_CHANGE */
+
 static PyObject *
 libvirt_virConnectNetworkEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
                                           PyObject *args)
@@ -7679,6 +7732,12 @@ libvirt_virConnectNetworkEventRegisterAny(PyObject *self ATTRIBUTE_UNUSED,
     case VIR_NETWORK_EVENT_ID_LIFECYCLE:
         cb = VIR_NETWORK_EVENT_CALLBACK(libvirt_virConnectNetworkEventLifecycleCallback);
         break;
+
+#ifdef VIR_NETWORK_EVENT_ID_METADATA_CHANGE
+    case VIR_NETWORK_EVENT_ID_METADATA_CHANGE:
+        cb = VIR_NETWORK_EVENT_CALLBACK(libvirt_virConnectNetworkEventMetadataChangeCallback);
+        break;
+#endif /* VIR_NETWORK_EVENT_ID_METADATA_CHANGE */
 
     case VIR_NETWORK_EVENT_ID_LAST:
         break;

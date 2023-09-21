@@ -664,6 +664,10 @@ def myNetworkEventLifecycleCallback(conn: libvirt.virConnect, net: libvirt.virNe
     print("myNetworkEventLifecycleCallback: Network %s %s %s" % (
         net.name(), NET_EVENTS[event], NET_EVENTS[event][detail]))
 
+def myNetworkEventMetadataChangeCallback(conn: libvirt.virConnect, dom: libvirt.virNetwork, mtype: int, nsuri: str, opaque: _T) -> None:
+    print("myNetworkEventMetadataChangeCallback: Network %s(%s) changed metadata mtype=%d nsuri=%s" % (
+        dom.name(), dom.ID(), mtype, nsuri))
+
 
 ##########################################################################
 # Storage pool events
@@ -806,6 +810,7 @@ def main() -> None:
 
     netcallbacks = [
         vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_LIFECYCLE, myNetworkEventLifecycleCallback, None),
+        vc.networkEventRegisterAny(None, libvirt.VIR_NETWORK_EVENT_ID_METADATA_CHANGE, myNetworkEventMetadataChangeCallback, None),
     ]
 
     poolcallbacks = [
