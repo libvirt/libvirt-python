@@ -204,7 +204,7 @@ class my_sdist(sdist):
     def gen_authors(self):
 
         authors = []
-        cmd = "git log --pretty=format:'%aN <%aE>'".split(" ")
+        cmd = ["git", "log", "--pretty=format:%aN <%aE>"]
         with subprocess.Popen(cmd,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL,
@@ -221,7 +221,7 @@ class my_sdist(sdist):
                           "\n".join(authors))
 
     def gen_changelog(self):
-        cmd = "git log '--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n'".split(" ")
+        cmd = ["git", "log", "--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n"]
         with open("ChangeLog", "w") as f_out, \
              subprocess.Popen(cmd,
                               stdout=subprocess.PIPE,
