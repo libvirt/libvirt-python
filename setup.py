@@ -50,7 +50,7 @@ def have_libvirt_lxc():
 def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
 
-    cmd = ["pkg-config"] + args + [f"{mod}"]
+    cmd = ["pkg-config"] + args + [mod]
     with subprocess.Popen(cmd,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT,
