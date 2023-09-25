@@ -51,13 +51,9 @@ def get_pkgconfig_data(args, mod, required=True):
     """Run pkg-config to and return content associated with it"""
 
     cmd = ["pkg-config"] + args + [mod]
-    with subprocess.Popen(cmd,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT,
-                          universal_newlines=True) as p:
-
-        line = p.stdout.readline()
-        if line is None or line == "":
+    output = subprocess.check_output(cmd, universal_newlines=True)
+    for line in output.splitlines():
+        if line == "":
             if required:
                 args_str = " ".join(args)
                 raise Exception(f"Cannot determine '{args_str}' from "
@@ -205,14 +201,11 @@ class my_sdist(sdist):
 
         authors = []
         cmd = ["git", "log", "--pretty=format:%aN <%aE>"]
-        with subprocess.Popen(cmd,
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.DEVNULL,
-                              universal_newlines=True) as p:
-            for line in p.stdout:
-                line = "   " + line.strip()
-                if line not in authors:
-                    authors.append(line)
+        output = subprocess.check_output(cmd, universal_newlines=True)
+        for line in output.splitlines():
+            line = "   " + line.strip()
+            if line not in authors:
+                authors.append(line)
 
         authors.sort(key=str.lower)
         self._gen_from_in("AUTHORS.in",
@@ -222,12 +215,9 @@ class my_sdist(sdist):
 
     def gen_changelog(self):
         cmd = ["git", "log", "--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n"]
-        with open("ChangeLog", "w") as f_out, \
-             subprocess.Popen(cmd,
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.DEVNULL,
-                              universal_newlines=True) as p:
-            for line in p.stdout:
+        with open("ChangeLog", "w") as f_out:
+            output = subprocess.check_output(cmd, universal_newlines=True)
+            for line in output.splitlines():
                 m = re.match(r"([a-f0-9]+):(\d+)\s(.*)", line)
                 if m:
                     t = time.gmtime(int(m.group(2)))
