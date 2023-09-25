@@ -199,15 +199,11 @@ class my_sdist(sdist):
 
     def gen_authors(self):
 
-        authors = []
         cmd = ["git", "log", "--pretty=format:%aN <%aE>"]
         output = subprocess.check_output(cmd, universal_newlines=True)
-        for line in output.splitlines():
-            line = "   " + line.strip()
-            if line not in authors:
-                authors.append(line)
-
-        authors.sort(key=str.lower)
+        git_authors = {line.strip() for line in output.splitlines()}
+        authors = sorted(git_authors, key=str.lower)
+        authors = ["   " + author for author in authors]
         self._gen_from_in("AUTHORS.in",
                           "AUTHORS",
                           "@AUTHORS@",
