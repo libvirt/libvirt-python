@@ -38,18 +38,12 @@ targets:
           paths:
             - libvirt-python-rpms
 
-  debian-12:
-    jobs:
-      - arch: x86_64
-        variables:
-          PIP_INSTALL: install --break-system-packages
+  debian-12: x86_64
 
   debian-sid:
     jobs:
       - arch: x86_64
         allow-failure: true
-        variables:
-          PIP_INSTALL: install --break-system-packages
 
   fedora-38:
     jobs:
