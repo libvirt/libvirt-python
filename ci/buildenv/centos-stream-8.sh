@@ -41,7 +41,6 @@ function install_buildenv() {
         python3-pytest \
         python3-setuptools \
         python3-wheel \
-        rpcgen \
         rpm-build
     rpm -qa | sort > /packages.txt
     mkdir -p /usr/libexec/ccache-wrappers

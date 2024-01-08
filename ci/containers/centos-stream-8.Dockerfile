@@ -42,7 +42,6 @@ RUN dnf distro-sync -y && \
         python3-pytest \
         python3-setuptools \
         python3-wheel \
-        rpcgen \
         rpm-build && \
     dnf autoremove -y && \
     dnf clean all -y && \
