@@ -15,18 +15,18 @@ function install_buildenv() {
            libvirt-devel \
            pkgconfig \
            python3-base \
+           python3-build \
            python3-devel \
            python3-lxml \
            python3-pip \
            python3-pytest \
            python3-setuptools \
-           python3-wheel \
            rpm-build
+    rm -f /usr/lib*/python3*/EXTERNALLY-MANAGED
     rpm -qa | sort > /packages.txt
     mkdir -p /usr/libexec/ccache-wrappers
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
-    /usr/bin/pip3 install build
 }
 
 export CCACHE_WRAPPERSDIR="/usr/libexec/ccache-wrappers"

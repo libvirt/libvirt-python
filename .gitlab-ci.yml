@@ -15,6 +15,8 @@ stages:
   export CFLAGS="-Werror"
 
 .native_git_build_job:
+  extends:
+    - .gitlab_native_build_job
   script:
     - *git_build_vars
     - pushd "$PWD"
@@ -36,17 +38,9 @@ stages:
           mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
       fi
 
-.native_git_build_job_prebuilt_env:
-  extends:
-    - .native_git_build_job
-    - .gitlab_native_build_job_prebuilt_env
-
-.native_git_build_job_local_env:
-  extends:
-    - .native_git_build_job
-    - .gitlab_native_build_job_local_env
-
 .native_build_job:
+  extends:
+    - .gitlab_native_build_job
   script:
     - export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     - export CFLAGS="-Werror"
@@ -61,19 +55,14 @@ stages:
           mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
       fi
 
-.native_build_job_prebuilt_env:
-  extends:
-    - .native_build_job
-    - .gitlab_native_build_job_prebuilt_env
-
-.native_build_job_local_env:
-  extends:
-    - .native_build_job
-    - .gitlab_native_build_job_local_env
-
 include: '/ci/gitlab.yml'
 
-.api_coverage_job:
+api_coverage_job:
+  extends:
+    - .gitlab_native_build_job
+  needs:
+    - job: x86_64-centos-stream-8-git
+      artifacts: true
   stage: sanity_checks
   script:
     - *git_build_vars
@@ -81,24 +70,6 @@ include: '/ci/gitlab.yml'
     - test-venv/bin/python -m pip install dist/libvirt_python*.whl
     - LIBVIRT_API_COVERAGE=1 test-venv/bin/python -m pytest tests
   allow_failure: true
-
-api_coverage_prebuilt_env:
-  extends:
-    - .gitlab_native_build_job_prebuilt_env
-    - .api_coverage_job
-  needs:
-    - job: x86_64-centos-stream-8-git-prebuilt-env
-      artifacts: true
   variables:
     NAME: centos-stream-8
-
-api_coverage_local_env:
-  extends:
-    - .gitlab_native_build_job_local_env
-    - .api_coverage_job
-  needs:
-    - job: x86_64-centos-stream-8-git-local-env
-      artifacts: true
-  variables:
-    IMAGE: quay.io/centos/centos:stream8
-    NAME: centos-stream-8
+    TARGET_BASE_IMAGE: quay.io/centos/centos:stream8
