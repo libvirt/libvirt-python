@@ -10150,11 +10150,14 @@ libvirt_virStreamRecvFlags(PyObject *self ATTRIBUTE_UNUSED,
     buf[ret > -1 ? ret : 0] = '\0';
     DEBUG("StreamRecvFlags ret=%d strlen=%zu\n", ret, strlen(buf));
 
-    if (ret == -2 || ret == -3)
-        return libvirt_intWrap(ret);
-    if (ret < 0)
-        return VIR_PY_NONE;
-    rv = libvirt_charPtrSizeWrap((char *) buf, (Py_ssize_t) ret);
+    if (ret == -2 || ret == -3) {
+        rv = libvirt_intWrap(ret);
+    } else if (ret < 0) {
+        rv = VIR_PY_NONE;
+    } else {
+        rv = libvirt_charPtrSizeWrap((char *) buf, (Py_ssize_t) ret);
+    }
+
     VIR_FREE(buf);
     return rv;
 }
