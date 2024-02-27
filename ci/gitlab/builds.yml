@@ -22,22 +22,6 @@ x86_64-centos-stream-8:
       - libvirt-python-rpms
 
 
-x86_64-centos-stream-8-git:
-  extends: .native_git_build_job
-  needs:
-    - job: x86_64-centos-stream-8-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: centos-stream-8
-    TARGET_BASE_IMAGE: quay.io/centos/centos:stream8
-  artifacts:
-    expire_in: 2 days
-    paths:
-      - scratch
-      - dist
-
-
 x86_64-centos-stream-9:
   extends: .native_build_job
   needs:
@@ -51,6 +35,22 @@ x86_64-centos-stream-9:
     expire_in: 1 hour
     paths:
       - libvirt-python-rpms
+
+
+x86_64-centos-stream-9-git:
+  extends: .native_git_build_job
+  needs:
+    - job: x86_64-centos-stream-9-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: centos-stream-9
+    TARGET_BASE_IMAGE: quay.io/centos/centos:stream9
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - scratch
+      - dist
 
 
 x86_64-debian-12:

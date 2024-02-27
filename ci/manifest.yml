@@ -9,6 +9,14 @@ gitlab:
 targets:
 
   centos-stream-8:
+    jobs:
+      - arch: x86_64
+        artifacts:
+          expire_in: 1 hour
+          paths:
+            - libvirt-python-rpms
+
+  centos-stream-9:
     projects:
       - libvirt-python
       - libvirt+minimal
@@ -30,13 +38,6 @@ targets:
             - scratch
             - dist
 
-  centos-stream-9:
-    jobs:
-      - arch: x86_64
-        artifacts:
-          expire_in: 1 hour
-          paths:
-            - libvirt-python-rpms
 
   debian-12: x86_64
 

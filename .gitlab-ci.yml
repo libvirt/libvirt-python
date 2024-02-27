@@ -61,7 +61,7 @@ api_coverage_job:
   extends:
     - .gitlab_native_build_job
   needs:
-    - job: x86_64-centos-stream-8-git
+    - job: x86_64-centos-stream-9-git
       artifacts: true
   stage: sanity_checks
   script:
@@ -71,5 +71,5 @@ api_coverage_job:
     - LIBVIRT_API_COVERAGE=1 test-venv/bin/python -m pytest tests
   allow_failure: true
   variables:
-    NAME: centos-stream-8
-    TARGET_BASE_IMAGE: quay.io/centos/centos:stream8
+    NAME: centos-stream-9
+    TARGET_BASE_IMAGE: quay.io/centos/centos:stream9

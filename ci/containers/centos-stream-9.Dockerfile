@@ -14,14 +14,29 @@ RUN dnf distro-sync -y && \
     dnf install -y \
         ca-certificates \
         ccache \
+        cpp \
         gcc \
+        gettext \
         git \
+        glib2-devel \
+        glibc-devel \
         glibc-langpack-en \
+        gnutls-devel \
+        libnl3-devel \
+        libtirpc-devel \
         libvirt-devel \
+        libxml2 \
+        libxml2-devel \
+        libxslt \
+        make \
+        meson \
+        ninja-build \
+        perl-base \
         pkgconfig \
         python3 \
         python3-build \
         python3-devel \
+        python3-docutils \
         python3-lxml \
         python3-pip \
         python3-pytest \
@@ -37,4 +52,6 @@ RUN dnf distro-sync -y && \
 
 ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
 ENV LANG "en_US.UTF-8"
+ENV MAKE "/usr/bin/make"
+ENV NINJA "/usr/bin/ninja"
 ENV PYTHON "/usr/bin/python3"
