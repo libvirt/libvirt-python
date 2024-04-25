@@ -12,11 +12,17 @@
     %define supported_platform 0
 %endif
 
+%if 0%{?rhel} || 0%{?fedora} < 42
+    %define dist_name %{name}
+%else
+    %define dist_name libvirt_python
+%endif
+
 Summary: The libvirt virtualization API python3 binding
 Name: libvirt-python
 Version: @VERSION@
 Release: 1%{?dist}
-Source0: https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
+Source0: https://libvirt.org/sources/python/%{dist_name}-%{version}.tar.gz
 Url: https://libvirt.org
 License: LGPL-2.1-or-later
 BuildRequires: libvirt-devel == %{version}
@@ -51,7 +57,7 @@ supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
 
 %prep
-%setup -q
+%setup -q -n %{dist_name}-%{version}
 
 # Unset execute bit for example scripts; it can introduce spurious
 # RPM dependencies, like /usr/bin/python3

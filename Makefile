@@ -19,4 +19,4 @@ test: all
 	tox
 
 rpm: all
-	rpmbuild -ta dist/libvirt-python-$(shell tr -d '\n' < VERSION).tar.gz
+	rpmbuild -ta dist/libvirt[-_]python-$(shell tr -d '\n' < VERSION).tar.gz
