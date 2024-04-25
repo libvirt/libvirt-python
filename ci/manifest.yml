@@ -11,6 +11,7 @@ targets:
   centos-stream-8:
     jobs:
       - arch: x86_64
+        template: .native_setuppy_build_job
         artifacts:
           expire_in: 1 hour
           paths:

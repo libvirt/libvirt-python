@@ -8,7 +8,7 @@
 # Native build jobs
 
 x86_64-centos-stream-8:
-  extends: .native_build_job
+  extends: .native_setuppy_build_job
   needs:
     - job: x86_64-centos-stream-8-container
       optional: true
