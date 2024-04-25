@@ -23,7 +23,8 @@ function install_buildenv() {
             python3-pip \
             python3-pytest \
             python3-setuptools \
-            python3-venv
+            python3-venv \
+            python3-wheel
     sed -Ei 's,^# (en_US\.UTF-8 .*)$,\1,' /etc/locale.gen
     dpkg-reconfigure locales
     rm -f /usr/lib*/python3*/EXTERNALLY-MANAGED

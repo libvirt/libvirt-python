@@ -41,6 +41,7 @@ RUN dnf distro-sync -y && \
         python3-pip \
         python3-pytest \
         python3-setuptools \
+        python3-wheel \
         rpm-build && \
     dnf autoremove -y && \
     dnf clean all -y && \

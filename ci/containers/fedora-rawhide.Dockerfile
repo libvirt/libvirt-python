@@ -33,6 +33,7 @@ exec "$@"\n' > /usr/bin/nosync && \
                python3-pip \
                python3-pytest \
                python3-setuptools \
+               python3-wheel \
                rpm-build && \
     nosync dnf autoremove -y && \
     nosync dnf clean all -y && \

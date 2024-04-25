@@ -22,6 +22,7 @@ RUN zypper dist-upgrade -y && \
            python3-pip \
            python3-pytest \
            python3-setuptools \
+           python3-wheel \
            rpm-build && \
     zypper clean --all && \
     rm -f /usr/lib*/python3*/EXTERNALLY-MANAGED && \
