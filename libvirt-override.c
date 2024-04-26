@@ -26,7 +26,7 @@
 #include <libvirt/virterror.h>
 #include <stddef.h>
 #include "typewrappers.h"
-#include "build/libvirt.h"
+#include "libvirt.h"
 #include "libvirt-utils.h"
 
 #ifndef __CYGWIN__
@@ -10930,7 +10930,7 @@ libvirt_virDomainFDAssociate(PyObject *self ATTRIBUTE_UNUSED,
  *									*
  ************************************************************************/
 static PyMethodDef libvirtMethods[] = {
-#include "build/libvirt-export.c.inc"
+#include "libvirt-export.c.inc"
     {(char *) "virGetVersion", libvirt_virGetVersion, METH_VARARGS, NULL},
     {(char *) "virConnectGetVersion", libvirt_virConnectGetVersion, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(1, 1, 3)

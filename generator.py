@@ -892,7 +892,7 @@ def emit_c_code(module: str) -> None:
     wrapper.write("#include <Python.h>\n")
     wrapper.write("#include <libvirt/%s.h>\n" % (module,))
     wrapper.write("#include \"typewrappers.h\"\n")
-    wrapper.write("#include \"%s/%s.h\"\n\n" % (buildDir, module))
+    wrapper.write("#include \"%s.h\"\n\n" % (module))
 
     for function in sorted(functions):
         if print_function_wrapper(package, function, wrapper, export, include):
