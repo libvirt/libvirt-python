@@ -304,7 +304,7 @@ py_types = {
 #######################################################################
 #
 #  This part writes the C <-> Python stubs libvirt.[ch] and
-#  the table libvirt-export.c to add when registering the Python module
+#  the table libvirt-export.c.inc to add when registering the Python module
 #
 #######################################################################
 
@@ -877,7 +877,7 @@ def emit_c_code(module: str) -> None:
     nb_wrap = 0
 
     header_file = "%s/%s.h" % (buildDir, module)
-    export_file = "%s/%s-export.c" % (buildDir, module)
+    export_file = "%s/%s-export.c.inc" % (buildDir, module)
     wrapper_file = "%s/%s.c" % (buildDir, module)
 
     include = open(header_file, "w")

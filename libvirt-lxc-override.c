@@ -94,7 +94,7 @@ libvirt_lxc_virDomainLxcOpenNamespace(PyObject *self ATTRIBUTE_UNUSED,
  *									*
  ************************************************************************/
 static PyMethodDef libvirtLxcMethods[] = {
-#include "build/libvirt-lxc-export.c"
+#include "build/libvirt-lxc-export.c.inc"
     {(char *) "virDomainLxcOpenNamespace", libvirt_lxc_virDomainLxcOpenNamespace, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
 };

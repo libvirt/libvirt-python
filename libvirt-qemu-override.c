@@ -447,7 +447,7 @@ libvirt_qemu_virDomainQemuMonitorCommandWithFiles(PyObject *self ATTRIBUTE_UNUSE
  *									*
  ************************************************************************/
 static PyMethodDef libvirtQemuMethods[] = {
-#include "build/libvirt-qemu-export.c"
+#include "build/libvirt-qemu-export.c.inc"
     {(char *) "virDomainQemuMonitorCommand", libvirt_qemu_virDomainQemuMonitorCommand, METH_VARARGS, NULL},
 #if LIBVIR_CHECK_VERSION(0, 10, 0)
     {(char *) "virDomainQemuAgentCommand", libvirt_qemu_virDomainQemuAgentCommand, METH_VARARGS, NULL},
