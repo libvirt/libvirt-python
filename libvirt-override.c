@@ -29,12 +29,6 @@
 #include "libvirt.h"
 #include "libvirt-utils.h"
 
-#ifndef __CYGWIN__
-extern PyObject *PyInit_libvirtmod(void);
-#else
-extern PyObject *PyInit_cygvirtmod(void);
-#endif
-
 #if 0
 # define DEBUG_ERROR 1
 #endif
@@ -11227,7 +11221,7 @@ static struct PyModuleDef moduledef = {
     NULL
 };
 
-PyObject *
+PyMODINIT_FUNC
 #ifndef __CYGWIN__
 PyInit_libvirtmod
 #else
