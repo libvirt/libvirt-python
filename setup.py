@@ -196,7 +196,7 @@ class my_sdist(sdist):
     def gen_rpm_spec(self):
         return self._gen_from_in("libvirt-python.spec.in",
                                  "libvirt-python.spec",
-                                 "@PY_VERSION@",
+                                 "@VERSION@",
                                  getVersion())
 
     def gen_authors(self):
