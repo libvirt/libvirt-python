@@ -118,7 +118,7 @@ class TestLibvirtAio(unittest.TestCase):
 
     @mock.patch('libvirt.virEventRegisterImpl',
                 side_effect=eventmock.virEventRegisterImplMock)
-    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10")
+    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10+")
     def testEventsPreInitImplicit(self, mock_event_register):
         # Register libvirt events before starting the asyncio loop.
         #
@@ -136,7 +136,7 @@ class TestLibvirtAio(unittest.TestCase):
 
     @mock.patch('libvirt.virEventRegisterImpl',
                 side_effect=eventmock.virEventRegisterImplMock)
-    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10")
+    @unittest.skipIf(sys.version_info >= (3,10), "test incompatible with 3.10+")
     def testEventsImplicitLoopInit(self, mock_event_register):
         # Register libvirt events before starting the asyncio loop.
         #
