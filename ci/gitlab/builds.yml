@@ -7,21 +7,6 @@
 
 # Native build jobs
 
-x86_64-centos-stream-8:
-  extends: .native_setuppy_build_job
-  needs:
-    - job: x86_64-centos-stream-8-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: centos-stream-8
-    TARGET_BASE_IMAGE: quay.io/centos/centos:stream8
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - libvirt-python-rpms
-
-
 x86_64-centos-stream-9:
   extends: .native_build_job
   needs:
@@ -75,21 +60,6 @@ x86_64-debian-sid:
     TARGET_BASE_IMAGE: docker.io/library/debian:sid-slim
 
 
-x86_64-fedora-38:
-  extends: .native_build_job
-  needs:
-    - job: x86_64-fedora-38-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: fedora-38
-    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:38
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - libvirt-python-rpms
-
-
 x86_64-fedora-39:
   extends: .native_build_job
   needs:
@@ -99,6 +69,21 @@ x86_64-fedora-39:
   variables:
     NAME: fedora-39
     TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:39
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
+
+
+x86_64-fedora-40:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-fedora-40-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: fedora-40
+    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:40
   artifacts:
     expire_in: 1 hour
     paths:
@@ -140,17 +125,6 @@ x86_64-opensuse-tumbleweed:
     TARGET_BASE_IMAGE: registry.opensuse.org/opensuse/tumbleweed:latest
 
 
-x86_64-ubuntu-2004:
-  extends: .native_build_job
-  needs:
-    - job: x86_64-ubuntu-2004-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: ubuntu-2004
-    TARGET_BASE_IMAGE: docker.io/library/ubuntu:20.04
-
-
 x86_64-ubuntu-2204:
   extends: .native_build_job
   needs:
@@ -160,3 +134,14 @@ x86_64-ubuntu-2204:
   variables:
     NAME: ubuntu-2204
     TARGET_BASE_IMAGE: docker.io/library/ubuntu:22.04
+
+
+x86_64-ubuntu-2404:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-ubuntu-2404-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: ubuntu-2404
+    TARGET_BASE_IMAGE: docker.io/library/ubuntu:24.04

@@ -55,24 +55,6 @@ stages:
           mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
       fi
 
-.native_setuppy_build_job:
-  extends:
-    - .gitlab_native_build_job
-  script:
-    - export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
-    - export CFLAGS="-Werror"
-    - $PYTHON setup.py bdist_wheel
-    - $PYTHON setup.py sdist
-    - $PYTHON -m venv test-venv --system-site-packages --symlinks
-    - test-venv/bin/python -m pip install dist/libvirt_python*.whl
-    - test-venv/bin/python -m pytest tests
-    - if test -x /usr/bin/rpmbuild && test "$RPM" != "skip" ;
-      then
-          unset CFLAGS ;
-          rpmbuild --clean --nodeps --define "_topdir $PWD/rpmbuild" -ta dist/libvirt-python*tar.gz ;
-          mv rpmbuild/RPMS/x86_64/ libvirt-python-rpms ;
-      fi
-
 include: '/ci/gitlab.yml'
 
 api_coverage_job:

@@ -8,15 +8,6 @@ gitlab:
 
 targets:
 
-  centos-stream-8:
-    jobs:
-      - arch: x86_64
-        template: .native_setuppy_build_job
-        artifacts:
-          expire_in: 1 hour
-          paths:
-            - libvirt-python-rpms
-
   centos-stream-9:
     projects:
       - libvirt-python
@@ -47,7 +38,7 @@ targets:
       - arch: x86_64
         allow-failure: true
 
-  fedora-38:
+  fedora-39:
     jobs:
       - arch: x86_64
         artifacts:
@@ -55,7 +46,7 @@ targets:
           paths:
             - libvirt-python-rpms
 
-  fedora-39:
+  fedora-40:
     jobs:
       - arch: x86_64
         artifacts:
@@ -81,6 +72,6 @@ targets:
         variables:
           RPM: skip
 
-  ubuntu-2004: x86_64
-
   ubuntu-2204: x86_64
+
+  ubuntu-2404: x86_64

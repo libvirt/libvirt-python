@@ -17,6 +17,7 @@ function install_buildenv() {
             locales \
             pkgconf \
             python3 \
+            python3-build \
             python3-dev \
             python3-lxml \
             python3-pip \
@@ -31,7 +32,6 @@ function install_buildenv() {
     mkdir -p /usr/libexec/ccache-wrappers
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/cc
     ln -s /usr/bin/ccache /usr/libexec/ccache-wrappers/gcc
-    /usr/bin/pip3 install build
 }
 
 export CCACHE_WRAPPERSDIR="/usr/libexec/ccache-wrappers"

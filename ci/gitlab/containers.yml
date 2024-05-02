@@ -7,13 +7,6 @@
 
 # Native container jobs
 
-x86_64-centos-stream-8-container:
-  extends: .container_job
-  allow_failure: false
-  variables:
-    NAME: centos-stream-8
-
-
 x86_64-centos-stream-9-container:
   extends: .container_job
   allow_failure: false
@@ -35,18 +28,18 @@ x86_64-debian-sid-container:
     NAME: debian-sid
 
 
-x86_64-fedora-38-container:
-  extends: .container_job
-  allow_failure: false
-  variables:
-    NAME: fedora-38
-
-
 x86_64-fedora-39-container:
   extends: .container_job
   allow_failure: false
   variables:
     NAME: fedora-39
+
+
+x86_64-fedora-40-container:
+  extends: .container_job
+  allow_failure: false
+  variables:
+    NAME: fedora-40
 
 
 x86_64-fedora-rawhide-container:
@@ -70,15 +63,15 @@ x86_64-opensuse-tumbleweed-container:
     NAME: opensuse-tumbleweed
 
 
-x86_64-ubuntu-2004-container:
-  extends: .container_job
-  allow_failure: false
-  variables:
-    NAME: ubuntu-2004
-
-
 x86_64-ubuntu-2204-container:
   extends: .container_job
   allow_failure: false
   variables:
     NAME: ubuntu-2204
+
+
+x86_64-ubuntu-2404-container:
+  extends: .container_job
+  allow_failure: false
+  variables:
+    NAME: ubuntu-2404
