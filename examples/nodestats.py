@@ -90,6 +90,6 @@ for dom, v in domsStrictCfg.items():
         if k == "memory":
             continue
         toPrint = "\tNode %s:\t%d MiB" % (k, node["size"] // 1024)
-        if node["pin"] is not None and node["pin"] == "":
+        if node["pin"] is not None and node["pin"] != "":
             toPrint = toPrint + " nodes %s" % node["pin"]
         print(toPrint)
