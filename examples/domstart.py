@@ -27,7 +27,7 @@ parser = ArgumentParser(description=__doc__)
 parser.add_argument("file", metavar="DOMAIN.XML", help="XML configuration of the domain in libvirt's XML format")
 args = parser.parse_args()
 
-(name, xmldesc) = read_domain(args.file)
+name, xmldesc = read_domain(args.file)
 
 try:
     conn = libvirt.open(None)
