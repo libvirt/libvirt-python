@@ -1,6 +1,6 @@
 projects:
   - libvirt-python
-  - libvirt+dist
+  - https://gitlab.com/libvirt/libvirt/-/raw/master/ci/lcitool/projects/libvirt+dist.yml
 
 gitlab:
   namespace: libvirt
@@ -11,8 +11,8 @@ targets:
   centos-stream-9:
     projects:
       - libvirt-python
-      - libvirt+minimal
-      - libvirt+dist
+      - https://gitlab.com/libvirt/libvirt/-/raw/master/ci/lcitool/projects/libvirt+minimal.yml
+      - https://gitlab.com/libvirt/libvirt/-/raw/master/ci/lcitool/projects/libvirt+dist.yml
 
     jobs:
       - arch: x86_64
