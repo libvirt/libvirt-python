@@ -35,7 +35,7 @@
       fi
     - cat /packages.txt
   variables:
-    IMAGE: $CI_REGISTRY/$RUN_UPSTREAM_NAMESPACE/libvirt-python/ci-$NAME:latest
+    IMAGE: $CI_REGISTRY/$CONTAINER_UPSTREAM_NAMESPACE/libvirt-python/ci-$NAME:latest
   rules:
     ### PUSH events
 
