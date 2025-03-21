@@ -866,5 +866,10 @@
       <arg name='params' type='virTypedParameterPtr' info='pointer to save parameter objects'/>
       <arg name='flags'  type='int' info='an OR&apos;ed set of virDomainSaveRestoreFlags'/>
     </function>
+    <function name='virDomainGetAutostartOnce' file='python'>
+      <info>Provides a boolean value indicating whether the domain is configured to be automatically started the next time the host machine boots only.</info>
+      <return type='int' info='the autostart flag, or None in case of error'/>
+      <arg name='domain' type='virDomainPtr' info='a network object'/>
+    </function>
   </symbols>
 </api>

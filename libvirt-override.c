@@ -10913,6 +10913,32 @@ libvirt_virDomainFDAssociate(PyObject *self ATTRIBUTE_UNUSED,
 #endif /* LIBVIR_CHECK_VERSION(9, 0, 0) */
 
 
+#if LIBVIR_CHECK_VERSION(11, 2, 0)
+static PyObject *
+libvirt_virDomainGetAutostartOnce(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
+    int c_retval, autostart;
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+
+    if (!PyArg_ParseTuple(args, (char *)"O:virDomainGetAutostartOnce",
+                          &pyobj_domain))
+        return NULL;
+
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainGetAutostartOnce(domain, &autostart);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    if (c_retval < 0)
+        return VIR_PY_INT_FAIL;
+
+    return libvirt_intWrap(autostart);
+}
+#endif /* LIBVIR_CHECK_VERSION(11, 2, 0) */
+
 
 /************************************************************************
  *									*
@@ -11198,6 +11224,9 @@ static PyMethodDef libvirtMethods[] = {
 #if LIBVIR_CHECK_VERSION(9, 0, 0)
     {(char *) "virDomainFDAssociate", libvirt_virDomainFDAssociate, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(9, 0, 0) */
+#if LIBVIR_CHECK_VERSION(11, 2, 0)
+    {(char *) "virDomainGetAutostartOnce", libvirt_virDomainGetAutostartOnce, METH_VARARGS, NULL},
+#endif /* LIBVIR_CHECK_VERSION(11, 2, 0) */
     {NULL, NULL, 0, NULL}
 };
 

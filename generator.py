@@ -440,6 +440,7 @@ skip_impl = {
     'virNodeDeviceGetAutostart',
     'virDomainSaveParams',
     'virDomainRestoreParams',
+    'virDomainGetAutostartOnce',
 
     'virDomainLxcOpenNamespace',
 
