@@ -5040,78 +5040,74 @@ libvirt_virDomainGetBlockJobInfo(PyObject *self ATTRIBUTE_UNUSED,
     return NULL;
 }
 
+static virPyTypedParamsHint virPyDomainSetBlockIoTuneParams[] = {
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_BYTES_SEC, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_BYTES_SEC, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_BYTES_SEC, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_IOPS_SEC, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_IOPS_SEC, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_IOPS_SEC, VIR_TYPED_PARAM_ULLONG },
+#if LIBVIR_CHECK_VERSION(1, 2, 11)
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_BYTES_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_BYTES_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_BYTES_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_IOPS_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_IOPS_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_IOPS_SEC_MAX, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_SIZE_IOPS_SEC, VIR_TYPED_PARAM_ULLONG },
+#endif /* LIBVIR_CHECK_VERSION(1, 2, 11)  */
+#if LIBVIR_CHECK_VERSION(2, 4, 0)
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_BYTES_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_BYTES_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_BYTES_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_IOPS_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_READ_IOPS_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+    { VIR_DOMAIN_BLOCK_IOTUNE_WRITE_IOPS_SEC_MAX_LENGTH, VIR_TYPED_PARAM_ULLONG },
+#endif /* LIBVIR_CHECK_VERSION(2, 4, 0)  */
+#if LIBVIR_CHECK_VERSION(3, 0, 0)
+    { VIR_DOMAIN_BLOCK_IOTUNE_GROUP_NAME, VIR_TYPED_PARAM_STRING },
+#endif /* LIBVIR_CHECK_VERSION(3, 0, 0) */
+};
+
+
 static PyObject *
 libvirt_virDomainSetBlockIoTune(PyObject *self ATTRIBUTE_UNUSED,
                                 PyObject *args)
 {
     virDomainPtr domain;
-    PyObject *pyobj_domain, *info;
-    PyObject *ret = NULL;
-    int i_retval;
+    PyObject *pyobj_domain = NULL;
+    PyObject *pyobj_dict = NULL;
+    virTypedParameterPtr params = NULL;
     int nparams = 0;
-    Py_ssize_t size = 0;
+    int c_retval;
     const char *disk;
     unsigned int flags;
-    virTypedParameterPtr params = NULL, new_params = NULL;
 
     if (!PyArg_ParseTuple(args, (char *)"OzOI:virDomainSetBlockIoTune",
-                          &pyobj_domain, &disk, &info, &flags))
-        return NULL;
-    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
-
-    if ((size = PyDict_Size(info)) < 0)
+                          &pyobj_domain, &disk, &pyobj_dict, &flags))
         return NULL;
 
-    if (size == 0) {
-        PyErr_Format(PyExc_LookupError,
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSetBlockIoTuneParams,
+                                   VIR_N_ELEMENTS(virPyDomainSetBlockIoTuneParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError,
                      "Need non-empty dictionary to set attributes");
         return NULL;
     }
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
 
     LIBVIRT_BEGIN_ALLOW_THREADS;
-    i_retval = virDomainGetBlockIoTune(domain, disk, NULL, &nparams, flags);
+    c_retval = virDomainSetBlockIoTune(domain, disk, params, nparams, flags);
     LIBVIRT_END_ALLOW_THREADS;
 
-    if (i_retval < 0)
-        return VIR_PY_INT_FAIL;
-
-    if (nparams == 0) {
-        PyErr_Format(PyExc_LookupError,
-                     "Domain has no settable attributes");
-        return NULL;
-    }
-
-    if (VIR_ALLOC_N(params, nparams) < 0)
-        return PyErr_NoMemory();
-
-    LIBVIRT_BEGIN_ALLOW_THREADS;
-    i_retval = virDomainGetBlockIoTune(domain, disk, params, &nparams, flags);
-    LIBVIRT_END_ALLOW_THREADS;
-
-    if (i_retval < 0) {
-        ret = VIR_PY_INT_FAIL;
-        goto cleanup;
-    }
-
-    new_params = setPyVirTypedParameter(info, params, nparams);
-    if (!new_params)
-        goto cleanup;
-
-    LIBVIRT_BEGIN_ALLOW_THREADS;
-    i_retval = virDomainSetBlockIoTune(domain, disk, new_params, size, flags);
-    LIBVIRT_END_ALLOW_THREADS;
-
-    if (i_retval < 0) {
-        ret = VIR_PY_INT_FAIL;
-        goto cleanup;
-    }
-
-    ret = VIR_PY_INT_SUCCESS;
-
- cleanup:
     virTypedParamsFree(params, nparams);
-    virTypedParamsFree(new_params, size);
-    return ret;
+
+    return libvirt_intWrap(c_retval);
 }
 
 static PyObject *
