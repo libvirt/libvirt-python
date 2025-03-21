@@ -441,6 +441,7 @@ skip_impl = {
     'virDomainSaveParams',
     'virDomainRestoreParams',
     'virDomainGetAutostartOnce',
+    'virDomainSetThrottleGroup',
 
     'virDomainLxcOpenNamespace',
 

@@ -10937,6 +10937,46 @@ libvirt_virDomainGetAutostartOnce(PyObject *self ATTRIBUTE_UNUSED,
 
     return libvirt_intWrap(autostart);
 }
+
+static PyObject *
+libvirt_virDomainSetThrottleGroup(PyObject *self ATTRIBUTE_UNUSED,
+                                  PyObject *args)
+{
+    virDomainPtr domain;
+    PyObject *pyobj_domain;
+    const char *group = NULL;
+    PyObject *pyobj_dict = NULL;
+    virTypedParameterPtr params = NULL;
+    int nparams = 0;
+    unsigned int flags = 0;
+    int c_retval;
+
+    if (!PyArg_ParseTuple(args, (char *)"OsO|I:virDomainSetThrottleGroup",
+                          &pyobj_domain, &group, &pyobj_dict, &flags))
+        return NULL;
+
+    domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
+
+    if (PyDict_Check(pyobj_dict)) {
+        if (virPyDictToTypedParams(pyobj_dict, &params, &nparams,
+                                   virPyDomainSetBlockIoTuneParams,
+                                   VIR_N_ELEMENTS(virPyDomainSetBlockIoTuneParams)) < 0) {
+            return NULL;
+        }
+    } else {
+        PyErr_Format(PyExc_TypeError, "Restore params must be a dictionary");
+        return NULL;
+    }
+
+
+    LIBVIRT_BEGIN_ALLOW_THREADS;
+    c_retval = virDomainSetThrottleGroup(domain, group, params, nparams, flags);
+    LIBVIRT_END_ALLOW_THREADS;
+
+    virTypedParamsFree(params, nparams);
+
+    return libvirt_intWrap(c_retval);
+}
 #endif /* LIBVIR_CHECK_VERSION(11, 2, 0) */
 
 
@@ -11226,6 +11266,7 @@ static PyMethodDef libvirtMethods[] = {
 #endif /* LIBVIR_CHECK_VERSION(9, 0, 0) */
 #if LIBVIR_CHECK_VERSION(11, 2, 0)
     {(char *) "virDomainGetAutostartOnce", libvirt_virDomainGetAutostartOnce, METH_VARARGS, NULL},
+    {(char *) "virDomainSetThrottleGroup", libvirt_virDomainSetThrottleGroup, METH_VARARGS, NULL},
 #endif /* LIBVIR_CHECK_VERSION(11, 2, 0) */
     {NULL, NULL, 0, NULL}
 };
