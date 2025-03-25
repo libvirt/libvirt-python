@@ -648,6 +648,10 @@ def myDomainEventMemoryDeviceSizeChangeCallback(conn: libvirt.virConnect, dom: l
     print("myDomainEventMemoryDeviceSizeChangeCallback: Domain %s(%s) memory device size change alias %s size %d" % (
         dom.name(), dom.ID(), alias, size))
 
+def myDomainEventNICMACChangeCallback(conn: libvirt.virConnect, dom: libvirt.virDomain, alias: str, oldMAC: str, newMAC: str, opaque: _T) -> None:
+    print("myDomainEventNICMACChangeCallback: Domain %s(%s) NIC MAC change alias %s old MAC: %s new MAC: %s" % (
+        dom.name(), dom.ID(), alias, oldMAC, newMAC))
+
 
 ##########################################################################
 # Network events
@@ -806,6 +810,7 @@ def main() -> None:
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, myDomainEventBlockThresholdCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE, myDomainEventMemoryFailureCallback, None),
         vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE, myDomainEventMemoryDeviceSizeChangeCallback, None),
+        vc.domainEventRegisterAny(None, libvirt.VIR_DOMAIN_EVENT_ID_NIC_MAC_CHANGE, myDomainEventNICMACChangeCallback, None),
     ]
 
     netcallbacks = [

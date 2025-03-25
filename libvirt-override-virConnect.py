@@ -279,6 +279,15 @@
         cb(self, virDomain(self, _obj=dom), alias, size, opaque)
         return 0
 
+    def _dispatchDomainEventNICMACChangeCallback(self, dom: 'virDomain', alias: str, oldMAC: str, newMAC: str, cbData: Dict[str, Any]) -> int:
+        """Dispatches event to python user domain NIC MAC change event callbacks
+        """
+        cb = cbData["cb"]
+        opaque = cbData["opaque"]
+
+        cb(self, virDomain(self, _obj=dom), alias, oldMAC, newMAC, opaque)
+        return 0
+
     def domainEventDeregisterAny(self, callbackID: int) -> None:
         """Removes a Domain Event Callback. De-registering for a
            domain callback will disable delivery of this event type """
