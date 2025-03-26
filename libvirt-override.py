@@ -91,7 +91,7 @@ def registerErrorHandler(f: Callable[[_T, List], None], ctx: _T) -> int:
 
 
 def openAuth(uri: str, auth: List, flags: int = 0) -> 'virConnect':
-    # TODO: The C code rquires a List and there is not *Mutable*Tuple for a better description such as
+    # TODO: The C code requires a List and there is not *Mutable*Tuple for a better description such as
     # auth: Tuple[List[int], Callable[[List[MutableTuple[int, str, str, str, Any]], _T], int], _T]
     """
     This function should be called first to get a connection to the
