@@ -26,23 +26,18 @@ host = caps.getElementsByTagName('host')[0]
 cells = host.getElementsByTagName('cells')[0]
 total_cpus = cells.getElementsByTagName('cpu').length
 
-socketIds = []
-siblingsIds = []
-
-socketIds = [
+socketIds = {
     proc.getAttribute('socket_id')
     for proc in cells.getElementsByTagName('cpu')
-    if proc.getAttribute('socket_id') not in socketIds
-]
+}
 
-siblingsIds = [
+siblingsIds = {
     proc.getAttribute('siblings')
     for proc in cells.getElementsByTagName('cpu')
-    if proc.getAttribute('siblings') not in siblingsIds
-]
+}
 
 print("Host topology")
 print("NUMA nodes:", cells.getAttribute('num'))
-print("   Sockets:", len(set(socketIds)))
-print("     Cores:", len(set(siblingsIds)))
+print("   Sockets:", len(socketIds))
+print("     Cores:", len(siblingsIds))
 print("   Threads:", total_cpus)
