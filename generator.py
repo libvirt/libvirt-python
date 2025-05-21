@@ -1794,8 +1794,8 @@ if validate_functions() < 0:
     sys.exit(1)
 
 quiet = False
-if not os.path.exists("build"):
-    os.mkdir("build")
+if not os.path.exists(buildDir):
+    os.mkdir(buildDir)
 
 output = None
 if len(sys.argv) >= 4:
