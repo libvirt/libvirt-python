@@ -60,21 +60,6 @@ x86_64-debian-sid:
     TARGET_BASE_IMAGE: docker.io/library/debian:sid-slim
 
 
-x86_64-fedora-40:
-  extends: .native_build_job
-  needs:
-    - job: x86_64-fedora-40-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: fedora-40
-    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:40
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - libvirt-python-rpms
-
-
 x86_64-fedora-41:
   extends: .native_build_job
   needs:
@@ -84,6 +69,21 @@ x86_64-fedora-41:
   variables:
     NAME: fedora-41
     TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:41
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
+
+
+x86_64-fedora-42:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-fedora-42-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: fedora-42
+    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:42
   artifacts:
     expire_in: 1 hour
     paths:

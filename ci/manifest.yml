@@ -38,7 +38,7 @@ targets:
       - arch: x86_64
         allow-failure: true
 
-  fedora-40:
+  fedora-41:
     jobs:
       - arch: x86_64
         artifacts:
@@ -46,7 +46,7 @@ targets:
           paths:
             - libvirt-python-rpms
 
-  fedora-41:
+  fedora-42:
     jobs:
       - arch: x86_64
         artifacts:

@@ -33,6 +33,6 @@ RUN zypper update -y && \
 
 RUN /usr/bin/pip3 install build
 
-ENV CCACHE_WRAPPERSDIR "/usr/libexec/ccache-wrappers"
-ENV LANG "en_US.UTF-8"
-ENV PYTHON "/usr/bin/python3"
+ENV CCACHE_WRAPPERSDIR="/usr/libexec/ccache-wrappers"
+ENV LANG="en_US.UTF-8"
+ENV PYTHON="/usr/bin/python3"
