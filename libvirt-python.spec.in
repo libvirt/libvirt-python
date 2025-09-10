@@ -12,11 +12,7 @@
     %define supported_platform 0
 %endif
 
-%if 0%{?rhel} || 0%{?fedora} < 42
-    %define dist_name %{name}
-%else
-    %define dist_name libvirt_python
-%endif
+%define dist_name @DIST_NAME@
 
 Summary: The libvirt virtualization API python3 binding
 Name: libvirt-python

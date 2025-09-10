@@ -197,9 +197,13 @@ class my_sdist(sdist):
                 f_out.write(line)
 
     def gen_rpm_spec(self):
+        full_name = self.distribution.get_fullname()
+        dist_name = full_name[:full_name.rfind("-")]
+
         return self._gen_from_in("libvirt-python.spec.in",
                                  "libvirt-python.spec",
-                                 {"@VERSION@": getVersion()})
+                                 {"@VERSION@": getVersion(),
+                                  "@DIST_NAME@": dist_name})
 
     def gen_authors(self):
 
