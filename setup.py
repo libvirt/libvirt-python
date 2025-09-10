@@ -189,16 +189,17 @@ class my_sdist(sdist):
         sdist.finalize_options(self)
 
     @staticmethod
-    def _gen_from_in(file_in, file_out, replace_pattern, replace):
+    def _gen_from_in(file_in, file_out, replacements):
         with open(file_in) as f_in, open(file_out, "w") as f_out:
             for line in f_in:
-                f_out.write(line.replace(replace_pattern, replace))
+                for pattern, replace in replacements.items():
+                    line = line.replace(pattern, replace)
+                f_out.write(line)
 
     def gen_rpm_spec(self):
         return self._gen_from_in("libvirt-python.spec.in",
                                  "libvirt-python.spec",
-                                 "@VERSION@",
-                                 getVersion())
+                                 {"@VERSION@": getVersion()})
 
     def gen_authors(self):
 
@@ -209,8 +210,7 @@ class my_sdist(sdist):
         authors = ["   " + author for author in authors]
         self._gen_from_in("AUTHORS.in",
                           "AUTHORS",
-                          "@AUTHORS@",
-                          "\n".join(authors))
+                          {"@AUTHORS@": "\n".join(authors)})
 
     def gen_changelog(self):
         cmd = ["git", "log", "--pretty=format:%H:%ct %an <%ae>%n%n%s%n%b%n"]
