@@ -53,7 +53,7 @@ def check_console(console: Console) -> bool:
 
 def stdin_callback(watch: int, fd: int, events: int, console: Console) -> None:
     readbuf = os.read(fd, 1024)
-    if readbuf.startswith(b""):
+    if readbuf.startswith(b"\x1d"):
         console.run_console = False
         return
     if console.stream:
