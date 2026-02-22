@@ -30,6 +30,13 @@ targets:
             - scratch
             - dist
 
+  centos-stream-10:
+    jobs:
+      - arch: x86_64
+        artifacts:
+          expire_in: 1 hour
+          paths:
+            - libvirt-python-rpms
 
   debian-12: x86_64
 

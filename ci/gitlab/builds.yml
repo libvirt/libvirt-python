@@ -38,6 +38,21 @@ x86_64-centos-stream-9-git:
       - dist
 
 
+x86_64-centos-stream-10:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-centos-stream-10-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: centos-stream-10
+    TARGET_BASE_IMAGE: quay.io/centos/centos:stream10
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
+
+
 x86_64-debian-12:
   extends: .native_build_job
   needs:
