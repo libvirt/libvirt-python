@@ -418,7 +418,7 @@ class virEventAsyncIOImpl(object):
         callback.close()
         return 0
 
-    def _add_timeout(self, timeout: int, cb: libvirt._TimerCB, opaque: _T) -> int:
+    def _add_timeout(self, timeout: int, cb: libvirt._TimerCB[_T], opaque: _T) -> int:
         '''Register a callback for a timer event
 
         :param int timeout: the timeout to monitor

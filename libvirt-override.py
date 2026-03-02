@@ -3,11 +3,11 @@ from types import TracebackType
 from typing import Any, Callable, Dict, List, Optional, overload, Tuple, Type, TypeVar, Union
 _T = TypeVar('_T')
 _EventCB = Callable[[int, int, int, _T], None]
-_EventAddHandleFunc = Callable[[int, int, _EventCB, _T], int]
+_EventAddHandleFunc = Callable[[int, int, _EventCB[_T], _T], int]
 _EventUpdateHandleFunc = Callable[[int, int], None]
 _EventRemoveHandleFunc = Callable[[int], int]
 _TimerCB = Callable[[int, _T], None]
-_EventAddTimeoutFunc = Callable[[int, _TimerCB, _T], int]
+_EventAddTimeoutFunc = Callable[[int, _TimerCB[_T], _T], int]
 _EventUpdateTimeoutFunc = Callable[[int, int], None]
 _EventRemoveTimeoutFunc = Callable[[int], int]
 _DomainCB = Callable[['virConnect', 'virDomain', int, int, _T], Optional[int]]
@@ -15,6 +15,7 @@ _BlkioParameter = Dict[str, Any]
 _MemoryParameter = Dict[str, Any]
 _SchedParameter = Dict[str, Any]
 _TypedParameter = Dict[str, Any]
+_RawError = Tuple[int, int, str, int, str, Optional[str], Optional[str], int, int]
 
 
 # The root of all libvirt errors.
@@ -23,7 +24,7 @@ class libvirtError(Exception):
 
         # Never call virConnGetLastError().
         # virGetLastError() is now thread local
-        err = libvirtmod.virGetLastError()  # type: Optional[Tuple[int, int, str, int, str, Optional[str], Optional[str], int, int]]
+        err = libvirtmod.virGetLastError()  # type: Optional[_RawError]
         if err is None:
             msg = defmsg
         else:
@@ -82,7 +83,7 @@ class libvirtError(Exception):
 #
 # register the libvirt global error handler
 #
-def registerErrorHandler(f: Callable[[_T, List], None], ctx: _T) -> int:
+def registerErrorHandler(f: Callable[[_T, _RawError], None], ctx: _T) -> int:
     """Register a Python function for error reporting.
        The function is called back as f(ctx, error), with error
        being a list of information about the error being raised.
@@ -153,10 +154,10 @@ def getVersion(name: Optional[str] = None) -> int:
 # Invoke an EventHandle callback
 #
 @overload
-def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Tuple[_EventCB, _T], opaquecompat: None = None) -> None: ...  # noqa E704
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Tuple[_EventCB[_T], _T], opaquecompat: None = None) -> None: ...  # noqa E704
 @overload  # noqa F811
-def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: _EventCB, opaquecompat: _T = None) -> None: ...  # noqa E704
-def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Union[Tuple[_EventCB, _T], _EventCB], opaquecompat: Optional[_T] = None) -> None:  # noqa F811
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: _EventCB[_T], opaquecompat: _T = None) -> None: ...  # noqa E704
+def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Union[Tuple[_EventCB[_T], _T], _EventCB[_T]], opaquecompat: Optional[_T] = None) -> None:  # noqa F811
     """
     Invoke the Event Impl Handle Callback in C
     """
@@ -178,7 +179,7 @@ def _eventInvokeHandleCallback(watch: int, fd: int, event: int, opaque: Union[Tu
 #
 # Invoke an EventTimeout callback
 #
-def _eventInvokeTimeoutCallback(timer: int, opaque: Union[Tuple[_TimerCB, _T], _TimerCB], opaquecompat: Optional[_T] = None) -> None:
+def _eventInvokeTimeoutCallback(timer: int, opaque: Union[Tuple[_TimerCB[_T], _T], _TimerCB[_T]], opaquecompat: Optional[_T] = None) -> None:
     """
     Invoke the Event Impl Timeout Callback in C
     """
@@ -213,7 +214,7 @@ def _dispatchEventTimeoutCallback(timer: int, cbData: Dict[str, Any]) -> int:
     return 0
 
 
-def virEventAddHandle(fd: int, events: int, cb: _EventCB, opaque: _T) -> int:
+def virEventAddHandle(fd: int, events: int, cb: _EventCB[_T], opaque: _T) -> int:
     """
     register a callback for monitoring file handle events
 
@@ -235,7 +236,7 @@ def virEventAddHandle(fd: int, events: int, cb: _EventCB, opaque: _T) -> int:
     return ret
 
 
-def virEventAddTimeout(timeout: int, cb: _TimerCB, opaque: _T) -> int:
+def virEventAddTimeout(timeout: int, cb: _TimerCB[_T], opaque: _T) -> int:
     """
     register a callback for a timer event
 

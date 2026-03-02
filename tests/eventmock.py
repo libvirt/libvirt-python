@@ -12,7 +12,7 @@ _remove_timeout_impl = None
 
 _registered = False
 
-def _add_handle(fd: int, event: int, cb: libvirt._EventCB, opaque: libvirt._T) -> int:
+def _add_handle(fd: int, event: int, cb: libvirt._EventCB[libvirt._T], opaque: libvirt._T) -> int:
     global _add_handle_impl
     assert _add_handle_impl != None
     return _add_handle_impl(fd, event, cb, opaque)
@@ -27,7 +27,7 @@ def _remove_handle(watch: int) -> int:
     assert _remove_handle_impl != None
     return _remove_handle_impl(watch)
 
-def _add_timeout(timeout: int, cb: libvirt._TimerCB, opaque: libvirt._T) -> int:
+def _add_timeout(timeout: int, cb: libvirt._TimerCB[libvirt._T], opaque: libvirt._T) -> int:
     global _add_timeout_impl
     assert _add_timeout_impl != None
     return _add_timeout_impl(timeout, cb, opaque)

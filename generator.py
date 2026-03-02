@@ -230,75 +230,96 @@ skipped_types = {
 #######################################################################
 
 py_types = {
-    'void': ('', '', '', ''),
-    'int': ('i', '', "int", "int"),
-    'long': ('l', '', "long", "long"),
-    'double': ('d', '', "double", "double"),
-    'unsigned int': ('I', '', "int", "int"),
-    'unsigned long': ('l', '', "long", "long"),
-    'long long': ('L', '', "longlong", "long long"),
-    'unsigned long long': ('L', '', "longlong", "long long"),
-    'unsigned char *': ('z', '', "charPtr", "char *"),
-    'char *': ('z', '', "charPtr", "char *"),
-    'const char *': ('z', '', "constcharPtr", "const char *"),
-    'size_t': ('n', '', "size_t", "size_t"),
+    'void': ('', '', '', '', 'None'),
+    'int': ('i', '', "int", "int", "int"),
+    'long': ('l', '', "long", "long", "int"),
+    'double': ('d', '', "double", "double", "float"),
+    'unsigned int': ('I', '', "int", "int", "int"),
+    'unsigned long': ('l', '', "long", "long", "int"),
+    'long long': ('L', '', "longlong", "long long", "int"),
+    'unsigned long long': ('L', '', "longlong", "long long", "int"),
+    'unsigned char *': ('z', '', "charPtr", "char *", "str"),
+    'char *': ('z', '', "charPtr", "char *", "str"),
+    'const char *': ('z', '', "constcharPtr", "const char *", "str"),
+    'size_t': ('n', '', "size_t", "size_t", "int"),
 
-    'virDomainPtr': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
-    'virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
-    'const virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr"),
+    'virDomainPtr': ('O', "virDomain", "virDomainPtr", "virDomainPtr", "virDomain"),
+    'virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr", "virDomain"),
+    'const virDomain *': ('O', "virDomain", "virDomainPtr", "virDomainPtr", "virDomain"),
 
-    'virNetworkPtr': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
-    'virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
-    'const virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr"),
+    'virNetworkPtr': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr", "virNetwork"),
+    'virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr", "virNetwork"),
+    'const virNetwork *': ('O', "virNetwork", "virNetworkPtr", "virNetworkPtr", "virNetwork"),
 
-    'virNetworkPortPtr': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
-    'virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
-    'const virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr"),
+    'virNetworkPortPtr': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr", "virNetworkPort"),
+    'virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr", "virNetworkPort"),
+    'const virNetworkPort *': ('O', "virNetworkPort", "virNetworkPortPtr", "virNetworkPortPtr", "virNetworkPort"),
 
-    'virInterfacePtr': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
-    'virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
-    'const virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr"),
+    'virInterfacePtr': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr", "virInterface"),
+    'virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr", "virInterface"),
+    'const virInterface *': ('O', "virInterface", "virInterfacePtr", "virInterfacePtr", "virInterface"),
 
-    'virStoragePoolPtr': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
-    'virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
-    'const virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr"),
+    'virStoragePoolPtr': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr", "virStoragePool"),
+    'virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr", "virStoragePool"),
+    'const virStoragePool *': ('O', "virStoragePool", "virStoragePoolPtr", "virStoragePoolPtr", "virStoragePool"),
 
-    'virStorageVolPtr': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
-    'virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
-    'const virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr"),
+    'virStorageVolPtr': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr", "virStorageVol"),
+    'virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr", "virStorageVol"),
+    'const virStorageVol *': ('O', "virStorageVol", "virStorageVolPtr", "virStorageVolPtr", "virStorageVol"),
 
-    'virConnectPtr': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
-    'virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
-    'const virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr"),
+    'virConnectPtr': ('O', "virConnect", "virConnectPtr", "virConnectPtr", "virConnect"),
+    'virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr", "virConnect"),
+    'const virConnect *': ('O', "virConnect", "virConnectPtr", "virConnectPtr", "virConnect"),
 
-    'virNodeDevicePtr': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
-    'virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
-    'const virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr"),
+    'virNodeDevicePtr': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr", "virNodeDevice"),
+    'virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr", "virNodeDevice"),
+    'const virNodeDevice *': ('O', "virNodeDevice", "virNodeDevicePtr", "virNodeDevicePtr", "virNodeDevice"),
 
-    'virSecretPtr': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
-    'virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
-    'const virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr"),
+    'virSecretPtr': ('O', "virSecret", "virSecretPtr", "virSecretPtr", "virSecret"),
+    'virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr", "virSecret"),
+    'const virSecret *': ('O', "virSecret", "virSecretPtr", "virSecretPtr", "virSecret"),
 
-    'virNWFilterPtr': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
-    'virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
-    'const virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr"),
+    'virNWFilterPtr': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr", "virNWFilter"),
+    'virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr", "virNWFilter"),
+    'const virNWFilter *': ('O', "virNWFilter", "virNWFilterPtr", "virNWFilterPtr", "virNWFilter"),
 
-    'virNWFilterBindingPtr': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
-    'virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
-    'const virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr"),
+    'virNWFilterBindingPtr': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr", "virNWFilterBinding"),
+    'virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr", "virNWFilterBinding"),
+    'const virNWFilterBinding *': ('O', "virNWFilterBinding", "virNWFilterBindingPtr", "virNWFilterBindingPtr", "virNWFilterBinding"),
 
-    'virStreamPtr': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
-    'virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
-    'const virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr"),
+    'virStreamPtr': ('O', "virStream", "virStreamPtr", "virStreamPtr", "virStream"),
+    'virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr", "virStream"),
+    'const virStream *': ('O', "virStream", "virStreamPtr", "virStreamPtr", "virStream"),
 
-    'virDomainCheckpointPtr': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
-    'virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
-    'const virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr"),
+    'virDomainCheckpointPtr': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr", "virDomainCheckpoint"),
+    'virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr", "virDomainCheckpoint"),
+    'const virDomainCheckpoint *': ('O', "virDomainCheckpoint", "virDomainCheckpointPtr", "virDomainCheckpointPtr", "virDomainCheckpoint"),
 
-    'virDomainSnapshotPtr': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-    'virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-    'const virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr"),
-}  # type: Dict[str, Tuple[str, str, str, str]]
+    'virDomainSnapshotPtr': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr", "virDomainSnapshot"),
+    'virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr", "virDomainSnapshot"),
+    'const virDomainSnapshot *': ('O', "virDomainSnapshot", "virDomainSnapshotPtr", "virDomainSnapshotPtr", "virDomainSnapshot"),
+}  # type: Dict[str, Tuple[str, str, str, str, str]]
+
+
+# These C types are used only in generated Python code, so don't need the
+# C-supporting elements from py_types.
+py_types_only = {
+    'bool': "bool",
+    'const unsigned char *': "str",
+    'const char **': "List[str]",
+    'unsigned int *': "List[int]",
+    'virErrorPtr': "_RawError",
+    'virEventAddHandleFunc': "_EventAddHandleFunc[_T]",
+    'virEventUpdateHandleFunc': "_EventUpdateHandleFunc",
+    'virEventRemoveHandleFunc': "_EventRemoveHandleFunc",
+    'virEventAddTimeoutFunc': "_EventAddTimeoutFunc[_T]",
+    'virEventUpdateTimeoutFunc': "_EventUpdateTimeoutFunc",
+    'virEventRemoveTimeoutFunc': "_EventRemoveTimeoutFunc",
+    'virBlkioParameterPtr': "_BlkioParameter",
+    'virMemoryParameterPtr': "_MemoryParameter",
+    'virSchedParameterPtr': "_SchedParameter",
+    'virTypedParameterPtr': "_TypedParameter",
+}  # type: Dict[str, str]
 
 
 #######################################################################
@@ -712,7 +733,7 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
             a_type = a_type[6:]
         c_args += "    %s %s;\n" % (a_type, a_name)
         if a_type in py_types:
-            (f, t, n, c) = py_types[a_type]
+            (f, t, n, c, p) = py_types[a_type]
             if f:
                 format += f
             if t:
@@ -750,7 +771,7 @@ def print_function_wrapper(package: str, name: str, output: IO[str], export: IO[
             c_call = "\n    %s(%s);\n" % (name, c_call)
         ret_convert = "    Py_INCREF(Py_None);\n    return Py_None;\n"
     elif r_type in py_types:
-        (f, t, n, c) = py_types[r_type]
+        (f, t, n, c, p) = py_types[r_type]
         c_return = "    %s c_retval;\n" % (r_type)
         if file == "python_accessor" and r_field:
             c_call = "\n    c_retval = %s->%s;\n" % (args[0][0], r_field)
@@ -858,7 +879,7 @@ def load_apis(module: str, api_xml: str):
         print("Found %d functions in %s" % ((n), api_xml))
 
     override_api_xml = "%s-override-api.xml" % module
-    py_types['pythonObject'] = ('O', "pythonObject", "pythonObject", "pythonObject")
+    py_types['pythonObject'] = ('O', "pythonObject", "pythonObject", "pythonObject", "object")
 
     try:
         onlyOverrides = True
@@ -1366,6 +1387,9 @@ def emit_py_code(module: str) -> None:
     if extra:
         extra.close()
 
+    types_map = {name: types[-1] for name, types in py_types.items()}
+    types_map.update(py_types_only)
+
     if "None" in function_classes:
         flist = function_classes["None"]
         oldfile = ""
@@ -1378,12 +1402,18 @@ def emit_py_code(module: str) -> None:
                 if n != 0:
                     classes.write(", ")
                 classes.write("%s" % a_name)
+                if a_type in types_map:
+                    classes.write(": \"%s\"" % types_map[a_type])
                 if a_name == "flags" or is_optional_arg(a_info):
                     if is_integral_type(a_type):
                         classes.write("=0")
                     else:
                         classes.write("=None")
-            classes.write("):\n")
+            r_type, r_info, r_field = ret
+            classes.write(")")
+            if r_type in types_map:
+                classes.write(" -> \"%s\"" % types_map[r_type])
+            classes.write(":\n")
             writeDoc(module, name, args, '    ', classes)
 
             for a_name, a_type, a_info in args:
@@ -1395,7 +1425,6 @@ def emit_py_code(module: str) -> None:
                                   "        %s__o = %s%s\n" %
                                   (a_name, a_name, classes_type[a_type][0]))
 
-            r_type, r_info, r_field = ret
             if r_type != "void":
                 classes.write("    ret = ")
             else:
@@ -1477,18 +1506,18 @@ def emit_py_code(module: str) -> None:
             if classname in ["virDomain", "virNetwork", "virInterface", "virStoragePool",
                              "virStorageVol", "virNodeDevice", "virSecret", "virStream",
                              "virNWFilter", "virNWFilterBinding"]:
-                classes.write("    def __init__(self, conn, _obj=None):\n")
+                classes.write("    def __init__(self, conn: \"virConnect\", _obj: object=None):\n")
                 classes.write("        self._conn = conn\n")
             elif classname in ["virDomainCheckpoint", "virDomainSnapshot"]:
-                classes.write("    def __init__(self, dom, _obj=None):\n")
+                classes.write("    def __init__(self, dom: \"virDomain\", _obj: object=None):\n")
                 classes.write("        self._dom = dom\n")
                 classes.write("        self._conn = dom.connect()\n")
             elif classname in ["virNetworkPort"]:
-                classes.write("    def __init__(self, net, _obj=None) -> None:\n")
+                classes.write("    def __init__(self, net: \"virNetwork\", _obj: object=None) -> None:\n")
                 classes.write("        self._net = net\n")
                 classes.write("        self._conn = net.connect()\n")
             else:
-                classes.write("    def __init__(self, _obj=None):\n")
+                classes.write("    def __init__(self, _obj: object=None):\n")
 
             classes.write("        if type(_obj).__name__ not in [\"PyCapsule\", \"PyCObject\"]:\n")
             classes.write("            raise Exception(\"Expected a wrapped C Object but got %s\" % type(_obj))\n")
@@ -1515,7 +1544,7 @@ def emit_py_code(module: str) -> None:
                 classes.write("    def network(self):\n")
                 classes.write("        return self._net\n\n")
 
-            classes.write("    def c_pointer(self):\n")
+            classes.write("    def c_pointer(self) -> object:\n")
             classes.write("        \"\"\"Get C pointer to underlying object\"\"\"\n")
             classes.write("        return %s.%s_pointer(self._o)\n\n" %
                           (pymod, classname))
@@ -1542,12 +1571,18 @@ def emit_py_code(module: str) -> None:
                 for n, (a_name, a_type, a_info) in enumerate(args):
                     if n != index:
                         classes.write(", %s" % a_name)
+                        if a_type in types_map:
+                            classes.write(": \"%s\"" % types_map[a_type])
                     if a_name == "flags" or is_optional_arg(a_info):
                         if is_integral_type(a_type):
                             classes.write("=0")
                         else:
                             classes.write("=None")
-                classes.write("):\n")
+                r_type, r_info, r_field = ret
+                classes.write(")")
+                if r_type in types_map:
+                    classes.write(" -> \"%s\"" % types_map[r_type])
+                classes.write(":\n")
                 writeDoc(module, name, args, '        ', classes)
                 for n, (a_name, a_type, a_info) in enumerate(args):
                     if a_type in classes_type:
@@ -1558,7 +1593,6 @@ def emit_py_code(module: str) -> None:
                             classes.write("        else:\n"
                                           "            %s__o = %s%s\n" %
                                           (a_name, a_name, classes_type[a_type][0]))
-                r_type, r_info, r_field = ret
                 if r_type != "void":
                     classes.write("        ret = ")
                 else:
@@ -1701,10 +1735,15 @@ def emit_py_code(module: str) -> None:
             if n != 0:
                 classes.write(", ")
             classes.write("%s" % a_name)
-        classes.write("):\n")
+            if a_type in types_map:
+                classes.write(": \"%s\"" % types_map[a_type])
+        r_type, r_info, r_field = ret
+        classes.write(")")
+        if r_type in types_map:
+            classes.write(" -> \"%s\"" % types_map[r_type])
+        classes.write(":\n")
         writeDoc(module, name, args, '    ', classes)
 
-        r_type, r_info, r_field = ret
         if r_type != "void":
             classes.write("    ret = ")
         else:
