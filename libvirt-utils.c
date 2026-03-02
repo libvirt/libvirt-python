@@ -19,9 +19,9 @@
  *
  */
 
-#include <string.h>
-
 #include <Python.h>
+
+#include <string.h>
 
 /* Ugly python defines that, which is also defined in errno.h */
 #undef _POSIC_C_SOURCE

@@ -19,9 +19,9 @@
 
 #define PY_SSIZE_T_CLEAN
 
+#include <Python.h>
 #include <stdio.h>
 #include <string.h>
-#include <Python.h>
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
 #include <stddef.h>
