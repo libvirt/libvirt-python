@@ -64,6 +64,17 @@ x86_64-debian-12:
     TARGET_BASE_IMAGE: docker.io/library/debian:12-slim
 
 
+x86_64-debian-13:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-debian-13-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: debian-13
+    TARGET_BASE_IMAGE: docker.io/library/debian:13-slim
+
+
 x86_64-debian-sid:
   extends: .native_build_job
   needs:
@@ -75,21 +86,6 @@ x86_64-debian-sid:
     TARGET_BASE_IMAGE: docker.io/library/debian:sid-slim
 
 
-x86_64-fedora-42:
-  extends: .native_build_job
-  needs:
-    - job: x86_64-fedora-42-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: fedora-42
-    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:42
-  artifacts:
-    expire_in: 1 hour
-    paths:
-      - libvirt-python-rpms
-
-
 x86_64-fedora-43:
   extends: .native_build_job
   needs:
@@ -99,6 +95,21 @@ x86_64-fedora-43:
   variables:
     NAME: fedora-43
     TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:43
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - libvirt-python-rpms
+
+
+x86_64-fedora-44:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-fedora-44-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: fedora-44
+    TARGET_BASE_IMAGE: registry.fedoraproject.org/fedora:44
   artifacts:
     expire_in: 1 hour
     paths:
@@ -140,17 +151,6 @@ x86_64-opensuse-tumbleweed:
     TARGET_BASE_IMAGE: registry.opensuse.org/opensuse/tumbleweed:latest
 
 
-x86_64-ubuntu-2204:
-  extends: .native_build_job
-  needs:
-    - job: x86_64-ubuntu-2204-container
-      optional: true
-  allow_failure: false
-  variables:
-    NAME: ubuntu-2204
-    TARGET_BASE_IMAGE: docker.io/library/ubuntu:22.04
-
-
 x86_64-ubuntu-2404:
   extends: .native_build_job
   needs:
@@ -160,3 +160,14 @@ x86_64-ubuntu-2404:
   variables:
     NAME: ubuntu-2404
     TARGET_BASE_IMAGE: docker.io/library/ubuntu:24.04
+
+
+x86_64-ubuntu-2604:
+  extends: .native_build_job
+  needs:
+    - job: x86_64-ubuntu-2604-container
+      optional: true
+  allow_failure: false
+  variables:
+    NAME: ubuntu-2604
+    TARGET_BASE_IMAGE: docker.io/library/ubuntu:26.04
